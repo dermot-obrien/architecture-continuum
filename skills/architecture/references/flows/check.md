@@ -70,6 +70,6 @@ The standards are the continuum's, and this skill's copies are in `references/`:
 
 ## Related flows
 
-- The `/architecture` create flows author each kind the check reads, and `/architecture rung` reads the same pages to derive each capability's rung.
+- The `/architecture` create flows author each kind the check reads, and `/architecture stage` reads the same pages to derive each capability's stage.
 - The `pattern` and `use-case` skills in architecture-pattern author the pattern documents and use cases, and `model stamp` in diagram-model writes the render records the `MOD` checks read.
 - The `cross-reference` skill in architecture-pattern reads the same two registers of identifiers to link citations; `REL-003` here checks the namespaces it would use.

@@ -94,7 +94,7 @@ The relations a kind carries depends on its position in the metamodel. The full 
 
 Three types carry meaning for the [definition ladder](./capabilities/standard-definition-ladder.md), which reads them from a capability or from the pattern that realises it:
 
-| Type | Points at | Ladder rung |
+| Type | Points at | Definition stage |
 |---|---|---|
 | `cost-model` | The model of the running cost | R4 Buildable |
 | `evidence` | An experiment, build or evaluation, and its results against the capability's criteria | R5 Proven |
@@ -357,23 +357,23 @@ gaps: ["Continuous Access Evaluation not yet implemented"]
 demand_assumption: "Operators need self-service credential rotation"   # only where no outcome is linked yet
 open_questions: none                 # only where no consideration affects the capability or its ABBs
 flows:
-  - { id: provision, name: "Provision an identity", description: "Joiner to first sign-in", rung: R3 }
-  - { id: rotate-credentials, name: "Rotate credentials", rung: R2 }
+  - { id: provision, name: "Provision an identity", description: "Joiner to first sign-in", stage: R3 }
+  - { id: rotate-credentials, name: "Rotate credentials", stage: R2 }
 ```
 
 Blocks attach at the lowest level a capability is defined to (the continuum's decision D4): an L1 or L2 capability with no children may carry `realised_by_abbs`, and nothing restricts it to L3.
 
 > **Realisation completeness is a gap, not a validation error.** `realised_by_abbs` is *recommended*, never required — an L3 capability with no realising ABB is a legitimate architecture **gap** surfaced by gap analysis (the foundation catalogue ships such placeholders deliberately, awaiting their ABBs). `provided_by_platform` is required only for L3 capabilities; L1/L2 capabilities are cross-platform groupings and may omit it.
 
-**Definition ladder fields.** These are optional and additive: a capability without them still validates. They are read by the [Definition Ladder Standard](./capabilities/standard-definition-ladder.md) and derived against by `/architecture rung`.
+**Definition ladder fields.** These are optional and additive: a capability without them still validates. They are read by the [Definition Ladder Standard](./capabilities/standard-definition-ladder.md) and derived against by `/architecture stage`.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `flows[]` | array of objects | optional | Named paths through the capability that someone would recognise as a job being done. Declare flows when they move at different speeds; the capability sits on the rung of its lowest flow. |
+| `flows[]` | array of objects | optional | Named paths through the capability that someone would recognise as a job being done. Declare flows when they move at different speeds; the capability sits at the stage of its lowest flow. |
 | `flows[].id` | kebab-case string | * (per entry) | Unique within the capability. Patterns name it in their own `flows` list to scope themselves to it. |
 | `flows[].name` | string | * (per entry) | Human-readable name. |
 | `flows[].description` | string | optional | What the job is, from start to end. |
-| `flows[].rung` | `R0` to `R6` | optional | The recorded rung. A derived rung wins where one is available, and a recorded rung above it is reported as a claim without evidence. |
+| `flows[].stage` | `R0` to `R6` | optional | The recorded definition stage. A derived stage wins where one is available, and a recorded stage above it is reported as a claim without evidence. `flows[].rung`, the former key, is still read; record one of the two, not both. |
 | `open_questions` | `none` | optional | A marker stating that no open question with more than one credible answer remains, so no consideration is expected. Omit it when considerations exist. |
 | `demand_assumption` | string | optional | The demand the capability answers, recorded as an explicit assumption until an outcome is linked in `required_by_outcomes`. |
 
@@ -684,7 +684,7 @@ pattern_type: reference-architecture      # required; agrees with the series
 pattern_scope: platform                   # required
 implements: [AP-001]                      # required on a reference architecture, at least one
 composes: [SBB-004, SBB-007]              # the catalogued blocks among its boxes: SBBs here, ABBs in an architecture pattern
-realises: [CAP-002, CAP-003]              # optional; read by /architecture rung
+realises: [CAP-002, CAP-003]              # optional; read by /architecture stage
 serves: [UC-001, UC-002]                  # optional; the use cases its scenarios walk
 model:
   diagram: components.drawio              # the diagram the model skill keeps in step

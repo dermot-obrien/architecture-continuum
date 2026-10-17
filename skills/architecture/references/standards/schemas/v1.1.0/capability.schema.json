@@ -45,17 +45,17 @@
         "demand_assumption": {
           "type": "string",
           "minLength": 1,
-          "description": "Optional. The demand this capability answers, recorded as an explicit assumption where no outcome is linked yet. Satisfies the demand part of definition-ladder rung R1 in place of required_by_outcomes."
+          "description": "Optional. The demand this capability answers, recorded as an explicit assumption where no outcome is linked yet. Satisfies the demand part of definition stage R1 in place of required_by_outcomes."
         },
 
         "open_questions": {
           "const": "none",
-          "description": "Optional marker. States that the capability has no open question with more than one credible answer, so no consideration is expected to affect it. Satisfies the consideration part of definition-ladder rung R2. Omit it when considerations exist."
+          "description": "Optional marker. States that the capability has no open question with more than one credible answer, so no consideration is expected to affect it. Satisfies the consideration part of definition stage R2. Omit it when considerations exist."
         },
 
         "flows": {
           "type": "array",
-          "description": "Optional. Named paths through the capability that someone would recognise as a job being done. Each carries its rung on the definition ladder (standards/capabilities/standard-definition-ladder.md). The capability sits on the rung of its lowest flow. A recorded rung is a claim; a derived rung (/architecture rung) wins where available.",
+          "description": "Optional. Named paths through the capability that someone would recognise as a job being done. Each carries its definition stage on the definition ladder (standards/capabilities/standard-definition-ladder.md). The capability sits at the stage of its lowest flow. A recorded stage is a claim; a derived stage (/architecture stage) wins where available.",
           "items": {
             "type": "object",
             "required": ["id", "name"],
@@ -63,8 +63,10 @@
               "id":          { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$", "description": "Kebab-case identifier, unique within the capability." },
               "name":        { "type": "string", "minLength": 1 },
               "description": { "type": "string" },
-              "rung":        { "type": "string", "pattern": "^R[0-6]$", "description": "Recorded rung on the definition ladder, R0 to R6." }
+              "stage":       { "type": "string", "pattern": "^R[0-6]$", "description": "Recorded definition stage on the ladder, R0 to R6." },
+              "rung":        { "type": "string", "pattern": "^R[0-6]$", "description": "The former name of stage, still read. Record one of the two, not both." }
             },
+            "not": { "required": ["stage", "rung"] },
             "additionalProperties": false
           }
         }

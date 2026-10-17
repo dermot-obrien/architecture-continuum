@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Dermot O'Brien
 # SPDX-License-Identifier: Apache-2.0
-"""Entry point that runs from a copied directory, with nothing installed.
-
-A skill is copied into a tool's skills folder, not pip-installed, so the package has to be
-importable from where it sits.
-"""
+"""The former name of bin/stage.py, kept so existing commands and scripts still run."""
 import os
 import sys
 

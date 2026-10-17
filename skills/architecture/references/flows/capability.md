@@ -67,7 +67,7 @@ Outcome and Use Case in the Purpose section. This is mandatory. The identifier m
 Where no Outcome exists yet and the user declines to create one, record the demand as
 `demand_assumption` rather than leaving it unstated. If the capability has distinct jobs that
 will be defined at different speeds, declare them as `flows[]` (`id`, `name`, `description`).
-Leave `rung` unset unless the user states one; `/architecture rung` derives it.
+Leave `stage` unset unless the user states one; `/architecture stage` derives it.
 
 ### Step 2: Update capability-model.md
 

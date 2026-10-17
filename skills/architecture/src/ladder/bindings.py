@@ -4,13 +4,13 @@
 
 The skill carries no layout of its own. The repository answers the contract in
 `inputs.toml` in `[suite.architecture]` of its `.agents/skill-bindings.toml`, and every
-relative path resolves against that file's directory, never the working directory. The rung
-reads only the options inputs.toml gives the rung flow; a key the table holds for another
+relative path resolves against that file's directory, never the working directory. The stage
+flow reads only the options inputs.toml gives it; a key the table holds for another
 flow is left to that flow. For one release a key missing there is read from the old
 `[suite.aaa-rung]`, with a warning.
 Every directory is optional: one left unset means the repository does not keep that kind,
 and nothing is read for it. A path that is set but does not exist stops the run: a derived
-rung computed over the wrong directory would look exactly like a real one.
+stage computed over the wrong directory would look exactly like a real one.
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
 
 SUITE = "architecture"
 LEGACY = "aaa-rung"
-FLOW = "rung"
+FLOW = "stage"
 CONFIG_NAMES = (os.path.join(".agents", "skill-bindings.toml"), "skill-bindings.toml")
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -79,7 +79,7 @@ class Bindings:
 
 
 def load(path: str | None = None, start: str | None = None) -> Bindings:
-    """Resolve the rung's bindings against its contract. Raises BindingError naming each problem."""
+    """Resolve the stage flow's bindings against its contract. Raises BindingError naming each problem."""
     if tomllib is None:
         raise BindingError("reading bindings needs Python 3.11 or newer (tomllib)")
     path = path or find(start or os.getcwd())

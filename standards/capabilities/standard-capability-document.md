@@ -201,19 +201,19 @@ Describe the key steps needed to move from the current maturity level to the tar
 
 This section is optional for L1 and L2 capabilities. It is REQUIRED for L3 capabilities.
 
-#### 3.4 Definition Rung
+#### 3.4 Definition Stage
 
-**Heading:** `### 3.4  Definition Rung`
+**Heading:** `### 3.4  Definition Stage`
 
-State how far the capability has been defined, as a rung on the [definition ladder](./standard-definition-ladder.md), per flow where the capability has more than one. The table mirrors `flows[]` in the front matter:
+State how far the capability has been defined, as a stage on the [definition ladder](./standard-definition-ladder.md), per flow where the capability has more than one. The table mirrors `flows[]` in the front matter:
 
-| Flow | Name | Rung | Blocking the next rung |
+| Flow | Name | Stage | Blocking the next stage |
 |------|------|------|------------------------|
 | `take-order` | Take an order | `R2` | CN-004 has no accepted decision record |
 
-A flow is a named path through the capability that someone would recognise as a job being done. The capability as a whole sits on the rung of its lowest flow. Where `/architecture rung` is available, copy the derived rung and blocker rather than asserting them. A capability with no declared flows states one rung for the whole capability.
+A flow is a named path through the capability that someone would recognise as a job being done. The capability as a whole sits at the stage of its lowest flow. Where `/architecture stage` is available, copy the derived stage and blocker rather than asserting them. A capability with no declared flows states one stage for the whole capability.
 
-This section is optional until the capability is being planned as rung movements, and RECOMMENDED from then on.
+This section is optional until the capability is being planned as stage movements, and RECOMMENDED from then on.
 
 
 ### Section 4 — ABB Realisation
@@ -295,19 +295,19 @@ A table tracking all changes:
 Entries are listed in reverse chronological order (newest first).
 
 
-## Definition Rung and Maturity
+## Definition Stage and Maturity
 
 A capability carries two measures that are easy to confuse. They are different axes and they are never combined into one score.
 
-| | Definition rung | Maturity |
+| | Definition stage | Maturity |
 |---|---|---|
 | Measures | How completely the capability has been defined and made ready | How well the capability performs once it operates |
 | Scale | R0 Unrecognised to R6 In service | 0 None to 5 Optimising |
 | Evidence | The artefacts that exist: capability, ABBs, considerations, decision records, SBBs, patterns, and linked implementation evidence | An assessment of the running capability by an assessor |
-| Recorded in | `flows[].rung`, and derivable by `/architecture rung` | `maturity.current` and `maturity.target` |
+| Recorded in | `flows[].stage`, and derivable by `/architecture stage` | `maturity.current` and `maturity.target` |
 | Moves | While the capability is defined and built | Once the capability is in service |
 
-The two meet at R6. Maturity only means something for a capability that is in service, and before that the ladder is the measure that moves. Where something already operates for a capability below R6 (built ahead of its definition), its maturity can be assessed, but that does not raise the rung: the running system is latent evidence until the rungs beneath it exist.
+The two meet at R6. Maturity only means something for a capability that is in service, and before that the ladder is the measure that moves. Where something already operates for a capability below R6 (built ahead of its definition), its maturity can be assessed, but that does not raise the stage: the running system is latent evidence until the stages beneath it exist.
 
 Neither is `lifecycle_state`, which says which version of the capability document is meant (baseline, in-flight, target or retired). See the [Definition Ladder Standard](./standard-definition-ladder.md#4-what-the-ladder-is-not).
 
@@ -392,14 +392,14 @@ Before finalising a capability document, verify:
 9. [ ] **Taxonomy Updated**: Does the capability have a row in the registry table of `capability-model.md`, and do the derived CSVs match it?
 10. [ ] **British English**: Did you use British English spelling?
 11. [ ] **Sub-Capabilities (L1/L2)**: Does Section 5 list all child capabilities?
-12. [ ] **Rung Not Maturity**: If a definition rung is stated, is it kept separate from the maturity score, and does the capability sit at its lowest flow's rung?
+12. [ ] **Stage Not Maturity**: If a definition stage is stated, is it kept separate from the maturity score, and does the capability sit at its lowest flow's stage?
 
 
 ## Quick Reference Sections
 
 1. **Purpose**: Why this capability is needed (business-driven).
 2. **Capability Definition**: Organisation + People + Processes + Technology.
-3. **Maturity**: Current assessment, target, and roadmap, plus the definition rung per flow.
+3. **Maturity**: Current assessment, target, and roadmap, plus the definition stage per flow.
 4. **ABB Realisation**: Mapping table, relationship types, coverage, and gaps.
 5. **Sub-Capabilities**: Children (L1/L2 only).
 6. **Revision History**: Semantic versioning log.

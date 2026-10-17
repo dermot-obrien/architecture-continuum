@@ -19,7 +19,11 @@ requires_any = true
 # The tables the ten skills this one replaced were answered in. A key missing from
 # [suite.architecture] is read from them for one release, with a warning.
 legacy_suites = ["aaa-create-platform", "aaa-create-strategy", "aaa-create-capability", "aaa-create-context", "aaa-create-abb", "aaa-create-sbb", "aaa-create-service", "aaa-create-runtime-agent", "aaa-rung", "aaa-continuum"]
-flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "rung", "check"]
+flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "stage", "check"]
+
+# A flow's former name, which still selects it.
+[inputs.flow_aliases]
+rung = "stage"
 
 [inputs.options.root]
 type = "dir"
@@ -62,9 +66,9 @@ description = """Where use case folders are created, one per UC-NNN."""
 
 [inputs.options.capabilityDir]
 type = "dir"
-flows = ["capability", "context", "abb", "rung"]
+flows = ["capability", "context", "abb", "stage"]
 required_by = ["capability"]
-description = """Where capability folders are created, one per CAP-NNN (or capabilityIdPattern), with the capability model; read by the context and ABB flows for the parent link, and by the rung."""
+description = """Where capability folders are created, one per CAP-NNN (or capabilityIdPattern), with the capability model; read by the context and ABB flows for the parent link, and by the stage flow."""
 
 [inputs.options.contextDir]
 type = "dir"
@@ -74,15 +78,15 @@ description = """Where bounded context folders are created, one per BC-NNN; read
 
 [inputs.options.abbDir]
 type = "dir"
-flows = ["abb", "sbb", "rung"]
+flows = ["abb", "sbb", "stage"]
 required_by = ["abb"]
-description = """Where ABB folders are created, one per ABB-NNN; read by the SBB flow for the ABB it realises, and by the rung."""
+description = """Where ABB folders are created, one per ABB-NNN; read by the SBB flow for the ABB it realises, and by the stage flow."""
 
 [inputs.options.sbbDir]
 type = "dir"
-flows = ["sbb", "service", "rung"]
+flows = ["sbb", "service", "stage"]
 required_by = ["sbb"]
-description = """Where SBB folders are created, one per SBB-NNN; read by the service flow for the SBB it implements, and by the rung."""
+description = """Where SBB folders are created, one per SBB-NNN; read by the service flow for the SBB it implements, and by the stage flow."""
 
 [inputs.options.serviceDir]
 type = "dir"
@@ -92,27 +96,27 @@ description = """Where service documents are created, one per deployable unit.""
 
 [inputs.options.decisionDir]
 type = "dir"
-flows = ["rung"]
-description = """Decision records (DR-NNN or ADR-NNN), searched recursively by the rung."""
+flows = ["stage"]
+description = """Decision records (DR-NNN or ADR-NNN), searched recursively by the stage flow."""
 
 [inputs.options.considerationDir]
 type = "dir"
-flows = ["rung"]
-description = """Considerations (CN-NNN), searched recursively by the rung."""
+flows = ["stage"]
+description = """Considerations (CN-NNN), searched recursively by the stage flow."""
 
 [inputs.options.patternDir]
 type = "dir"
-flows = ["rung"]
-description = """Architecture patterns and reference architectures, with realises: [CAP-NNN] (or ids matching capabilityIdPattern) in their front matter, searched recursively by the rung."""
+flows = ["stage"]
+description = """Architecture patterns and reference architectures, with realises: [CAP-NNN] (or ids matching capabilityIdPattern) in their front matter, searched recursively by the stage flow."""
 
 [inputs.options.localPattern]
 type = "str"
-flows = ["rung"]
+flows = ["stage"]
 description = """Regex for a model-local box identifier leading a Building Blocks cell, such as 07 in "07 Gateway". Falls back to [model] local_pattern in the same file, then to [0-9]{1,3}."""
 
 [inputs.options.capabilityIdPattern]
 type = "str"
-flows = ["capability", "context", "abb", "rung"]
+flows = ["capability", "context", "abb", "stage"]
 description = '''Regex a capability identifier must match in full, for a repository that numbers its capabilities other than CAP-NNN, such as '^CP-\d{3}$'. A capability page without an id in its front matter takes it from its folder name (CP-102-agent-orchestration/index.md), then the first word of its title or H1. Default: '^CAP-\d{3}$'.'''
 
 [inputs.options.agentProfileSchema]

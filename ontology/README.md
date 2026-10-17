@@ -18,7 +18,7 @@ It holds:
   work layer Deliverable that names the `artefact_kind` it produces and the `artefact_ids`
   it produced or revised. This is the seam in [aaw-work-seam.md](../standards/aaw-work-seam.md):
   a decision deliverable becomes a Decision Record, and the kind of artefact a deliverable
-  produces decides the rung it evidences.
+  produces decides the stage it evidences.
 - The architecture concepts of the base ontology, `standards/ontology/ontology-schema.json`,
   each by `$ref`: Platform, Capability, Component, Interface, Integration, Change, Driver,
   Theme, Transition, Opportunity, UseCase, Decision, Pattern, Standard, QualityAttribute, Risk, Control,

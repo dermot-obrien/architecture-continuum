@@ -84,8 +84,8 @@ jobs:
           done
           exit $status
 
-  rung:
-    name: Rung tests
+  stage:
+    name: Stage tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -99,7 +99,7 @@ jobs:
       - name: Unit tests
         run: |
           python -m unittest discover -s skills/architecture/tests
-          RUNG_PURE_YAML=1 python -m unittest discover -s skills/architecture/tests
+          STAGE_PURE_YAML=1 python -m unittest discover -s skills/architecture/tests
 
   install:
     name: Install into a scratch workspace
@@ -154,7 +154,9 @@ jobs:
           # Each skill resolves its own bindings, with no other skill installed.
           node .agents/skills/architecture/bin/check.mjs --json --flow abb | node -e 'const r = JSON.parse(require("fs").readFileSync(0, "utf8")); if (r.status !== "ok" || !r.bindings.abbDir.endsWith("/arch/abbs")) { console.error(r); process.exit(1); }'
           # Every flow's check passes with the one table bound.
-          for f in platform strategy capability context abb sbb service runtime-agent rung check; do node .agents/skills/architecture/bin/check.mjs --flow "$f" > /dev/null || { echo "::error::the $f flow's check fails"; exit 1; }; done
+          for f in platform strategy capability context abb sbb service runtime-agent stage check; do node .agents/skills/architecture/bin/check.mjs --flow "$f" > /dev/null || { echo "::error::the $f flow's check fails"; exit 1; }; done
+          # rung, the stage flow's former name, still selects it.
+          node .agents/skills/architecture/bin/check.mjs --json --flow rung | node -e 'const r = JSON.parse(require("fs").readFileSync(0, "utf8")); if (r.status !== "ok" || r.flow !== "stage") { console.error(r); process.exit(1); }'
 
   continuum:
     name: Front matter schemas and the continuum check
