@@ -5,7 +5,7 @@ Every command this repository ships, with its options as its `--help` prints the
 On macOS and Linux type `python3` where this page says `python`.
 
 - [Installing](#installing): `skills.mjs`, the seeder
-- [Skill tools](#skill-tools): `rung.py`, the post-install checks, `check.mjs --json`
+- [Skill tools](#skill-tools): `stage.py`, the post-install checks, `check.mjs --json`
 - [Validation](#validation): skills, bundle, front matter
 - [Ontology tools](#ontology-tools): validate, consolidate, namespace-divergent
 - [Maintainer scripts](#maintainer-scripts)
@@ -50,28 +50,28 @@ Ends with a `seed complete` line giving the number of capabilities, ABBs and SBB
 
 ## Skill tools
 
-### rung.py
+### stage.py
 
 ```text
-python .agents/skills/architecture/bin/rung.py [CAP-NNN ...] [--bindings BINDINGS] [--json] [--verbose] [--check] [--doctor] [--version]
+python .agents/skills/architecture/bin/stage.py [CAP-NNN ...] [--bindings BINDINGS] [--json] [--verbose] [--check] [--doctor] [--version]
 ```
 
-Derives each capability's rung on the definition ladder, per flow, and names what blocks the
-next rung. Read-only.
+Derives each capability's definition stage on the ladder, per flow, and names what blocks the
+next stage. Read-only. `bin/rung.py`, its former name, runs the same command, and `/architecture rung` still selects the flow.
 
 | Option | Effect |
 |---|---|
 | `CAP-NNN ...` | Only these capabilities. Default: every one |
 | `--bindings BINDINGS` | The bindings file to use. Default: the nearest `.agents/skill-bindings.toml` above the working directory |
-| `--json` | Machine-readable output: `result`, `bindings`, `ladder`, `capabilities` (each with `rung`, `flows`, `blockers`, `latent`), `unbound`, `warnings` |
+| `--json` | Machine-readable output: `result`, `bindings`, `ladder`, `capabilities` (each with `stage`, `flows`, `blockers`, `latent`), `unbound`, `warnings`. Each `stage` key is written again as `rung`, its former name, for one release |
 | `--verbose`, `-v` | Every blocker, not only the first |
-| `--check` | Exit 1 when a rung recorded in `flows[].rung` is above the derived one |
+| `--check` | Exit 1 when a stage recorded in `flows[].stage` is above the derived one |
 | `--doctor` | Resolve the bindings, print them, and stop |
-| `--version` | Print `/architecture rung <version>` |
+| `--version` | Print `architecture stage <version>` |
 | `--help`, `-h` | Print usage |
 
-In the table, `Recorded` shows a flow's recorded rung, with `claimed` when it is above the
-derived rung and `stale` when below. Lines after the table start with `unbound` (a kind with
+In the table, `Recorded` shows a flow's recorded stage, with `claimed` when it is above the
+derived stage and `stale` when below. Lines after the table start with `unbound` (a kind with
 no folder bound), `note` (latent evidence, or a capability named elsewhere with no document) or
 `warn` (a document that could not be read).
 
@@ -146,7 +146,7 @@ Step 0 of every create flow resolves its bindings with the skill's check:
 node .agents/skills/architecture/bin/check.mjs --json --flow <flow>
 ```
 
-Run it from the workspace root. It prints one JSON object: `skill`, `flow`, `status` (`ok` or `error`), `bindingsFile`, `bindings` with each key of the skill's `inputs.toml` as an absolute path (`null` when not declared), and `problems` and `warnings`. It exits non-zero when `status` is `error`, and the flow stops. No other skill is needed. The rung resolves its own bindings with `rung.py --doctor`, and the check flow with `continuum.mjs doctor`.
+Run it from the workspace root. It prints one JSON object: `skill`, `flow`, `status` (`ok` or `error`), `bindingsFile`, `bindings` with each key of the skill's `inputs.toml` as an absolute path (`null` when not declared), and `problems` and `warnings`. It exits non-zero when `status` is `error`, and the flow stops. No other skill is needed. The stage flow resolves its own bindings with `stage.py --doctor`, and the check flow with `continuum.mjs doctor`.
 
 ### validate-skills.mjs
 
@@ -164,7 +164,7 @@ The specification's reference validator does the same job and CI runs both:
 
 ```bash
 pip install "git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref"
-skills-ref validate skills/architecture rung
+skills-ref validate skills/architecture
 ```
 
 ### validate-bundle.mjs
@@ -218,7 +218,7 @@ For working on this repository. Run from its root.
 
 | Command | Does |
 |---|---|
-| `python -m unittest discover -s skills/architecture/tests` | The rung's tests. CI also runs them with `RUNG_PURE_YAML=1` |
+| `python -m unittest discover -s skills/architecture/tests` | The stage flow's tests. CI also runs them with `STAGE_PURE_YAML=1` |
 | `node scripts/test-architecture-ontology.mjs` | Tests `ontology/architecture.schema.json` against the base ontology's worked example and cases it must refuse |
 | `node scripts/migrate-frontmatter.mjs [--root <dir>] [--date YYYY-MM-DD] [--dry-run]` | Brings front matter up to v1.1.0 from each document's body. Idempotent. Default root `foundation` |
 | `node scripts/gen-capability-csvs.mjs` | Regenerates the foundation's `capability-hierarchy.csv` and `capability-abb-mapping.csv` from `capability-model.md` |

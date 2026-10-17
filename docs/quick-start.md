@@ -1,6 +1,6 @@
 # Quick start
 
-From an empty folder to a derived capability rung in about ten minutes. You will install the skills into a scratch workspace, seed a starter capability model, bind the skills to folders, and have `/architecture rung` tell you how far each capability has been defined and what blocks the next step. Then you hand the workspace to your agent.
+From an empty folder to a derived capability stage in about ten minutes. You will install the skills into a scratch workspace, seed a starter capability model, bind the skills to folders, and have `/architecture stage` tell you how far each capability has been defined and what blocks the next step. Then you hand the workspace to your agent.
 
 Every command below works as written in PowerShell and in bash. Where the two shells differ, both forms are given. On macOS and Linux use the bash form, and type `python3` where it says `python`.
 
@@ -61,7 +61,7 @@ You now have the two skills in `.agents/skills/` and a lock file, `.agents/skill
 
 ## 4. Seed a starter model
 
-The foundation catalogue is optional content that no skill needs, but it gives `/architecture rung` something to report on. Copy its `core` profile into the workspace:
+The foundation catalogue is optional content that no skill needs, but it gives `/architecture stage` something to report on. Copy its `core` profile into the workspace:
 
 ```bash
 node ../ai-assisted-architecture/scripts/seed-foundation.mjs --workspace .
@@ -148,14 +148,14 @@ node .agents/skills/architecture/bin/check.mjs --flow abb --json
 
 It prints one JSON object: `status` (`ok`), the `bindingsFile`, each binding (`abbDir`, `contextDir`, `capabilityDir`) as an absolute path, and any `problems` and `warnings`.
 
-## 7. Derive the rungs of the starter model
+## 7. Derive the stages of the starter model
 
 ```bash
-python .agents/skills/architecture/bin/rung.py
+python .agents/skills/architecture/bin/stage.py
 ```
 
 ```text
-Capability  Flow  Rung             Recorded  Blocking the next rung
+Capability  Flow  Stage            Recorded  Blocking the next stage
 ----------  ----  ---------------  --------  ----------------------
 CAP-001     -     R0 Unrecognised            CAP-001 names no demand: add required_by_outcomes, or record demand_assumption
 CAP-002     -     R0 Unrecognised            CAP-002 names no demand: add required_by_outcomes, or record demand_assumption
@@ -166,10 +166,10 @@ CAP-006     -     R1 Named                   ABB-002 does not declare requires (
 CAP-007     -     R1 Named                   ABB-003 does not declare requires (an empty list is enough) (+3 more)
 ```
 
-That is your first real result. Each row is a capability, the rung it has earned from the
+That is your first real result. Each row is a capability, the stage it has earned from the
 documents that exist, and the specific thing stopping it from moving up. The seed is
 deliberately incomplete, so there is work to do. [Concepts](concepts.md#the-definition-ladder)
-explains the rungs.
+explains the stages.
 
 ## 8. Add a capability of your own
 
@@ -191,7 +191,7 @@ demand_assumption: Customer service asked for fewer where-is-my-order calls.
 flows:
   - id: shipping
     name: Shipping update
-    rung: R2
+    stage: R2
 ---
 
 # Order Notifications
@@ -212,7 +212,7 @@ demand_assumption: Customer service asked for fewer where-is-my-order calls.
 flows:
   - id: shipping
     name: Shipping update
-    rung: R2
+    stage: R2
 ---
 
 # Order Notifications
@@ -222,12 +222,12 @@ EOF
 Derive it, with every blocker, then check the claim. The first command prints:
 
 ```bash
-python .agents/skills/architecture/bin/rung.py CAP-100 -v
-python .agents/skills/architecture/bin/rung.py CAP-100 --check
+python .agents/skills/architecture/bin/stage.py CAP-100 -v
+python .agents/skills/architecture/bin/stage.py CAP-100 --check
 ```
 
 ```text
-Capability  Flow         Rung      Recorded    Blocking the next rung
+Capability  Flow         Stage     Recorded    Blocking the next stage
 ----------  -----------  --------  ----------  ----------------------
 CAP-100     (all flows)  R1 Named              CAP-100 names no ABB in realised_by_abbs
                                                no consideration affects CAP-100 or its ABBs, and it does not declare open_questions: none
@@ -277,17 +277,17 @@ sed -i.bak 's/^demand_assumption:.*/&\nrealised_by_abbs: [ABB-100]\nopen_questio
 ```
 
 ```bash
-python .agents/skills/architecture/bin/rung.py CAP-100 --check
+python .agents/skills/architecture/bin/stage.py CAP-100 --check
 ```
 
 ```text
-Capability  Flow         Rung        Recorded  Blocking the next rung
+Capability  Flow         Stage       Recorded  Blocking the next stage
 ----------  -----------  ----------  --------  ----------------------
 CAP-100     (all flows)  R2 Bounded            no pattern realises CAP-100 for flow shipping: add realises: [CAP-100] to a logical pattern
             shipping     R2 Bounded  R2        no pattern realises CAP-100 for flow shipping: add realises: [CAP-100] to a logical pattern
 ```
 
-The recorded rung is now backed by evidence, `--check` exits 0, and the blocker names the next
+The recorded stage is now backed by evidence, `--check` exits 0, and the blocker names the next
 artefact to write.
 
 ## 10. Hand it to your agent
@@ -299,7 +299,7 @@ Open the `workspace` folder in your agent (VS Code with GitHub Copilot, Cursor, 
 under capability CAP-100.
 ```
 
-The flow runs the `check.mjs --json --flow abb` you ran in step 6, finds that no bounded context exists yet, proposes one rather than inventing it, and asks before creating anything. Once you agree it writes `building-blocks/architecture-building-blocks/ABB-NNN/index.md` and its diagrams, following the standards it loads from its own `references/standards/`. Run `rung.py` again afterwards to see what changed.
+The flow runs the `check.mjs --json --flow abb` you ran in step 6, finds that no bounded context exists yet, proposes one rather than inventing it, and asks before creating anything. Once you agree it writes `building-blocks/architecture-building-blocks/ABB-NNN/index.md` and its diagrams, following the standards it loads from its own `references/standards/`. Run `stage.py` again afterwards to see what changed.
 
 ## Where next
 

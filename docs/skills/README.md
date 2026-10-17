@@ -14,7 +14,7 @@ The architecture skill was ten skills, `aaa-create-strategy` to `aaa-continuum`,
 | [/architecture sbb](architecture/sbb.md) | Creates a Solution Building Block that maps an ABB to products, simple or composite | `SBB-NNN/` |
 | [/architecture service](architecture/service.md) | Creates a runtime service that implements an SBB | `<name>.md` |
 | [/architecture runtime-agent](architecture/runtime-agent.md) | Specifies an autonomous runtime agent with guardrails, scope and provenance | Ontology records and an agent profile |
-| [/architecture rung](architecture/rung.md) | Derives each capability's rung on the definition ladder and what blocks the next | Nothing: read-only |
+| [/architecture stage](architecture/stage.md) | Derives each capability's stage on the definition ladder and what blocks the next | Nothing: read-only |
 | [/architecture check](architecture/check.md) | Checks every page and register of an architecture against the continuum's standards, and scaffolds the layout for a new repository | Nothing, or the empty layout |
 | [workspace](workspace.md) | Clears out what retired tooling left in a repository, installs the declared skills, wires a build that runs without them, and builds the site | `scripts/architecture.mjs`, the installer, npm scripts and `.gitignore` lines |
 
@@ -39,7 +39,7 @@ description lets the agent pick it when a request matches.
 
 Follow the golden thread from the top when you are modelling something new: strategy,
 platform, capability, context, ABB, SBB, service. When you already know the building block you
-need, start there; the flow will offer to create what is missing above it. Use `/architecture rung` at
+need, start there; the flow will offer to create what is missing above it. Use `/architecture stage` at
 any point to see where each capability stands, and `/architecture check` before publishing or merging
 to see what disagrees with the standards. A repository new to the continuum starts with the
 check flow's scaffold, or with `workspace init`, which also installs the skills and wires the build.

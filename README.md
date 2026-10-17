@@ -50,7 +50,7 @@ Two skills. `architecture` has a flow per level: eight write one kind of artefac
 | [`/architecture sbb`](docs/skills/architecture/sbb.md) | Solution building blocks, simple or composite, mapped to technologies |
 | [`/architecture service`](docs/skills/architecture/service.md) | Services, the deployable units, each realising an SBB inside one context |
 | [`/architecture runtime-agent`](docs/skills/architecture/runtime-agent.md) | Autonomous runtime agents with guardrails, capability scope and provenance |
-| [`/architecture rung`](docs/skills/architecture/rung.md) | Read-only. Each capability's rung on the definition ladder, per flow, and what blocks the next |
+| [`/architecture stage`](docs/skills/architecture/stage.md) | Read-only. Each capability's stage on the definition ladder, per flow, and what blocks the next |
 | [`/architecture check`](docs/skills/architecture/check.md) | Read-only. Every page and register of an architecture against the continuum's standards, with each disagreement named; scaffolds the layout for a new repository |
 | [`workspace`](docs/skills/workspace.md) | Initialises or reinitialises a repository for the skills: clears out what retired tooling left, installs the declared skills, and wires the build so it runs without them |
 
@@ -58,7 +58,7 @@ The flows were ten skills, `aaa-create-strategy` to `aaa-create-runtime-agent`, 
 
 Every skill follows the [Agent Skills specification](https://agentskills.io/specification). CI validates them on every pull request with the specification's reference validator, `skills-ref`, and with `scripts/validate-skills.mjs`, which also checks that relative links resolve and warns when a `SKILL.md` body passes the specification's 500-line or 5,000-token guidance.
 
-The `pattern` skill, which authors an architecture pattern as one Markdown document that is also the model and the deck, began here and lives in [architecture-pattern](https://github.com/dermot-obrien/architecture-pattern). `/architecture rung` reads a pattern's front matter.
+The `pattern` skill, which authors an architecture pattern as one Markdown document that is also the model and the deck, began here and lives in [architecture-pattern](https://github.com/dermot-obrien/architecture-pattern). `/architecture stage` reads a pattern's front matter.
 
 ## Install
 
@@ -99,21 +99,21 @@ Version 0.3.0 and earlier installed through AAW's framework engine with `aaa ins
 
 ## Quick start
 
-After installing, seed a starter model from the clone, bind `/architecture rung` to it, and ask where each capability stands:
+After installing, seed a starter model from the clone, bind `/architecture stage` to it, and ask where each capability stands:
 
 ```bash
 node ../architecture-continuum/scripts/seed-foundation.mjs --workspace .
 printf '[suite.architecture]\ncapabilityDir = "../capabilities"\nabbDir = "../building-blocks/architecture-building-blocks"\n' > .agents/skill-bindings.toml
-python .agents/skills/architecture/bin/rung.py
+python .agents/skills/architecture/bin/stage.py
 ```
 
 ```powershell
 node ../architecture-continuum/scripts/seed-foundation.mjs --workspace .
 '[suite.architecture]', 'capabilityDir = "../capabilities"', 'abbDir = "../building-blocks/architecture-building-blocks"' | Set-Content -Encoding ascii .agents/skill-bindings.toml
-python .agents/skills/architecture/bin/rung.py
+python .agents/skills/architecture/bin/stage.py
 ```
 
-You should see a table of seven capabilities, each with its rung and the artefact blocking the next one. Then bind the other flows and type `/architecture abb` (or any other flow) in your agent. The [quick start](docs/quick-start.md) does all of this from an empty folder, in PowerShell and bash, in about ten minutes.
+You should see a table of seven capabilities, each with its stage and the artefact blocking the next one. Then bind the other flows and type `/architecture abb` (or any other flow) in your agent. The [quick start](docs/quick-start.md) does all of this from an empty folder, in PowerShell and bash, in about ten minutes.
 
 ## Documentation
 

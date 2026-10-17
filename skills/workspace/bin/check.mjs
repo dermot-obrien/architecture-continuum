@@ -14,7 +14,8 @@
  *
  * A skill with flows declares, per option, the flows that need it (required_by). With
  * --flow <name> the check requires exactly those; without it, it requires the options
- * marked required, and with requires_any in [inputs], at least one binding. A key missing
+ * marked required, and with requires_any in [inputs], at least one binding. A flow's former
+ * name, mapped to its current one in [inputs.flow_aliases], selects the same flow. A key missing
  * from [suite.<skill>] is read from the tables [inputs] legacy_suites names, with a
  * warning, so a workspace answering the old tables keeps working while it moves.
  *
@@ -124,15 +125,18 @@ if (!existsSync(config)) {
 const inputsFile = path.join(skillDir, "inputs.toml");
 const options = {};
 let inputs = {};
+let aliases = {};
 if (existsSync(inputsFile)) {
   const parsed = toml(readFileSync(inputsFile, "utf8"));
   inputs = parsed.inputs ?? {};
+  aliases = parsed["inputs.flow_aliases"] ?? {};
   for (const [name, table] of Object.entries(parsed)) {
     const m = /^inputs\.options\.(.+)$/.exec(name);
     if (m) options[m[1]] = table;
   }
 }
 const flows = Array.isArray(inputs.flows) ? inputs.flows : [];
+if (flow !== null && !flows.includes(flow) && typeof aliases[flow] === "string") flow = aliases[flow];
 if (flow !== null && !flows.includes(flow)) {
   console.error(`${skill} has no flow ${flow}${flows.length ? `; its flows are ${flows.join(", ")}` : ""}`);
   process.exit(2);

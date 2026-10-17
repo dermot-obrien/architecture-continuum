@@ -1,12 +1,14 @@
 # SPDX-FileCopyrightText: 2026 Dermot O'Brien
 # SPDX-License-Identifier: Apache-2.0
-"""rung: report each capability's rung on the definition ladder, and what blocks the next.
+"""stage: report each capability's definition stage on the ladder, and what blocks the next.
 
-    python bin/rung.py                     table of every capability and its flows
-    python bin/rung.py --json              the same, for tools
-    python bin/rung.py CAP-012 --verbose   one capability, every blocker
-    python bin/rung.py --check             exit 1 if a recorded rung claims more than the evidence
-    python bin/rung.py --doctor            resolve the bindings and stop
+    python bin/stage.py                     table of every capability and its flows
+    python bin/stage.py --json              the same, for tools
+    python bin/stage.py CAP-012 --verbose   one capability, every blocker
+    python bin/stage.py --check             exit 1 if a recorded stage claims more than the evidence
+    python bin/stage.py --doctor            resolve the bindings and stop
+
+bin/rung.py, the former name, runs the same command.
 
 Exit codes: 0 done, 1 --check found a claim above the evidence, 2 the bindings did not resolve.
 """
@@ -23,17 +25,18 @@ from .derive import DIR_KEYS, Workspace, derive_all
 
 
 def _args(argv):
-    p = argparse.ArgumentParser(prog="rung", description=__doc__.split("\n")[0])
-    p.add_argument("capabilities", nargs="*", metavar="CAP-NNN",
-                   help="only these capabilities (default: every one)")
+    p = argparse.ArgumentParser(prog="stage", description=__doc__.split("\n")[0])
+    p.add_argument("capabilities", nargs="*", metavar="ID",
+                   help="only these capabilities, by id: CAP-NNN unless capabilityIdPattern "
+                   "binds another (default: every one)")
     p.add_argument("--bindings", help="path to skill-bindings.toml (default: nearest "
                    ".agents/skill-bindings.toml above the working directory)")
     p.add_argument("--json", action="store_true", help="machine-readable output")
     p.add_argument("--verbose", "-v", action="store_true", help="every blocker, not just the first")
     p.add_argument("--check", action="store_true",
-                   help="exit 1 when a recorded flow rung is above the derived one")
+                   help="exit 1 when a recorded flow stage is above the derived one")
     p.add_argument("--doctor", action="store_true", help="resolve the bindings, report, and stop")
-    p.add_argument("--version", action="version", version=f"architecture rung {__version__}")
+    p.add_argument("--version", action="version", version=f"architecture stage {__version__}")
     return p.parse_args(argv)
 
 
@@ -63,13 +66,14 @@ def main(argv=None) -> int:
             for k in b.unbound:
                 print(f"  {k:<17} (not bound)")
             print(f"  localPattern      {b.local_pattern}")
+            print(f"  capabilityIdPattern {b.capability_id_pattern}")
         return 0
 
-    ws = Workspace(b.paths, b.local_pattern)
+    ws = Workspace(b.paths, b.local_pattern, b.capability_id_pattern)
     report = derive_all(ws, a.capabilities or None)
     report = {"result": "ok", "bindings": b.to_dict(), **report}
 
-    claims = [(c["id"], f["id"], f["recorded"], f["rung"])
+    claims = [(c["id"], f["id"], f["recorded"], f["stage"])
               for c in report["capabilities"] for f in c["flows"] if f.get("claim") == "above"]
 
     if a.json:
@@ -84,13 +88,13 @@ def _wrap(s: str, width: int) -> str:
 
 
 def render(report: dict, verbose: bool = False) -> str:
-    rows = [("Capability", "Flow", "Rung", "Recorded", "Blocking the next rung")]
+    rows = [("Capability", "Flow", "Stage", "Recorded", "Blocking the next stage")]
     notes = []
     for c in report["capabilities"]:
         first = (c["blockers"][0] if c["blockers"] else "top of the ladder")
         more = f" (+{len(c['blockers']) - 1} more)" if len(c["blockers"]) > 1 and not verbose else ""
         rows.append((c["id"], "(all flows)" if c["flows"] else "-",
-                     f"{c['rung']} {c['name']}", "", first + more))
+                     f"{c['stage']} {c['name']}", "", first + more))
         if verbose:
             for extra in c["blockers"][1:]:
                 rows.append(("", "", "", "", extra))
@@ -102,13 +106,13 @@ def render(report: dict, verbose: bool = False) -> str:
                 rec += " claimed"
             elif f.get("claim") == "below":
                 rec += " stale"
-            rows.append(("", f["id"], f"{f['rung']} {f['name']}", rec, fb + fmore))
+            rows.append(("", f["id"], f"{f['stage']} {f['name']}", rec, fb + fmore))
             if verbose:
                 for extra in f["blockers"][1:]:
                     rows.append(("", "", "", "", extra))
         if c.get("latent"):
             notes.append(f"{c['id']}: latent evidence at {', '.join(c['latent'])}, "
-                         f"not counted until the rungs below hold")
+                         f"not counted until the stages below hold")
         if c.get("evidence_elsewhere"):
             notes.append(f"{c['id']}: named by {', '.join(c['evidence_elsewhere'])} "
                          f"but has no capability document")

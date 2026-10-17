@@ -26,6 +26,7 @@ when `status` is `error`. Do not proceed on an error and do not guess a path.
 | `contextDir` | Where a new Bounded Context folder is created |
 | `platformDir` | Searched for the Platform the context realises |
 | `capabilityDir` (optional) | The Capabilities the context realises |
+| `capabilityIdPattern` (optional) | The capability identifier series, `CAP-NNN` by default |
 
 The contract is declared in the skill's `inputs.toml`. The repository answers it in
 `[suite.architecture]` of its `.agents/skill-bindings.toml`. An optional binding that is not

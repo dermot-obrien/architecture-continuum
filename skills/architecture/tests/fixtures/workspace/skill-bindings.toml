@@ -1,8 +1,8 @@
 bindingsVersion = "1.0"
 
-# A small, neutral workspace for the rung tests: an order-handling business with one
-# capability at each rung, one blocked by an open question, one that lost its rung, one
-# with flows at different rungs, and one named only by a pattern.
+# A small, neutral workspace for the stage tests: an order-handling business with one
+# capability at each definition stage, one blocked by an open question, one that lost its
+# stage, one with flows at different stages, and one named only by a pattern.
 
 [suite.architecture]
 capabilityDir    = "capabilities"

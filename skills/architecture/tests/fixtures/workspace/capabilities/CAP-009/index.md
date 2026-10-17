@@ -21,11 +21,11 @@ open_questions: none
 flows:
   - id: issue-invoice
     name: Issue an invoice
-    rung: R4
+    stage: R4
   - id: credit-note
     name: Raise a credit note
     description: From a disputed line to a credit
-    rung: R4
+    rung: R4  # the former key, still read
 ---
 
 # CAP-009 Invoicing

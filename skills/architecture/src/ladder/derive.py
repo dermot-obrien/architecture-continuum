@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """The definition ladder, derived from the artefacts that exist.
 
-A capability sits on the highest rung for which it, and every rung below, has evidence.
-Each rung's check returns the specific artefacts that are missing or say the wrong thing,
-so the result is never just a number: it is the rung held and what blocks the next one.
+A capability sits at the highest definition stage for which it, and every stage below, has
+evidence. Each stage's check returns the specific artefacts that are missing or say the wrong
+thing, so the result is never just a number: it is the stage held and what blocks the next one.
 
 The rules are those of the Definition Ladder Standard
 (standards/capabilities/standard-definition-ladder.md, section 2).
@@ -17,7 +17,7 @@ import re
 from . import docs
 from .docs import as_list, text
 
-RUNGS = (
+STAGES = (
     ("R0", "Unrecognised"),
     ("R1", "Named"),
     ("R2", "Bounded"),
@@ -26,10 +26,12 @@ RUNGS = (
     ("R5", "Proven"),
     ("R6", "In service"),
 )
-RUNG_NAMES = dict(RUNGS)
+STAGE_NAMES = dict(STAGES)
 LIVE = ("accepted", "active")
 
-CAP_RE = re.compile(r"^CAP-\d{3}$")
+# A capability's identifier, unless [suite.architecture] capabilityIdPattern binds another.
+DEFAULT_CAPABILITY_ID = r"^CAP-\d{3}$"
+INDEX_NAMES = ("index.md", "index.mdx", "readme.md", "readme.mdx")
 # The directories a repository may bind, each optional, and what leaving one unbound costs.
 DIR_KEYS = {
     "capabilityDir": "capability documents, so every capability is R0",
@@ -54,11 +56,11 @@ KIND_LEVELS = {
 BOX_SECTION_RE = re.compile(r"^(required\s+)?building\s+blocks$", re.I)
 
 
-def rung_index(rung: str) -> int:
-    return int(rung[1:])
+def stage_index(stage: str) -> int:
+    return int(stage[1:])
 
 
-def rung_id(i: int) -> str:
+def stage_id(i: int) -> str:
     return f"R{i}"
 
 
@@ -177,14 +179,17 @@ def has_reference(doc, rtype: str) -> bool:
 class Workspace:
     """Every artefact the ladder reads, indexed by identifier."""
 
-    def __init__(self, paths: dict, local_pattern: str = "[0-9]{1,3}"):
+    def __init__(self, paths: dict, local_pattern: str = "[0-9]{1,3}",
+                 capability_id_pattern: str = DEFAULT_CAPABILITY_ID):
         self.paths = paths
         self.warnings = []
         # A directory left unbound means the repository does not keep that kind: it is read
         # as empty, and the report names it so the blockers it causes are not misread.
         self.unbound = [k for k in DIR_KEYS if not paths.get(k)]
         self.local_re = re.compile(rf"^\s*({local_pattern})(?=\s|$)")
-        self.capabilities = self._index(paths.get("capabilityDir"), "capability", r"^CAP-\d{3}$")
+        self.cap_re = re.compile(capability_id_pattern)
+        self.capabilities = self._index(paths.get("capabilityDir"), "capability", self.cap_re,
+                                        self._capability_ident)
         self.abbs = self._index(paths.get("abbDir"), "abb", r"^ABB-\d{3}$")
         self.sbbs = self._index(paths.get("sbbDir"), "sbb", r"^SBB-\d{3}(\.\d+){0,2}$")
         self.decisions = self._index(paths.get("decisionDir"), "decision-record", r"^DR-\d{3}$")
@@ -194,7 +199,28 @@ class Workspace:
                          if not d.problems and text(d.get("kind")) in ("", "pattern")
                          and (d.get("realises") is not None or text(d.get("document_type")) == "pattern")]
 
-    def _index(self, root: str | None, kind: str, id_re: str) -> dict:
+    def is_capability(self, ident: str) -> bool:
+        return bool(self.cap_re.fullmatch(ident))
+
+    def _capability_ident(self, d) -> str:
+        """A capability's id: its front matter id, else the folder an index page names, else
+        the first word of its title or H1, whichever matches the capability id pattern."""
+        if d.id:
+            return d.id
+        name = os.path.basename(d.path)
+        if name.lower() in INDEX_NAMES:
+            parts = os.path.basename(os.path.dirname(d.path)).split("-")
+            for i in range(1, len(parts) + 1):
+                if self.is_capability("-".join(parts[:i])):
+                    return "-".join(parts[:i])
+        h1 = next((t for lv, t, _ in docs.sections(d.body) if lv == 1), "")
+        for candidate in (text(d.get("title")), h1):
+            word = (candidate or "").split(" ", 1)[0]
+            if word and self.is_capability(word):
+                return word
+        return ""
+
+    def _index(self, root: str | None, kind: str, id_re, ident=None) -> dict:
         rx = re.compile(id_re)
         out = {}
         if not root:
@@ -205,11 +231,12 @@ class Workspace:
             k = text(d.get("kind"))
             if k and k != kind:
                 continue
-            if not rx.match(d.id):
+            i = ident(d) if ident else d.id
+            if not rx.fullmatch(i):
                 continue
-            prior = out.get(d.id)
+            prior = out.get(i)
             if prior is None or _prefer(d, prior):
-                out[d.id] = d
+                out[i] = d
         return out
 
     def classify(self, cell: str, kind: str = "") -> Box:
@@ -256,12 +283,12 @@ class Workspace:
         out = {}
         for p in self.patterns:
             for c in p.realises:
-                if CAP_RE.match(c):
+                if self.is_capability(c):
                     out.setdefault(c, []).append(f"pattern {p.id}")
         for cid, d in self.considerations.items():
             for c in as_list(d.get("affects")):
                 c = text(c)
-                if CAP_RE.match(c):
+                if self.is_capability(c):
                     out.setdefault(c, []).append(f"consideration {cid}")
         return out
 
@@ -274,13 +301,13 @@ def _prefer(new, old) -> bool:
     return score(new) < score(old)
 
 
-# ------------------------------------------------------------------------ the rungs
+# ----------------------------------------------------------------------- the stages
 
 class Derivation:
     """One capability, or one flow of it."""
 
     def __init__(self, checks: dict, recorded: str = ""):
-        self.checks = checks                # rung index -> list of blockers
+        self.checks = checks                # stage index -> list of blockers
         held = 0
         for i in range(1, 7):
             if checks[i]:
@@ -289,23 +316,25 @@ class Derivation:
         self.held = held
         self.next = held + 1 if held < 6 else None
         self.blockers = checks[self.next] if self.next else []
-        self.latent = [rung_id(i) for i in range(held + 2, 7) if not checks[i]]
+        self.latent = [stage_id(i) for i in range(held + 2, 7) if not checks[i]]
         self.recorded = recorded
         if recorded and re.fullmatch(r"R[0-6]", recorded):
-            r = rung_index(recorded)
+            r = stage_index(recorded)
             self.claim = "matches" if r == held else ("above" if r > held else "below")
         else:
             self.claim = None
 
     def to_dict(self):
         return {
-            "rung": rung_id(self.held), "name": RUNG_NAMES[rung_id(self.held)],
-            "next": rung_id(self.next) if self.next else None,
+            # rung is the former name of stage, written as well for one release.
+            "stage": stage_id(self.held), "rung": stage_id(self.held),
+            "name": STAGE_NAMES[stage_id(self.held)],
+            "next": stage_id(self.next) if self.next else None,
             "blockers": list(self.blockers),
             "latent": list(self.latent),
             "recorded": self.recorded or None,
             "claim": self.claim,
-            "checks": {rung_id(i): list(v) for i, v in self.checks.items()},
+            "checks": {stage_id(i): list(v) for i, v in self.checks.items()},
         }
 
 
@@ -347,7 +376,7 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
         fid = text(f.get("id"))
         declared.append(fid)
         pats = [p for p in patterns if not p.flows or fid in p.flows]
-        d = Derivation(checks_for(pats, f" for flow {fid}"), text(f.get("rung")))
+        d = Derivation(checks_for(pats, f" for flow {fid}"), recorded_stage(f))
         flows_out.append({"id": fid, "name": text(f.get("name")), **d.to_dict(),
                           "patterns": [p.id for p in pats]})
 
@@ -358,9 +387,9 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
                 warnings.append(f"pattern {p.id} names flow {fl}, which {cid} does not declare")
 
     if flows_out:
-        lowest = min(flows_out, key=lambda f: rung_index(f["rung"]))
-        summary = {k: lowest[k] for k in ("rung", "name", "next", "blockers")}
-        summary["latent"] = sorted({x for f in flows_out for x in f["latent"]}, key=rung_index)
+        lowest = min(flows_out, key=lambda f: stage_index(f["stage"]))
+        summary = {k: lowest[k] for k in ("stage", "rung", "name", "next", "blockers")}
+        summary["latent"] = sorted({x for f in flows_out for x in f["latent"]}, key=stage_index)
         summary["limited_by_flow"] = lowest["id"]
         summary["checks"] = whole.to_dict()["checks"]
     else:
@@ -371,7 +400,7 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
         "id": cid,
         "title": text(doc.get("title")),
         "path": doc.path,
-        "level": text(doc.get("level")),
+        "level": text(capability_field(doc, "level")),
         "status": text(doc.get("status")),
         **summary,
         "recorded": None,
@@ -383,12 +412,29 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
     }
 
 
+def recorded_stage(flow) -> str:
+    """A flow's recorded stage: its stage key, else the former rung key."""
+    return text(flow.get("stage")) or text(flow.get("rung"))
+
+
+def capability_field(doc, key):
+    """A capability's own field: the top-level key, else the same key in a nested capability:
+    block, which some repositories use to keep the capability's attributes apart from the
+    page's. A top-level key always wins."""
+    value = doc.get(key)
+    if value is None:
+        block = doc.get("capability")
+        if isinstance(block, dict):
+            value = block.get(key)
+    return value
+
+
 def _r1(doc, cid) -> list:
     out = []
-    level = text(doc.get("level"))
+    level = text(capability_field(doc, "level"))
     if level not in ("L1", "L2", "L3"):
         out.append(f"{cid} has no level (L1, L2 or L3)")
-    if level in ("L2", "L3") and not text(doc.get("parent")):
+    if level in ("L2", "L3") and not text(capability_field(doc, "parent")):
         out.append(f"{cid} is {level} but names no parent")
     purpose = text(doc.get("description"))
     if not purpose:
@@ -495,13 +541,13 @@ def _r6(doc, cid, pats) -> list:
 def derive_all(ws: Workspace, only: list | None = None) -> dict:
     ids = set(ws.capabilities) | set(ws.referenced_capabilities())
     if only:
-        ids = {i for i in ids if i in only} | {i for i in only if CAP_RE.match(i)}
+        ids = {i for i in ids if i in only} | {i for i in only if ws.is_capability(i)}
     caps = [derive_capability(ws, cid) for cid in sorted(ids)]
     warnings = list(ws.warnings)
     for c in caps:
         warnings.extend(c.get("warnings", []))
     return {
-        "ladder": [{"rung": r, "name": n} for r, n in RUNGS],
+        "ladder": [{"stage": r, "rung": r, "name": n} for r, n in STAGES],
         "capabilities": caps,
         "unbound": list(ws.unbound),
         "warnings": warnings,

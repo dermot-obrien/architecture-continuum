@@ -1,4 +1,4 @@
-rung,name,description
+stage,name,description
 R0,Unrecognised,"The capability is not in the capability model, whatever else exists."
 R1,Named,"A capability document gives it an identifier, a level, a parent where its level needs one, a purpose, and the demand it answers: an outcome, or a claim recorded as an assumption."
 R2,Bounded,"The ABBs it needs are named and each declares what it requires. Non-goals are written down. Every open question with more than one credible answer is a consideration, or the capability declares it has none."

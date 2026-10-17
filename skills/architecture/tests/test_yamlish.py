@@ -27,8 +27,8 @@ maturity: { current: 0, target: 3 }
 flows:
   - id: issue-invoice
     name: Issue an invoice
-    rung: R4
-  - { id: credit-note, name: "Raise a credit note, fast", rung: R2 }
+    stage: R4
+  - { id: credit-note, name: "Raise a credit note, fast", stage: R2 }
 references:
   - { type: cost-model, path: "cost/model.csv" }
   - type: doc
@@ -57,8 +57,8 @@ EXPECTED = {
     "open_questions": "none",
     "maturity": {"current": "0", "target": "3"},
     "flows": [
-        {"id": "issue-invoice", "name": "Issue an invoice", "rung": "R4"},
-        {"id": "credit-note", "name": "Raise a credit note, fast", "rung": "R2"},
+        {"id": "issue-invoice", "name": "Issue an invoice", "stage": "R4"},
+        {"id": "credit-note", "name": "Raise a credit note, fast", "stage": "R2"},
     ],
     "references": [
         {"type": "cost-model", "path": "cost/model.csv"},

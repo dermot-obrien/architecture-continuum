@@ -6,7 +6,7 @@ This folder contains normative standards only.
 
 - `standard-capability-document.md`
 - `standard-capability-diagram.md`
-- `standard-definition-ladder.md`, with its machine-readable rungs in `definition-ladder.csv`
+- `standard-definition-ladder.md`, with its machine-readable stages in `definition-ladder.csv`
 
 ## Excluded
 
