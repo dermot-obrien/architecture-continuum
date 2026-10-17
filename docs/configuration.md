@@ -38,7 +38,7 @@ Rules that apply to every key below:
 | `platformDir` | dir | platform, capability, context | | `PL-NNN` documents |
 | `outcomeDir` | dir | strategy | platform | `OC-NNN` folders |
 | `useCaseDir` | dir | strategy | | `UC-NNN` folders. May be the same folder as `outcomeDir` |
-| `capabilityDir` | dir | capability | context, abb, rung | `CAP-NNN` folders, with `capability-model.md` and its two CSVs |
+| `capabilityDir` | dir | capability | context, abb, rung | `CAP-NNN` folders (or `capabilityIdPattern`), with `capability-model.md` and its two CSVs |
 | `contextDir` | dir | context | abb, service | `BC-NNN` folders |
 | `abbDir` | dir | abb | sbb, rung | `ABB-NNN` folders |
 | `sbbDir` | dir | sbb | service, rung | `SBB-NNN` folders, composites included |
@@ -47,6 +47,7 @@ Rules that apply to every key below:
 | `considerationDir` | dir | | rung | Considerations, `kind: consideration` |
 | `patternDir` | dir | | rung | Patterns, read for `realises`, `flows`, `references` and their Building Blocks tables |
 | `localPattern` | str | | rung | Regex for a model-local box id, such as `07` in `07 Gateway` |
+| `capabilityIdPattern` | str | | capability, context, abb, rung | Regex a capability id matches in full. Default `^CAP-\d{3}$` |
 | `agentProfileSchema` | file | | runtime-agent | The JSON Schema an agent profile is validated against |
 | `ontologyValidator` | file | | runtime-agent | The validator run over each record the runtime-agent flow writes |
 
@@ -83,17 +84,28 @@ Every key the rung reads is optional. A folder left unset means the workspace do
 
 | Key | Type | Holds | If unbound |
 |---|---|---|---|
-| `capabilityDir` | dir | Capabilities, `kind: capability`, `CAP-NNN` | Every capability is R0 |
+| `capabilityDir` | dir | Capabilities, `kind: capability` or no kind, with an id matching `capabilityIdPattern` | Every capability is R0 |
 | `abbDir` | dir | ABBs, `kind: abb`, read for `requires` | R2 cannot be evidenced |
 | `sbbDir` | dir | SBBs, `kind: sbb`, read for `realises` and `status` | R4 cannot be evidenced |
 | `decisionDir` | dir | Decision records, `kind: decision-record`, read for `status` | A resolved consideration cannot be confirmed at R3 |
 | `considerationDir` | dir | Considerations, `kind: consideration`, read for `affects`, `consideration_status`, `resolved_by` | R2 needs `open_questions: none` on the capability |
 | `patternDir` | dir | Patterns, read for `realises`, `flows`, `references` and their Building Blocks tables | R3 and above cannot be evidenced |
 | `localPattern` | str | Regex for a model-local box id leading a Building Blocks cell, such as `07` in `07 Gateway` | Falls back as below |
+| `capabilityIdPattern` | str | Regex a capability id matches in full, for a workspace that numbers its capabilities other than `CAP-NNN` | `^CAP-\d{3}$` |
 
 `localPattern` precedence: `[suite.architecture] localPattern`, then `[model] local_pattern` in the
 same file, then `[0-9]{1,3}`. Write a regex in a single-quoted TOML string so backslashes are
 not treated as escapes.
+
+`capabilityIdPattern` is the regex a capability's identifier must match in full: in `capabilityDir`, in a pattern's `realises`, in a consideration's `affects`, and on the rung's command line. A workspace that numbers its capabilities `CP-NNN` under capability area folders binds it like this:
+
+```toml
+[suite.architecture]
+capabilityDir       = "../capabilities"
+capabilityIdPattern = '^CP-\d{3}$'
+```
+
+A capability page with no `id` in its front matter takes its identifier from its folder when it is an `index.md` or `README.md` (`CP-102-agent-orchestration/index.md` is `CP-102`), and otherwise from the first word of its `title` or H1. A page whose identifier matches neither way is not a capability, so a capability area's own page (`CA-04-agent-interaction/README.mdx`) is passed over.
 
 
 ### What the check reads

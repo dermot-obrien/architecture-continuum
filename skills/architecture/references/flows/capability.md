@@ -23,6 +23,7 @@ when `status` is `error`. Do not proceed on an error and do not guess a path.
 | Binding | Used for |
 |---|---|
 | `capabilityDir` | Where a new Capability folder is created |
+| `capabilityIdPattern` (optional) | The capability identifier series, `CAP-NNN` by default |
 | `platformDir` | Searched for the parent Platform |
 
 The contract is declared in the skill's `inputs.toml`. The repository answers it in
@@ -61,7 +62,7 @@ context diagram of that system belongs to the capability, never to an ABB.
 ### Step 1: index.md
 
 Create the capability document at `<capabilityDir>/CAP-NNN/index.md`. Link back to the parent
-Outcome and Use Case in the Purpose section. This is mandatory.
+Outcome and Use Case in the Purpose section. This is mandatory. The identifier matches `capabilityIdPattern` when the repository binds one (`CAP-NNN` by default). Number a new capability in the repository's own series, such as `CP-NNN` for `'^CP-\d{3}$'`, and follow where its existing capabilities sit (a capability area folder, a slug after the identifier).
 
 Where no Outcome exists yet and the user declines to create one, record the demand as
 `demand_assumption` rather than leaving it unstated. If the capability has distinct jobs that

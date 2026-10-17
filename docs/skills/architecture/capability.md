@@ -12,6 +12,7 @@ set or map capability maturity, or create a `CAP-NNN` artefact or a capability m
 |---|---|---|
 | `capabilityDir` | yes | Where `CAP-NNN/` folders are created, and where `capability-model.md` and its CSVs live |
 | `platformDir` | yes | Searched for the platform the capability belongs to |
+| `capabilityIdPattern` | no | The capability identifier series, when it is not `CAP-NNN`, such as `'^CP-\d{3}$'` |
 
 Standards it loads: capability document (`standard-capability-document.md`), traceability and
 front matter, plus the capability diagram and visual design standards when it draws a map.

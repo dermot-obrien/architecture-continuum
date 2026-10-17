@@ -29,7 +29,9 @@ RUNGS = (
 RUNG_NAMES = dict(RUNGS)
 LIVE = ("accepted", "active")
 
-CAP_RE = re.compile(r"^CAP-\d{3}$")
+# A capability's identifier, unless [suite.architecture] capabilityIdPattern binds another.
+DEFAULT_CAPABILITY_ID = r"^CAP-\d{3}$"
+INDEX_NAMES = ("index.md", "index.mdx", "readme.md", "readme.mdx")
 # The directories a repository may bind, each optional, and what leaving one unbound costs.
 DIR_KEYS = {
     "capabilityDir": "capability documents, so every capability is R0",
@@ -177,14 +179,17 @@ def has_reference(doc, rtype: str) -> bool:
 class Workspace:
     """Every artefact the ladder reads, indexed by identifier."""
 
-    def __init__(self, paths: dict, local_pattern: str = "[0-9]{1,3}"):
+    def __init__(self, paths: dict, local_pattern: str = "[0-9]{1,3}",
+                 capability_id_pattern: str = DEFAULT_CAPABILITY_ID):
         self.paths = paths
         self.warnings = []
         # A directory left unbound means the repository does not keep that kind: it is read
         # as empty, and the report names it so the blockers it causes are not misread.
         self.unbound = [k for k in DIR_KEYS if not paths.get(k)]
         self.local_re = re.compile(rf"^\s*({local_pattern})(?=\s|$)")
-        self.capabilities = self._index(paths.get("capabilityDir"), "capability", r"^CAP-\d{3}$")
+        self.cap_re = re.compile(capability_id_pattern)
+        self.capabilities = self._index(paths.get("capabilityDir"), "capability", self.cap_re,
+                                        self._capability_ident)
         self.abbs = self._index(paths.get("abbDir"), "abb", r"^ABB-\d{3}$")
         self.sbbs = self._index(paths.get("sbbDir"), "sbb", r"^SBB-\d{3}(\.\d+){0,2}$")
         self.decisions = self._index(paths.get("decisionDir"), "decision-record", r"^DR-\d{3}$")
@@ -194,7 +199,28 @@ class Workspace:
                          if not d.problems and text(d.get("kind")) in ("", "pattern")
                          and (d.get("realises") is not None or text(d.get("document_type")) == "pattern")]
 
-    def _index(self, root: str | None, kind: str, id_re: str) -> dict:
+    def is_capability(self, ident: str) -> bool:
+        return bool(self.cap_re.fullmatch(ident))
+
+    def _capability_ident(self, d) -> str:
+        """A capability's id: its front matter id, else the folder an index page names, else
+        the first word of its title or H1, whichever matches the capability id pattern."""
+        if d.id:
+            return d.id
+        name = os.path.basename(d.path)
+        if name.lower() in INDEX_NAMES:
+            parts = os.path.basename(os.path.dirname(d.path)).split("-")
+            for i in range(1, len(parts) + 1):
+                if self.is_capability("-".join(parts[:i])):
+                    return "-".join(parts[:i])
+        h1 = next((t for lv, t, _ in docs.sections(d.body) if lv == 1), "")
+        for candidate in (text(d.get("title")), h1):
+            word = (candidate or "").split(" ", 1)[0]
+            if word and self.is_capability(word):
+                return word
+        return ""
+
+    def _index(self, root: str | None, kind: str, id_re, ident=None) -> dict:
         rx = re.compile(id_re)
         out = {}
         if not root:
@@ -205,11 +231,12 @@ class Workspace:
             k = text(d.get("kind"))
             if k and k != kind:
                 continue
-            if not rx.match(d.id):
+            i = ident(d) if ident else d.id
+            if not rx.fullmatch(i):
                 continue
-            prior = out.get(d.id)
+            prior = out.get(i)
             if prior is None or _prefer(d, prior):
-                out[d.id] = d
+                out[i] = d
         return out
 
     def classify(self, cell: str, kind: str = "") -> Box:
@@ -256,12 +283,12 @@ class Workspace:
         out = {}
         for p in self.patterns:
             for c in p.realises:
-                if CAP_RE.match(c):
+                if self.is_capability(c):
                     out.setdefault(c, []).append(f"pattern {p.id}")
         for cid, d in self.considerations.items():
             for c in as_list(d.get("affects")):
                 c = text(c)
-                if CAP_RE.match(c):
+                if self.is_capability(c):
                     out.setdefault(c, []).append(f"consideration {cid}")
         return out
 
@@ -495,7 +522,7 @@ def _r6(doc, cid, pats) -> list:
 def derive_all(ws: Workspace, only: list | None = None) -> dict:
     ids = set(ws.capabilities) | set(ws.referenced_capabilities())
     if only:
-        ids = {i for i in ids if i in only} | {i for i in only if CAP_RE.match(i)}
+        ids = {i for i in ids if i in only} | {i for i in only if ws.is_capability(i)}
     caps = [derive_capability(ws, cid) for cid in sorted(ids)]
     warnings = list(ws.warnings)
     for c in caps:

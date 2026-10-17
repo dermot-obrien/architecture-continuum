@@ -136,6 +136,11 @@ A typo, or a key from another skill's table. The keys are listed in
 Fix `localPattern`, or `[model] local_pattern`. Use a single-quoted TOML string so
 backslashes stay as written.
 
+#### `capabilityIdPattern '<regex>' is not a valid regex: <reason>`
+
+Fix `capabilityIdPattern` in `[suite.architecture]`. Use a single-quoted TOML string so
+backslashes stay as written. Exit code 2.
+
 #### `reading bindings needs Python 3.11 or newer (tomllib)`
 
 The rung reads TOML with `tomllib`, new in 3.11. Upgrade Python, or run it with a newer interpreter such as `py -3.12`. Exit code 2.
@@ -147,8 +152,11 @@ Nothing to report because no capabilities folder is bound. Bind `capabilityDir`.
 #### `(no capabilities found under capabilityDir, and none named by a pattern or consideration)`
 
 The folder is bound but no document in it was indexed. A capability is indexed only when its
-file starts with a `---` front matter block, its `id` is `CAP-` and three digits, and its
-`kind` is `capability` or absent.
+file starts with a `---` front matter block, its `kind` is `capability` or absent, and its
+identifier matches `capabilityIdPattern` in full (`CAP-` and three digits by default). The
+identifier is the front matter `id`, or with none, the folder name of an `index.md` or
+`README.md`, then the first word of the `title` or H1. A workspace that numbers its
+capabilities otherwise, such as `CP-102`, binds `capabilityIdPattern = '^CP-\d{3}$'`.
 
 #### `unbound  <key>: no <kind>, so <consequence>`
 

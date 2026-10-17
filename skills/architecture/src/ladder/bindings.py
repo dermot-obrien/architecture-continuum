@@ -17,6 +17,8 @@ from __future__ import annotations
 import os
 import re
 
+from .derive import DEFAULT_CAPABILITY_ID
+
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
@@ -57,12 +59,13 @@ def contract(skill_dir: str = SKILL_DIR) -> dict:
 
 class Bindings:
     def __init__(self, path: str, paths: dict, local_pattern: str, unbound: list | None = None,
-                 warnings: list | None = None):
+                 warnings: list | None = None, capability_id_pattern: str = DEFAULT_CAPABILITY_ID):
         self.path = path
         self.warnings = list(warnings or [])
         self.root = os.path.dirname(os.path.abspath(path))
         self.paths = paths
         self.local_pattern = local_pattern
+        self.capability_id_pattern = capability_id_pattern
         self.unbound = list(unbound or [])
 
     def __getitem__(self, key):
@@ -71,6 +74,7 @@ class Bindings:
     def to_dict(self):
         return {"bindingFile": self.path, "resolved": dict(self.paths),
                 "unbound": list(self.unbound), "localPattern": self.local_pattern,
+                "capabilityIdPattern": self.capability_id_pattern,
                 "warnings": list(self.warnings)}
 
 
@@ -125,8 +129,6 @@ def load(path: str | None = None, start: str | None = None) -> Bindings:
             elif spec.get("type") == "file" and not os.path.isfile(full):
                 problems.append(f"[suite.{table}] {key} = {value!r} resolves to {full}, which is not a file")
             resolved[key] = full
-        else:
-            resolved[key] = value
     if problems:
         raise BindingError("\n".join(problems))
 
@@ -135,4 +137,9 @@ def load(path: str | None = None, start: str | None = None) -> Bindings:
         re.compile(local)
     except re.error as ex:
         raise BindingError(f"local pattern {local!r} is not a valid regex: {ex}")
-    return Bindings(os.path.abspath(path), resolved, local, unbound, warnings)
+    cap = str(section.get("capabilityIdPattern") or DEFAULT_CAPABILITY_ID)
+    try:
+        re.compile(cap)
+    except re.error as ex:
+        raise BindingError(f"capabilityIdPattern {cap!r} is not a valid regex: {ex}")
+    return Bindings(os.path.abspath(path), resolved, local, unbound, warnings, cap)

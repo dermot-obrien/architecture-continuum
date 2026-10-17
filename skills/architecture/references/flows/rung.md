@@ -18,13 +18,14 @@ Every directory is optional. A repository that does not keep a kind of artefact 
 
 | Binding | Holds |
 |---|---|
-| `capabilityDir` | Capability documents (`CAP-NNN`) |
+| `capabilityDir` | Capability documents (`CAP-NNN`, or ids matching `capabilityIdPattern`) |
 | `abbDir` | Architecture Building Blocks (`ABB-NNN`) |
 | `sbbDir` | Solution Building Blocks (`SBB-NNN`) |
 | `decisionDir` | Decision records (`DR-NNN`) |
 | `considerationDir` | Considerations (`CN-NNN`) |
 | `patternDir` | Patterns, with `realises: [CAP-NNN]` in their front matter |
 | `localPattern` | The regex for a local box id such as `07`. Falls back to `[model] local_pattern`, then `[0-9]{1,3}` |
+| `capabilityIdPattern` | The regex a capability id matches in full, default `^CAP-\d{3}$`. A capability page with no `id` takes it from its folder name, then the first word of its title or H1 |
 
 The contract is in the skill's `inputs.toml`. The repository answers it in `[suite.architecture]` of its `.agents/skill-bindings.toml`, and paths resolve against that file's directory. Every directory is searched recursively for Markdown with front matter.
 

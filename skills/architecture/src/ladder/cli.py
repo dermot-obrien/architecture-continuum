@@ -24,8 +24,9 @@ from .derive import DIR_KEYS, Workspace, derive_all
 
 def _args(argv):
     p = argparse.ArgumentParser(prog="rung", description=__doc__.split("\n")[0])
-    p.add_argument("capabilities", nargs="*", metavar="CAP-NNN",
-                   help="only these capabilities (default: every one)")
+    p.add_argument("capabilities", nargs="*", metavar="ID",
+                   help="only these capabilities, by id: CAP-NNN unless capabilityIdPattern "
+                   "binds another (default: every one)")
     p.add_argument("--bindings", help="path to skill-bindings.toml (default: nearest "
                    ".agents/skill-bindings.toml above the working directory)")
     p.add_argument("--json", action="store_true", help="machine-readable output")
@@ -63,9 +64,10 @@ def main(argv=None) -> int:
             for k in b.unbound:
                 print(f"  {k:<17} (not bound)")
             print(f"  localPattern      {b.local_pattern}")
+            print(f"  capabilityIdPattern {b.capability_id_pattern}")
         return 0
 
-    ws = Workspace(b.paths, b.local_pattern)
+    ws = Workspace(b.paths, b.local_pattern, b.capability_id_pattern)
     report = derive_all(ws, a.capabilities or None)
     report = {"result": "ok", "bindings": b.to_dict(), **report}
 

@@ -64,7 +64,7 @@ description = """Where use case folders are created, one per UC-NNN."""
 type = "dir"
 flows = ["capability", "context", "abb", "rung"]
 required_by = ["capability"]
-description = """Where capability folders are created, one per CAP-NNN, with the capability model; read by the context and ABB flows for the parent link, and by the rung."""
+description = """Where capability folders are created, one per CAP-NNN (or capabilityIdPattern), with the capability model; read by the context and ABB flows for the parent link, and by the rung."""
 
 [inputs.options.contextDir]
 type = "dir"
@@ -103,12 +103,17 @@ description = """Considerations (CN-NNN), searched recursively by the rung."""
 [inputs.options.patternDir]
 type = "dir"
 flows = ["rung"]
-description = """Architecture patterns and reference architectures, with realises: [CAP-NNN] in their front matter, searched recursively by the rung."""
+description = """Architecture patterns and reference architectures, with realises: [CAP-NNN] (or ids matching capabilityIdPattern) in their front matter, searched recursively by the rung."""
 
 [inputs.options.localPattern]
 type = "str"
 flows = ["rung"]
 description = """Regex for a model-local box identifier leading a Building Blocks cell, such as 07 in "07 Gateway". Falls back to [model] local_pattern in the same file, then to [0-9]{1,3}."""
+
+[inputs.options.capabilityIdPattern]
+type = "str"
+flows = ["capability", "context", "abb", "rung"]
+description = '''Regex a capability identifier must match in full, for a repository that numbers its capabilities other than CAP-NNN, such as '^CP-\d{3}$'. A capability page without an id in its front matter takes it from its folder name (CP-102-agent-orchestration/index.md), then the first word of its title or H1. Default: '^CAP-\d{3}$'.'''
 
 [inputs.options.agentProfileSchema]
 type = "file"
