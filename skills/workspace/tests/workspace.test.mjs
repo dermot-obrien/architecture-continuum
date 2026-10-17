@@ -11,7 +11,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  applyClean, applyInstall, check, planClean, planInstall, readToml, regenerate, removeTopLevelKey, SHIM_MARK,
+  applyClean, applyInstall, check, lockMismatches, planClean, planInstall, readToml, regenerate, removeTopLevelKey, SHIM_MARK,
 } from "../src/workspace.mjs";
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "bin", "workspace.mjs");
@@ -223,4 +223,23 @@ test("an old aaa- skill is retired unless the lock still installs it", () => {
   const why = Object.fromEntries(planClean(repo, { self: "/nowhere" }).actions.map((a) => [a.path, a.why]));
   assert.match(why[".agents/skills/aaa-create-abb"], /folded into the architecture skill/);
   assert.match(why[".agents/skills/aaa-rung"], /a retired skill; install puts it back only if the declared release still has it/);
+});
+
+test("a lock the declaration has moved past is found, so install rewrites it rather than installing the old commits", () => {
+  const B = "https://example.org/architecture-continuum.git";
+  const R = "https://example.org/markdown-deck.git";
+  write(".agents/skills.lock.json", JSON.stringify({ lockfile: 1, skills: {
+    "aaa-rung": { source: "bundle", bundle: B, bundleRef: "v0.5.0", ref: null },
+    "markdown-deck": { source: R, ref: "markdown-deck--v0.6.8", path: "skills/markdown-deck" },
+  } }));
+  const declare = (bundleRef, deckRef) => write(".agents/skills.json", JSON.stringify({ sources: [
+    { bundle: B, ref: bundleRef },
+    { repo: R, ref: deckRef, path: "skills/markdown-deck", name: "markdown-deck" },
+  ] }));
+  declare("v0.5.0", "markdown-deck--v0.6.8");
+  assert.deepEqual(lockMismatches(repo), []);
+  declare("v0.6.0", "markdown-deck--v0.6.8");
+  assert.deepEqual(lockMismatches(repo), [`${B} at v0.6.0`]);
+  declare("v0.6.0", "6e8e180");
+  assert.deepEqual(lockMismatches(repo), [`${B} at v0.6.0`, "markdown-deck at 6e8e180"]);
 });

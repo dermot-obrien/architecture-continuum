@@ -64,6 +64,8 @@ The `pattern` skill, which authors an architecture pattern as one Markdown docum
 
 You need git, Node.js 18 or later and Python 3.11 or later. draw.io desktop is optional, for PNG export of diagrams. No package registry is needed.
 
+The [install quick start](docs/quick-install.md) installs the continuum and every skill it works with (`pattern`, `use-case`, `cross-reference`, `model` and `markdown-deck`) into a repository with one declaration and one command, and says how to reinstall over an installation, move to a newer release, or move from the old `aaa-*` skills. The rest of this section is the installer underneath.
+
 Each skill is complete on its own: `architecture` carries the standards it reads, the `.aaa-config.yaml` template and its own binding resolver, and needs no other skill. Install them with `bin/skills.mjs`, the standalone skills installer in [AI-Assisted Work](https://github.com/dermot-obrien/ai-assisted-work) (AAW), from the workspace root:
 
 ```bash
@@ -74,9 +76,13 @@ node ../ai-assisted-work/bin/skills.mjs install --bundle ../architecture-continu
 
 Name a skill after the command to install only that one. For a team workspace, commit an `.agents/skills.json` that declares the bundle and let the installer fetch it and lock the commit:
 
+<!-- x-release-please-start-version -->
 ```json
-{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "main" } ] }
+{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.6.0" } ] }
 ```
+<!-- x-release-please-end -->
+
+Pin a release tag, never `main`: the tag is what the lock and the release notes describe.
 
 ```bash
 node scripts/skills.mjs sync --copy            # writes .agents/skills.lock.json; commit it
@@ -123,6 +129,7 @@ You should see a table of seven capabilities, each with its stage and the artefa
 | [The schema on the continuum](docs/schema.md) | The front matter schemas as one picture, in the continuum's layout, generated and checked |
 | [Views of the continuum](docs/continuum-views.md) | The continuum in the words of C4, TOGAF, domain-driven design, ArchiMate, platform engineering, Team Topologies and the Well-Architected frameworks |
 | [The skill bundles](docs/landscape.md) | The landscape of skill bundles and where a solution's architecture lives |
+| [Install quick start](docs/quick-install.md) | The continuum and its related skills in one command, and reinstalling over an installation |
 | [Quick start](docs/quick-start.md) | A first real result in about ten minutes |
 | [Installation](docs/installation.md) | Every install route, for every agent, and updating and removing |
 | [Concepts](docs/concepts.md) | Skills, bindings, standards, the golden thread and the definition ladder, in the order you need them |
