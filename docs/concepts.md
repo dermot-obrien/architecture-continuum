@@ -12,7 +12,7 @@ Each workflow is an [Agent Skill](https://agentskills.io/specification): a folde
 that reads Agent Skills can use them, and the description lets the agent pick a skill when a
 request matches, not only when you type `/architecture abb`.
 
-There is one skill, `architecture`, with a flow per level. Eight flows author one kind of artefact each. The rung flow is read-only and reports how far each capability has been defined, and the check flow checks a whole repository against the continuum. See
+There is one skill, `architecture`, with a flow per level. Eight flows author one kind of artefact each. The stage flow is read-only and reports how far each capability has been defined, and the check flow checks a whole repository against the continuum. See
 [Skills](skills/README.md).
 
 The skill carries the method. The standards it follows and the folders it writes to belong to
@@ -41,7 +41,7 @@ capabilityDir = "../capabilities"
 Paths resolve against the folder holding the bindings file, never the working directory. That
 is why they start with `../` when the file is in `.agents/`.
 
-Before doing anything, every create flow runs the skill's resolver from the workspace root, `node <skills>/architecture/bin/check.mjs --json --flow <flow>`, and uses only the paths it prints. A binding the flow needs that is missing stops it with a message naming the key. An optional binding that is missing means the step that needs it is reported as not done, never quietly skipped. The rung has its own resolver, `rung.py --doctor`, which follows the same rules.
+Before doing anything, every create flow runs the skill's resolver from the workspace root, `node <skills>/architecture/bin/check.mjs --json --flow <flow>`, and uses only the paths it prints. A binding the flow needs that is missing stops it with a message naming the key. An optional binding that is missing means the step that needs it is reported as not done, never quietly skipped. The stage has its own resolver, `stage.py --doctor`, which follows the same rules.
 
 Every key is listed in [Configuration](configuration.md#skill-bindings).
 
@@ -108,10 +108,10 @@ the JSON Schemas that `scripts/validate-frontmatter.mjs` checks against.
 
 ## The definition ladder
 
-How far has a capability been defined? The ladder answers with a rung that can be checked from
+How far has a capability been defined? The ladder answers with a stage that can be checked from
 the artefacts, not asserted.
 
-| Rung | Name | Holds when |
+| Stage | Name | Holds when |
 |---|---|---|
 | R0 | Unrecognised | Not in the capability model |
 | R1 | Named | A capability document with a level, a parent where needed, a purpose and a demand |
@@ -121,15 +121,15 @@ the artefacts, not asserted.
 | R5 | Proven | The physical pattern links evidence |
 | R6 | In service | The capability is `active` and a runbook is linked |
 
-A capability holds the highest rung with every rung below it evidenced. A capability with
+A capability holds the highest stage with every stage below it evidenced. A capability with
 distinct jobs declares `flows[]`, and each flow climbs separately from R3 up; the capability sits
-at its lowest flow. A rung recorded in `flows[].rung` that the evidence does not back is a
-claim, and `rung.py --check` fails on it. Architecture's reach ends at R4: R5 and R6 are
+at its lowest flow. A stage recorded in `flows[].stage` that the evidence does not back is a
+claim, and `stage.py --check` fails on it. Architecture's reach ends at R4: R5 and R6 are
 received from implementation. The full rules are in
 `standards/capabilities/standard-definition-ladder.md`.
 
 Patterns, which R3 and above need, are authored with the
-[architecture-pattern](https://github.com/dermot-obrien/architecture-pattern) skill. `/architecture rung`
+[architecture-pattern](https://github.com/dermot-obrien/architecture-pattern) skill. `/architecture stage`
 reads their `realises`, `flows` and `references` front matter.
 
 ## The foundation seed

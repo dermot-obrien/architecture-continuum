@@ -10,7 +10,8 @@ sequences, flow `[...]` and `{...}`, quoted and plain scalars, comments, and `|`
 block scalars.
 
 Both paths return the same shapes (dict, list, str), so derivation never depends on which
-one ran. Set RUNG_PURE_YAML=1 (or the old AAA_RUNG_PURE_YAML=1) to force the built-in parser.
+one ran. Set STAGE_PURE_YAML=1 (or the older RUNG_PURE_YAML=1 or AAA_RUNG_PURE_YAML=1) to force the
+built-in parser.
 """
 from __future__ import annotations
 
@@ -27,9 +28,13 @@ class YamlError(ValueError):
     pass
 
 
+def _pure() -> bool:
+    return any(os.environ.get(k) for k in ("STAGE_PURE_YAML", "RUNG_PURE_YAML", "AAA_RUNG_PURE_YAML"))
+
+
 def load(text: str):
     """Parse YAML text into dicts, lists and strings. Empty text is {}."""
-    if _pyyaml is not None and not (os.environ.get("RUNG_PURE_YAML") or os.environ.get("AAA_RUNG_PURE_YAML")):
+    if _pyyaml is not None and not _pure():
         try:
             data = _pyyaml.load(text, Loader=_pyyaml.BaseLoader)
         except _pyyaml.YAMLError as ex:

@@ -5,8 +5,8 @@ tools print them; `<...>` stands for a path, key or value that varies.
 
 - [Installing](#installing)
 - [Bindings and post-install checks](#bindings-and-post-install-checks)
-- [/architecture rung](#/architecture rung)
-- [Rung blockers](#rung-blockers): what each one asks you to create or fix
+- [/architecture stage](#the-stage-flow)
+- [Stage blockers](#stage-blockers): what each one asks you to create or fix
 - [In your agent](#in-your-agent)
 - [Validation and ontology scripts](#validation-and-ontology-scripts)
 
@@ -83,9 +83,9 @@ The table is empty or missing, and no old `[suite.aaa-*]` table answers either. 
 
 The repository still answers the ten skills' old tables. It works for this release. Move each key named into `[suite.architecture]` and delete the old table; a key is read from only one table, and when two old tables disagree the first is used and the conflict is a second warning.
 
-#### `architecture has no flow <name>; its flows are platform, strategy, capability, context, abb, sbb, service, runtime-agent, rung, check`
+#### `architecture has no flow <name>; its flows are platform, strategy, capability, context, abb, sbb, service, runtime-agent, stage, check`
 
-`--flow` names a flow the skill does not have. Use one of those listed. Exit code 2.
+`--flow` names a flow the skill does not have. Use one of those listed. `rung`, the stage flow's former name, still selects it. Exit code 2.
 
 #### `<file>: [suite.<skill>] <key> = "<value>" resolves to <path>, which does not exist. Create it, or correct <key>.`
 
@@ -111,11 +111,11 @@ Upgrade Node.js. Exit code 2.
 
 `check.mjs` takes only `--json` and `--flow <name>`. Set `SKILL_DIR` to point it at another installed skill; see [Commands](commands.md#post-install-checks).
 
-## The rung flow
+## The stage flow
 
 #### `! bindings did not resolve:` followed by one line per problem
 
-`rung.py` stopped before reading anything, with exit code 2. The lines below it are:
+`stage.py` stopped before reading anything, with exit code 2. The lines below it are:
 
 #### `no .agents/skill-bindings.toml found above the working directory. Add [suite.architecture] to the repository's bindings file, or pass --bindings`
 
@@ -129,7 +129,7 @@ unbound.
 #### `[suite.architecture] <key> is not a key this skill declares`
 
 A typo, or a key from another skill's table. The keys are listed in
-[Configuration](configuration.md#/architecture rung).
+[Configuration](configuration.md#what-the-stage-flow-reads).
 
 #### `local pattern '<regex>' is not a valid regex: <reason>`
 
@@ -143,7 +143,7 @@ backslashes stay as written. Exit code 2.
 
 #### `reading bindings needs Python 3.11 or newer (tomllib)`
 
-The rung reads TOML with `tomllib`, new in 3.11. Upgrade Python, or run it with a newer interpreter such as `py -3.12`. Exit code 2.
+The stage flow reads TOML with `tomllib`, new in 3.11. Upgrade Python, or run it with a newer interpreter such as `py -3.12`. Exit code 2.
 
 #### `(capabilityDir is not bound, and none named by a pattern or consideration)`
 
@@ -160,26 +160,26 @@ capabilities otherwise, such as `CP-102`, binds `capabilityIdPattern = '^CP-\d{3
 
 #### `unbound  <key>: no <kind>, so <consequence>`
 
-That kind of artefact is not bound, so the rungs that need it cannot be evidenced. It is a
+That kind of artefact is not bound, so the stages that need it cannot be evidenced. It is a
 gap in the workspace, not in the capability. Bind the folder if the workspace keeps that kind.
 
 #### `warn  <path>: front matter is not valid YAML: <reason>` or `front matter is not a mapping`
 
 That document was skipped. Fix its front matter. Tabs in indentation are refused.
 
-#### `Recorded` shows `<rung> claimed`
+#### `Recorded` shows `<stage> claimed`
 
-A flow records a rung higher than the evidence supports, and `--check` exits 1. Either add
-the missing evidence (the blocker says what) or lower `flows[].rung`.
+A flow records a stage higher than the evidence supports, and `--check` exits 1. Either add
+the missing evidence (the blocker says what) or lower `flows[].stage`.
 
-#### `Recorded` shows `<rung> stale`
+#### `Recorded` shows `<stage> stale`
 
-The evidence supports more than the recorded rung. Raise `flows[].rung`, or remove it and let
-`/architecture rung` derive it.
+The evidence supports more than the recorded stage. Raise `flows[].stage`, or remove it and let
+`/architecture stage` derive it.
 
-#### `note  <CAP>: latent evidence at <rungs>, not counted until the rungs below hold`
+#### `note  <CAP>: latent evidence at <stages>, not counted until the stages below hold`
 
-Artefacts for a higher rung exist, but a lower rung is not yet met. They will count once it is.
+Artefacts for a higher stage exist, but a lower stage is not yet met. They will count once it is.
 
 #### `note  <CAP>: named by <pattern or consideration> but has no capability document`
 
@@ -190,9 +190,9 @@ or correct the reference.
 
 The pattern's `flows` and the capability's `flows[].id` disagree. Correct one of them.
 
-## Rung blockers
+## Stage blockers
 
-The last column of the `rung.py` table names what stops the next rung. Each blocker, what it
+The last column of the `stage.py` table names what stops the next stage. Each blocker, what it
 means, and who writes the fix.
 
 | Blocker | Fix | Skill |
@@ -219,7 +219,7 @@ means, and who writes the fix.
 | `pattern <id> links no evidence: add a reference of type evidence` | Link the implementation's evidence | You, from implementation |
 | `<CAP> status is <status>, not active` | Set the capability `active` once in service | You |
 | `no runbook reference on <CAP> or a pattern that realises it` | Link the runbook as type `runbook` | You, from implementation |
-| `needs R<n> first` | Fix the lower rung's blockers first | |
+| `needs R<n> first` | Fix the lower stage's blockers first | |
 
 `/pattern` is the [architecture-pattern](https://github.com/dermot-obrien/architecture-pattern)
 skill, installed separately.

@@ -1,11 +1,11 @@
 ---
 name: architecture
-description: "Author and check an architecture on the architecture continuum, one flow per level: platforms, business outcomes and use cases, capabilities, bounded contexts, architecture and solution building blocks, services and runtime agents, each to its standard with the golden thread of traceability kept; a capability's rung on the definition ladder and what blocks the next; and a check of every page and register against the continuum's standards, or the scaffold of a new architecture root. Use when asked to create or define one of those artefacts (/architecture platform, strategy, capability, context, abb, sbb, service, runtime-agent), what rung a capability is on (/architecture rung), whether an architecture is compliant, or to start one (/architecture check). Also answers to its former names: aaa-create-platform, aaa-create-strategy, aaa-create-capability, aaa-create-context, aaa-create-abb, aaa-create-sbb, aaa-create-service, aaa-create-runtime-agent, aaa-rung, aaa-continuum."
+description: "Author and check an architecture on the architecture continuum, one flow per level: platforms, business outcomes and use cases, capabilities, bounded contexts, architecture and solution building blocks, services and runtime agents, each to its standard with the golden thread of traceability kept; a capability's definition stage on the ladder and what blocks the next; and a check of every page and register against the continuum's standards, or the scaffold of a new architecture root. Use when asked to create or define one of those artefacts (/architecture platform, strategy, capability, context, abb, sbb, service, runtime-agent), what definition stage a capability is at (/architecture stage, formerly rung), whether an architecture is compliant, or to start one (/architecture check). Also answers to its former names: aaa-create-platform, aaa-create-strategy, aaa-create-capability, aaa-create-context, aaa-create-abb, aaa-create-sbb, aaa-create-service, aaa-create-runtime-agent, aaa-rung, aaa-continuum."
 license: CC-BY-4.0 AND Apache-2.0
-compatibility: Node.js 18 or newer for the binding check and the continuum check (which also needs ajv, ajv-formats and js-yaml, from npm install here or the workspace); Python 3.11 or newer for the rung. PNG export needs draw.io desktop. Carries its own copy of the standards in references/standards/. Artefact locations come from [suite.architecture] of the repository's .agents/skill-bindings.toml; the skill ships no layout of its own.
+compatibility: Node.js 18 or newer for the binding check and the continuum check (which also needs ajv, ajv-formats and js-yaml, from npm install here or the workspace); Python 3.11 or newer for the stage flow. PNG export needs draw.io desktop. Carries its own copy of the standards in references/standards/. Artefact locations come from [suite.architecture] of the repository's .agents/skill-bindings.toml; the skill ships no layout of its own.
 metadata:
   author: dermot-obrien
-  version: "0.8.1"
+  version: "0.9.0"
 ---
 
 # Architecture
@@ -26,7 +26,7 @@ This skill was ten skills, `aaa-create-platform` to `aaa-create-runtime-agent`, 
 | `/architecture sbb`, "a solution building block", `SBB-NNN` | A building block mapped to technologies, simple or composite | [references/flows/sbb.md](references/flows/sbb.md) |
 | `/architecture service`, "a deployable service" | A runtime service that implements an SBB inside one context | [references/flows/service.md](references/flows/service.md) |
 | `/architecture runtime-agent`, "a runtime agent", "an agent profile" | An autonomous agent with tiered guardrails, scope and provenance | [references/flows/runtime-agent.md](references/flows/runtime-agent.md) |
-| `/architecture rung [CAP-NNN]`, "what rung is this capability on" | Read-only. Each capability's rung, per flow, and what blocks the next | [references/flows/rung.md](references/flows/rung.md) |
+| `/architecture stage [CAP-NNN]` (or `rung`, its former name), "what stage is this capability at" | Read-only. Each capability's stage, per flow, and what blocks the next | [references/flows/stage.md](references/flows/stage.md) |
 | `/architecture check`, "is this compliant", `/architecture scaffold` | Read-only. Every page and register against the continuum's standards; or the layout of a new root | [references/flows/check.md](references/flows/check.md) |
 
 Read the flow's reference before acting, and the references it names when it names them. With no flow named, ask which artefact the user means; never guess a level.
@@ -39,7 +39,7 @@ Resolve the bindings first and use only the paths printed. The skill carries the
 node <skills>/architecture/bin/check.mjs --json --flow <flow>
 ```
 
-`<skills>` is the directory the skill is installed in. Run it from the workspace root. It prints each binding as an absolute path, or `null` when it is not declared, and exits non-zero when a binding the flow needs is missing or a declared path does not exist. Do not proceed on an error and do not guess a path. The rung and check flows resolve their own bindings too, as their references say.
+`<skills>` is the directory the skill is installed in. Run it from the workspace root. It prints each binding as an absolute path, or `null` when it is not declared, and exits non-zero when a binding the flow needs is missing or a declared path does not exist. Do not proceed on an error and do not guess a path. The stage and check flows resolve their own bindings too, as their references say.
 
 All bindings sit in one table, `[suite.architecture]` of `.agents/skill-bindings.toml`, and paths resolve against that file's directory. The contract, with the flows that need each binding, is [inputs.toml](inputs.toml):
 
@@ -63,7 +63,7 @@ A repository that still has the old tables, `[suite.aaa-create-abb]` and the res
 1. Never invent a parent. Where a flow needs a parent that does not exist, propose it with a plausible name and create it only when the user agrees.
 2. Load the standards the flow's discovery reference names before writing anything. A copy the workspace holds wins over the skill's copy in `references/standards/`.
 3. Every artefact links back to its parent in its front matter, and the parent's inverse list is updated in the same change.
-4. The rung and check flows never edit a page. They report, with the file and what to change.
+4. The stage and check flows never edit a page. They report, with the file and what to change.
 
 ## Standards
 

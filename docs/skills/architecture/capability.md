@@ -41,8 +41,8 @@ ability and leaves the product for the SBB that realises it.
 
 When no outcome exists and you decline to create one, the demand is recorded as
 `demand_assumption`. Distinct jobs of the capability that will be defined at different speeds
-become `flows[]`. The skill leaves `flows[].rung` unset unless you state one;
-[/architecture rung](rung.md) derives it.
+become `flows[]`. The skill leaves `flows[].stage` unset unless you state one;
+[/architecture stage](stage.md) derives it.
 
 ## Try it
 
@@ -55,4 +55,4 @@ It supports the where-is-my-order outcome.
 
 - [/architecture context](context.md) creates the bounded context that realises it.
 - [/architecture abb](abb.md) creates the building blocks beneath it.
-- [/architecture rung](rung.md) reports how far it has been defined.
+- [/architecture stage](stage.md) reports how far it has been defined.

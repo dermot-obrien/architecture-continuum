@@ -381,14 +381,14 @@ Recursive via `parent_capability_id`. The original ontology had SubCapability as
 
 Crawl, walk, run and fly are not a scale of their own. They are a coarse reading of the [definition ladder](../capabilities/standard-definition-ladder.md) (R0 to R6), grouped into four bands, and this table is the whole of their definition:
 
-| Horizon | Ladder rungs | Reads as |
+| Horizon | Definition stages | Reads as |
 |---|---|---|
 | crawl | R1 Named, R2 Bounded | The capability is recognised and scoped: named, with its building blocks and open questions listed, but nothing yet decided |
 | walk | R3 Decided, R4 Buildable | The capability is designed: its questions are settled and it can be built from a physical pattern |
 | run | R5 Proven | An implementation has exercised it end to end and the evidence is linked |
 | fly | R6 In service | It runs for real, with an owner, a runbook and a reported measure |
 
-A capability at R0 is not in the capability model and so has no horizon. A capability's horizon is the band containing its rung, which is the rung of its lowest flow, and it moves only when the rung does. Where a rung is derived (by `/architecture rung`), the horizon is derived from it and is never set independently.
+A capability at R0 is not in the capability model and so has no horizon. A capability's horizon is the band containing its definition stage, which is the stage of its lowest flow, and it moves only when the stage does. Where a stage is derived (by `/architecture stage`), the horizon is derived from it and is never set independently.
 
 This is a mapping, not a new scale, and it does not replace AAA capability maturity (0 to 5, None to Optimising). That maturity measures how well an in-service capability performs, so it becomes meaningful at fly and continues beyond it, while the horizons stop at fly. `Milestone.maturity_horizon` uses the same four values with the same meaning: the band a milestone commits the capability to reach.
 

@@ -9,7 +9,7 @@ Whichever route you take, you need:
 | The `architecture` skill folder (and `workspace`, if you use it) where your agent reads skills | The skills themselves |
 | `.agents/skill-bindings.toml` | Where each flow writes, in one `[suite.architecture]` table; see [Configuration](configuration.md#skill-bindings) |
 | Node.js 18 or later | The installer, the architecture skill's `bin/check.mjs`, and the ontology validator |
-| Python 3.11 or later | The rung flow |
+| Python 3.11 or later | The stage flow |
 | ajv, ajv-formats and js-yaml (`npm install` in the skill folder, or in the workspace) | `/architecture check` |
 | git | Fetching the bundle |
 | draw.io desktop, optional | PNG export of diagrams |

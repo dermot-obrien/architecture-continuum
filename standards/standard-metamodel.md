@@ -235,14 +235,14 @@ Universal envelope shape (`status`, `version`, `last_modified`, `author`, `prove
 
 ### 4.1 Definition ladder
 
-A capability's progress through definition is a rung on the [definition ladder](./capabilities/standard-definition-ladder.md): R0 Unrecognised, R1 Named, R2 Bounded, R3 Decided, R4 Buildable, R5 Proven, R6 In service. The rung is derived from the artefacts in other groupings (ABBs, SBBs, considerations, decision records, architecture patterns, reference architectures and linked implementation evidence), so it adds no entity of its own. It is recorded per flow in the capability's optional `flows[]`, and it is a separate axis from maturity (0 to 5), which measures a capability once it operates.
+A capability's progress through definition is a definition stage on the [definition ladder](./capabilities/standard-definition-ladder.md): R0 Unrecognised, R1 Named, R2 Bounded, R3 Decided, R4 Buildable, R5 Proven, R6 In service. The stage is derived from the artefacts in other groupings (ABBs, SBBs, considerations, decision records, architecture patterns, reference architectures and linked implementation evidence), so it adds no entity of its own. It is recorded per flow in the capability's optional `flows[]`, and it is a separate axis from maturity (0 to 5), which measures a capability once it operates.
 
 | Field | On | Purpose |
 |---|---|---|
-| `flows[]` | Capability | Named paths through the capability, each with an optional recorded `rung` |
+| `flows[]` | Capability | Named paths through the capability, each with an optional recorded `stage` |
 | `open_questions: none` | Capability | States that the capability has no open question to list as a consideration |
 | `demand_assumption` | Capability | Demand recorded as an explicit assumption where no outcome is linked yet |
-| `realises` | Architecture pattern, reference architecture | The capabilities the document realises, so it counts toward their rungs |
+| `realises` | Architecture pattern, reference architecture | The capabilities the document realises, so it counts toward their stages |
 
 ### 4.2 Consideration (Governance grouping)
 
@@ -253,7 +253,7 @@ Consideration ──affects──► Capability / ABB / SBB / Architecture patte
 Consideration ──resolved_by──► Decision Record
 ```
 
-It belongs to the Governance grouping beside the ADR: a consideration is the question, and the decision record is the answer. Listing considerations is part of rung R2, and resolving each by an accepted decision record is part of R3. Field reference: [Frontmatter Standard §6.16](./standard-frontmatter.md#616-consideration-cn-nnn).
+It belongs to the Governance grouping beside the ADR: a consideration is the question, and the decision record is the answer. Listing considerations is part of stage R2, and resolving each by an accepted decision record is part of R3. Field reference: [Frontmatter Standard §6.16](./standard-frontmatter.md#616-consideration-cn-nnn).
 
 ## 5. Building Blocks (ABB / SBB)
 

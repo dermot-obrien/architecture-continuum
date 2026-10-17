@@ -1,7 +1,7 @@
 {
   "name": "architecture",
   "version": "0.7.0",
-  "description": "Author and check an architecture on the architecture continuum, one flow per level, with the rung of each capability and a check of every page and register. An Agent Skill from AI-Assisted Architecture.",
+  "description": "Author and check an architecture on the architecture continuum, one flow per level, with the stage of each capability and a check of every page and register. An Agent Skill from AI-Assisted Architecture.",
   "author": "Dermot O'Brien",
   "homepage": "https://github.com/dermot-obrien/architecture-continuum",
   "repository": {

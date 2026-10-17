@@ -60,21 +60,24 @@ intervention, and the architecture artefacts above come into play.
   before AAW delivers it. AAR's `/aar-sync-research-result` proposes the record, citing the
   hypothesis node and its work item, when a finding settles an architectural choice.
 
-## Planning, deliverables and rungs
+## Planning, deliverables and definition stages
 
 Planning is the third seam. AAW plans architecture work a period at a time; AAA says what
-that work has made true. The unit that joins them is a rung on the
+that work has made true. The unit that joins them is a definition stage, a stage on the
 [definition ladder](capabilities/standard-definition-ladder.md): a piece of architecture work
-is framed as moving one capability area's flows from one rung to another, and a planning
-period opens with the grid of where each area starts and where it is committed to finish.
+is framed as moving one capability area's flows from one definition stage to another, and a
+planning period opens with the grid of where each area starts and where it is committed to
+finish. A definition stage says how far a capability has been defined and built towards
+service; it is not a stage of the delivery lifecycle, which AAW owns. The stages were called
+rungs before; the `rung` column and keys are still read.
 
-### Deliverable types map to artefact kinds, and so to rungs
+### Deliverable types map to artefact kinds, and so to definition stages
 
 Each deliverable type in a workspace's deliverable register names the AAA artefact kind it
-produces. The artefact kind decides the rung the deliverable evidences, so a named product
-says which rung it moves toward. A typical mapping:
+produces. The artefact kind decides the definition stage the deliverable evidences, so a named product
+says which stage it moves toward. A typical mapping:
 
-| Deliverable type | AAA artefact kind | Rung it evidences |
+| Deliverable type | AAA artefact kind | Definition stage it evidences |
 |------------------|-------------------|-------------------|
 | Capability definition | Capability (`CAP-NNN`) | R1 Named |
 | Building block specification | ABB (`ABB-NNN`) | R2 Bounded |
@@ -87,29 +90,29 @@ says which rung it moves toward. A typical mapping:
 | Evaluation received | An `evidence` reference on the physical pattern | R5 Proven |
 | Runbook received | A `runbook` reference, and the capability `active` | R6 In service |
 
-The register records the rung in its own `rung` column, using the rung identifiers of the
+The register records the definition stage in its own `stage` column, using the stage identifiers of the
 workspace's ladder. The names of the deliverable types belong to the workspace; the artefact
-kinds and rungs are AAA's. R5 and R6 are received from implementation, so their deliverables
+kinds and stages are AAA's. R5 and R6 are received from implementation, so their deliverables
 are links, not documents architecture writes.
 
 ### The ladder AAW reads
 
-AAW's quarter planning reads a ladder as a CSV with the columns `rung,name,description`. AAA
+AAW's quarter planning reads a ladder as a CSV with the columns `stage,name,description`. AAA
 ships one at `standards/capabilities/definition-ladder.csv`. A workspace that adopts the AAA
 ladder binds that file, or its own governed copy of it, as the planning skill's ladder, so
-both frameworks name the same rungs.
+both frameworks name the same stages.
 
-### Derived rungs feed the framing
+### Derived definition stages feed the framing
 
-`/architecture rung` derives each capability's rung, per flow, from the artefacts that exist, and names
-the artefact that blocks the next rung. Its `--json` output is what planning consumes:
+`/architecture stage` derives each capability's definition stage, per flow, from the artefacts that exist, and names
+the artefact that blocks the next stage. Its `--json` output is what planning consumes:
 
-- **Starting rung.** An epic's "from" rung is the derived rung at the start of the period, not
-  a claim. A framing whose "from" is above the derived rung is claiming evidence that does not
+- **Starting stage.** An epic's "from" stage is the derived stage at the start of the period, not
+  a claim. A framing whose "from" is above the derived stage is claiming evidence that does not
   exist yet.
-- **Products.** The blocker `/architecture rung` names is the first product the epic needs. Each target
-  rung should have at least one named product whose deliverable type evidences it.
-- **Close.** At the end of the period the rung reached is read again from `/architecture rung`, not
+- **Products.** The blocker `/architecture stage` names is the first product the epic needs. Each target
+  stage should have at least one named product whose deliverable type evidences it.
+- **Close.** At the end of the period the stage reached is read again from `/architecture stage`, not
   asserted, and any unfinished movement carries into the next period's grid as its start.
 
 Criteria follow the same rule. An outcome measure has an identifier of the form `OC-NNN-M<n>`
@@ -124,13 +127,13 @@ identifiers as `advances_criterion_ids` to say which measures a piece of work mo
 | cross-cutting change | class `intervention` | Capability / ABB / SBB revision |
 | architecture project | `architecture-work` work item | the work that produces AAA artefacts |
 | baseline vs target | release / version | `lifecycle_state` on each artefact |
-| progress of architecture work | an epic's rung movement per flow | a rung on the definition ladder, derived by `/architecture rung` |
-| what a product evidences | deliverable type and its `rung` | artefact kind |
+| progress of architecture work | an epic's movement between definition stages, per flow | a definition stage, derived by `/architecture stage` |
+| what a product evidences | deliverable type and its `stage` | artefact kind |
 | a criterion work advances | `advances_criterion_ids` | an outcome measure id (`OC-NNN-M<n>`) |
 
 AAA owns the *architecture metamodel and artefacts*; AAW owns the *class definitions and the
 delivery lifecycle*. The seam is `decision → DR`, `cross-cutting intervention → building
-blocks`, and `deliverable type → artefact kind → rung`.
+blocks`, and `deliverable type → artefact kind → definition stage`.
 
 See AAW's `docs/concepts/work-classification.md` for the full taxonomy,
 and AAA's `standard-metamodel.md` for the artefact definitions.

@@ -15,7 +15,7 @@ Installed one by one, or all together from `bundle.json`, with AI-Assisted Work'
 | Create ABB | `/architecture abb` | End-to-end ABB creation: logical structure and diagrams. |
 | Create SBB | `/architecture sbb` | End-to-end SBB creation: product mapping, realisation, composite structure. |
 | Create Service | `/architecture service` | Runtime unit of execution definition. |
-| Derive Rung | `/architecture rung` | Read-only. Derives each capability's rung on the definition ladder, per flow, and names the artefact blocking the next rung. See `standards/capabilities/standard-definition-ladder.md`. |
+| Derive Stage | `/architecture stage` | Read-only. Derives each capability's stage on the definition ladder, per flow, and names the artefact blocking the next stage. See `standards/capabilities/standard-definition-ladder.md`. |
 | Create Runtime Agent | `/architecture runtime-agent` | (Builder skill) Author an autonomous **runtime agent** as a catalogued service with run-time guardrails, contracts, capability scope, and output provenance. See `standards/agent-native/agent-types.md`. |
 
 ## Scripts
@@ -58,7 +58,7 @@ For **agent-native** workspaces (AI-majority engineering), also load:
 - For business platforms, apply `platform-standard.md` via `/architecture platform`.
 - For capability documents, apply `standard-capability-document.md` via `/architecture capability`.
 - For capability diagrams (maps and traceability matrices), apply `standard-capability-diagram.md`.
-- For how far a capability has been defined, apply `standard-definition-ladder.md`, and derive the rung with `/architecture rung`.
+- For how far a capability has been defined, apply `standard-definition-ladder.md`, and derive the stage with `/architecture stage`.
 - For bounded context definitions, apply `standard-bounded-context.md` via `/architecture context`.
 - For whether something is an ABB, an SBB, a component inside one, or a whole system, apply `standard-building-block-calibration.md` before `/architecture abb`, `/architecture sbb`, or a pattern's building-block table.
 - For ABB narrative/content documents, apply `standard-abb-document.md` via `/architecture abb`.

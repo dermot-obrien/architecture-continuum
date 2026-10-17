@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "consideration.schema.json",
   "title": "Consideration Artefact (v1.1.0)",
-  "description": "An open architectural question with more than one credible answer: the question, the options, the criteria that decide between them, and the decision record that resolves it. Listing considerations is part of definition-ladder rung R2; resolving every one by an accepted decision record is part of R3. The consideration's own lifecycle is `consideration_status`, kept separate from the envelope `status` so the two enums never apply to one property.",
+  "description": "An open architectural question with more than one credible answer: the question, the options, the criteria that decide between them, and the decision record that resolves it. Listing considerations is part of definition stage R2; resolving every one by an accepted decision record is part of R3. The consideration's own lifecycle is `consideration_status`, kept separate from the envelope `status` so the two enums never apply to one property.",
   "type": "object",
 
   "allOf": [

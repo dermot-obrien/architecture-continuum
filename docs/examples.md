@@ -9,7 +9,7 @@ Each standard carries a worked example the skills compare their output against.
 | Example | Shows | Used by |
 |---|---|---|
 | `standards/building-blocks/architecture-building-blocks/example/` | A complete ABB: `index.md`, `summary.md`, the components and summary draw.io diagrams and their PNG exports | [/architecture abb](skills/architecture/abb.md) |
-| `standards/building-blocks/architecture-building-blocks/example-requires/` | Five ABBs (`ABB-010` to `ABB-014`) whose `requires` lists form a dependency graph, for gap analysis | [/architecture abb](skills/architecture/abb.md), [/architecture rung](skills/architecture/rung.md) |
+| `standards/building-blocks/architecture-building-blocks/example-requires/` | Five ABBs (`ABB-010` to `ABB-014`) whose `requires` lists form a dependency graph, for gap analysis | [/architecture abb](skills/architecture/abb.md), [/architecture stage](skills/architecture/stage.md) |
 | `standards/building-blocks/solution-building-blocks/example/` | A simple SBB mapping each ABB component to a product, with its diagrams | [/architecture sbb](skills/architecture/sbb.md) |
 | `standards/building-blocks/solution-building-blocks/example-composite/` | A composite SBB with parts, ports and connectors (`index.md`), and the C4 System Context view of the same system from outside (`c4-context.md`) | [/architecture sbb](skills/architecture/sbb.md) |
 | `standards/ontology/example-identity-platform.json` | One platform described in the modernisation ontology: capabilities, components, changes and milestones | [Ontology](ontology.md) |
@@ -35,20 +35,20 @@ To see what the profiles would copy into your workspace without writing anything
 node <aaa>/scripts/seed-foundation.mjs --profile all --dry-run
 ```
 
-## A workspace at every rung
+## A workspace at every stage
 
 `skills/architecture/tests/fixtures/workspace/` is a small order-handling workspace built for the
-`/architecture rung` tests. It has one capability at each rung from R1 to R6, one held back by an open
-consideration, one whose decision was superseded, one with two flows at different rungs, and
+`/architecture stage` tests. It has one capability at each stage from R1 to R6, one held back by an open
+consideration, one whose decision was superseded, one with two flows at different stages, and
 one named only by a pattern. It carries its own `skill-bindings.toml`, so you can run the
 skill against it directly from a clone of this repository:
 
 ```bash
-python skills/architecture/bin/rung.py --bindings skills/architecture/tests/fixtures/workspace/skill-bindings.toml
+python skills/architecture/bin/stage.py --bindings skills/architecture/tests/fixtures/workspace/skill-bindings.toml
 ```
 
 ```text
-Capability  Flow           Rung             Recorded    Blocking the next rung
+Capability  Flow           Stage            Recorded    Blocking the next stage
 ----------  -------------  ---------------  ----------  ----------------------
 CAP-001     -              R1 Named                     CAP-001 names no ABB in realised_by_abbs (+1 more)
 CAP-002     -              R2 Bounded                   no pattern realises CAP-002: add realises: [CAP-002] to a logical pattern
@@ -58,8 +58,8 @@ CAP-006     -              R6 In service                top of the ladder
 ...
 ```
 
-Read its documents side by side with the report to see which front matter earns each rung.
-[Configuration](configuration.md#front-matter-read-by-aaa-rung) lists the fields.
+Read its documents side by side with the report to see which front matter earns each stage.
+[Configuration](configuration.md#front-matter-read-by-the-stage-flow) lists the fields.
 
 ## The quick start
 

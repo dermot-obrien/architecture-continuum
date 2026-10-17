@@ -25,7 +25,7 @@ The rule in one line: no ABB or SBB exists below the container level. There is n
 > - [ABB Document Standard](./architecture-building-blocks/standard-abb-document.md): what an ABB document holds, once the grain is right.
 > - [SBB Document Standard](./solution-building-blocks/standard-sbb-document.md): what an SBB document holds, including the composite form.
 > - [C4 System Context Diagram Standard](./standard-c4-context-diagram.md): the context view, which belongs to a capability.
-> - [Definition Ladder Standard](../capabilities/standard-definition-ladder.md): how architecture patterns, reference architectures, ABBs and SBBs evidence a capability's rung.
+> - [Definition Ladder Standard](../capabilities/standard-definition-ladder.md): how architecture patterns, reference architectures, ABBs and SBBs evidence a capability's stage.
 > - [Traceability & Hierarchy Standard](../standard-traceability.md): the golden thread the grain sits in.
 
 ## 1. The C4 levels
@@ -134,7 +134,7 @@ A calibration review walks every block and applies the container test. The outco
 | Is a system | Replace it with a capability and an architecture pattern; its former components become the boxes if they pass the test |
 | Is a deployment node | Keep it for the deployment view; remove it from architecture patterns and reference architectures |
 
-A fold or a replacement changes nothing on the definition ladder by itself. R2 asks that the building blocks a capability needs are named, and naming them at the right grain is what the review does. A rung is lost only where the evidence a rung requires was attached to a retired block and has not been carried to its container.
+A fold or a replacement changes nothing on the definition ladder by itself. R2 asks that the building blocks a capability needs are named, and naming them at the right grain is what the review does. A stage is lost only where the evidence a stage requires was attached to a retired block and has not been carried to its container.
 
 ## 9. What this standard changes in its neighbours
 

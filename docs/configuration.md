@@ -5,11 +5,11 @@ different things.
 
 | File | Written by | Read by |
 |---|---|---|
-| [`.agents/skill-bindings.toml`](#skill-bindings) | You | Every skill, through its own `bin/check.mjs --json` (with `--flow` for an architecture flow) or `rung.py --doctor`, and the post-install checks |
+| [`.agents/skill-bindings.toml`](#skill-bindings) | You | Every skill, through its own `bin/check.mjs --json` (with `--flow` for an architecture flow) or `stage.py --doctor`, and the post-install checks |
 | [`.aaa-config.yaml`](#aaa-configyaml), optional | You, from the template the architecture skill carries | The post-install checks and the ontology validator |
 | [`foundation-workspace.yaml`](#foundation-workspaceyaml) | `scripts/seed-foundation.mjs` | Nothing yet; a record of what was seeded |
-| [Front matter](#front-matter-read-by-the-rung) | The skills, or you | `/architecture rung`, `validate-frontmatter.mjs` |
-| [Environment variables](#environment-variables) | You | The checks and `/architecture rung` |
+| [Front matter](#front-matter-read-by-the-stage-flow) | The skills, or you | `/architecture stage`, `validate-frontmatter.mjs` |
+| [Environment variables](#environment-variables) | You | The checks and `/architecture stage` |
 | [Foundation profiles](#foundation-profiles) | Maintainers of this repository | The seeder |
 
 The installer's own files, `.agents/skills.json` and `.agents/skills.lock.json`, belong to AI-Assisted Work's `skills.mjs`; see [Installation](installation.md#route-2-a-declared-locked-set-of-skills).
@@ -23,8 +23,8 @@ Rules that apply to every key below:
 - Type `dir` is a folder, `file` is a file, `str` is a string.
 - No key has a default. A flow that needs a key that is missing stops, naming the key. A key a flow reads but does not need, when missing, means the step that needs it is reported as not done.
 - Relative paths resolve against the folder holding the bindings file, never the working directory. With the file in `.agents/`, paths start with `../`.
-- A path that is set must exist. The rung also rejects a key the contract does not declare.
-- The file is found by searching upward from the working directory for `.agents/skill-bindings.toml`, then `skill-bindings.toml`, taking the first. `rung.py --bindings <path>` overrides the search for the rung.
+- A path that is set must exist. The stage flow also rejects a key the contract does not declare.
+- The file is found by searching upward from the working directory for `.agents/skill-bindings.toml`, then `skill-bindings.toml`, taking the first. `stage.py --bindings <path>` overrides the search for the stage flow.
 - Write the file as UTF-8 without a byte order mark. PowerShell 5.1 adds one unless you use `-Encoding ascii`.
 
 ### architecture
@@ -38,16 +38,16 @@ Rules that apply to every key below:
 | `platformDir` | dir | platform, capability, context | | `PL-NNN` documents |
 | `outcomeDir` | dir | strategy | platform | `OC-NNN` folders |
 | `useCaseDir` | dir | strategy | | `UC-NNN` folders. May be the same folder as `outcomeDir` |
-| `capabilityDir` | dir | capability | context, abb, rung | `CAP-NNN` folders (or `capabilityIdPattern`), with `capability-model.md` and its two CSVs |
+| `capabilityDir` | dir | capability | context, abb, stage | `CAP-NNN` folders (or `capabilityIdPattern`), with `capability-model.md` and its two CSVs |
 | `contextDir` | dir | context | abb, service | `BC-NNN` folders |
-| `abbDir` | dir | abb | sbb, rung | `ABB-NNN` folders |
-| `sbbDir` | dir | sbb | service, rung | `SBB-NNN` folders, composites included |
+| `abbDir` | dir | abb | sbb, stage | `ABB-NNN` folders |
+| `sbbDir` | dir | sbb | service, stage | `SBB-NNN` folders, composites included |
 | `serviceDir` | dir | service | | Service definitions, one file per service |
-| `decisionDir` | dir | | rung | Decision records, `kind: decision-record` |
-| `considerationDir` | dir | | rung | Considerations, `kind: consideration` |
-| `patternDir` | dir | | rung | Patterns, read for `realises`, `flows`, `references` and their Building Blocks tables |
-| `localPattern` | str | | rung | Regex for a model-local box id, such as `07` in `07 Gateway` |
-| `capabilityIdPattern` | str | | capability, context, abb, rung | Regex a capability id matches in full. Default `^CAP-\d{3}$` |
+| `decisionDir` | dir | | stage | Decision records, `kind: decision-record` |
+| `considerationDir` | dir | | stage | Considerations, `kind: consideration` |
+| `patternDir` | dir | | stage | Patterns, read for `realises`, `flows`, `references` and their Building Blocks tables |
+| `localPattern` | str | | stage | Regex for a model-local box id, such as `07` in `07 Gateway` |
+| `capabilityIdPattern` | str | | capability, context, abb, stage | Regex a capability id matches in full. Default `^CAP-\d{3}$` |
 | `agentProfileSchema` | file | | runtime-agent | The JSON Schema an agent profile is validated against |
 | `ontologyValidator` | file | | runtime-agent | The validator run over each record the runtime-agent flow writes |
 
@@ -78,9 +78,9 @@ agentProfileSchema = "skills/architecture/references/standards/schemas/v1.1.0/ag
 ontologyValidator  = "skills/architecture/references/scripts/ontology/validate.cjs"
 ```
 
-### What the rung reads
+### What the stage flow reads
 
-Every key the rung reads is optional. A folder left unset means the workspace does not keep that kind: nothing is read for it, and the report names it with the rungs it cannot evidence. With no `[suite.architecture]` table at all, every kind is unbound and the report is empty, but the run succeeds. Every folder is searched recursively for Markdown files with front matter.
+Every key the stage flow reads is optional. A folder left unset means the workspace does not keep that kind: nothing is read for it, and the report names it with the stages it cannot evidence. With no `[suite.architecture]` table at all, every kind is unbound and the report is empty, but the run succeeds. Every folder is searched recursively for Markdown files with front matter.
 
 | Key | Type | Holds | If unbound |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Every key the rung reads is optional. A folder left unset means the workspace do
 same file, then `[0-9]{1,3}`. Write a regex in a single-quoted TOML string so backslashes are
 not treated as escapes.
 
-`capabilityIdPattern` is the regex a capability's identifier must match in full: in `capabilityDir`, in a pattern's `realises`, in a consideration's `affects`, and on the rung's command line. A workspace that numbers its capabilities `CP-NNN` under capability area folders binds it like this:
+`capabilityIdPattern` is the regex a capability's identifier must match in full: in `capabilityDir`, in a pattern's `realises`, in a consideration's `affects`, and on the stage flow's command line. A workspace that numbers its capabilities `CP-NNN` under capability area folders binds it like this:
 
 ```toml
 [suite.architecture]
@@ -117,7 +117,7 @@ capability:
   parent: CA-04
 ```
 
-and the rung reads it as `level: L2`, `parent: CA-04`. A top-level key wins over the nested one.
+and the stage flow reads it as `level: L2`, `parent: CA-04`. A top-level key wins over the nested one.
 
 
 ### What the check reads
@@ -140,7 +140,7 @@ decks = "../site/static/decks"
 The same file may hold tables for other skills, such as `[model]`, `[markdown.*]` and
 `bindingsVersion` for the `model` skill, or `[suite.pattern]` for architecture-pattern. Those
 are documented in their own repositories. The architecture skill reads only `[model] local_pattern`, as a
-fallback for the rung.
+fallback for the stage flow.
 
 ## .aaa-config.yaml
 
@@ -172,9 +172,9 @@ Precedence for the ontology validator's schema: `--schema` on the command line, 
 
 Copied from `foundation/workspace-manifest.example.yaml` by `scripts/seed-foundation.mjs`, if it does not exist. It records `foundation_source`, `imported_profiles` and a `policy` block (`workspace_is_canonical`, `allow_framework_fallback_readonly`, `require_copy_before_edit`). No tool reads it yet. Treat it as a note of what was seeded and on what terms.
 
-## Front matter read by the rung
+## Front matter read by the stage flow
 
-`/architecture rung` reads a small set of front matter fields. The full field list for every kind, with
+`/architecture stage` reads a small set of front matter fields. The full field list for every kind, with
 types and required fields, is in `standards/standard-frontmatter.md` and the schemas in
 `standards/schemas/v1.1.0/`.
 
@@ -190,7 +190,7 @@ either no `kind` or the right one.
 | capability | `required_by_outcomes`, or `demand_assumption` | R1 |
 | capability | `realised_by_abbs` | R2 |
 | capability | `open_questions: none` | R2, when no consideration applies |
-| capability | `flows[]`: `id`, `name`, `description`, `rung` (`R0` to `R6`) | Per-flow rungs, and the recorded rung `--check` compares against |
+| capability | `flows[]`: `id`, `name`, `description`, `stage` (`R0` to `R6`; `rung`, the former key, is still read) | Per-flow stages, and the recorded stage `--check` compares against |
 | capability | `status` | R6 needs `active` |
 | capability, pattern | `references[]` with `type` `cost-model`, `evidence` or `runbook` | R4, R5, R6 |
 | abb | `requires` | R2. An empty list is enough |
@@ -204,7 +204,7 @@ either no `kind` or the right one.
 | Variable | Read by | Effect |
 |---|---|---|
 | `SKILL_DIR` | Each skill's `bin/check.mjs` | The installed skill's folder. Defaults to the folder above `bin/`. Installers set it |
-| `RUNG_PURE_YAML` | The rung | Any non-empty value forces the built-in front matter parser even when PyYAML is installed. The old name, `AAA_RUNG_PURE_YAML`, still works |
+| `STAGE_PURE_YAML` | The stage flow | Any non-empty value forces the built-in front matter parser even when PyYAML is installed. The old names, `RUNG_PURE_YAML` and `AAA_RUNG_PURE_YAML`, still work |
 
 ## Foundation profiles
 

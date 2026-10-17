@@ -54,9 +54,9 @@ In the bundle a domain is not a folder or an identifier. It is recorded in two p
 
 A capability is what the organisation must be able to do, expressed in business terms and independent of how it is done. It encompasses organisation, people, processes and technology, and it survives a change of implementation. It answers: what must be possible.
 
-The source is TOGAF's Business Architecture work on business capabilities, with BIZBOK's capability mapping behind it. The bundle adds two measures a capability carries: maturity, 0 to 5, which measures a capability once it operates, and the rung on the definition ladder, R0 Unrecognised to R6 In service, which measures how far it has been defined and is derived from the artefacts beneath it rather than asserted. The two are separate axes.
+The source is TOGAF's Business Architecture work on business capabilities, with BIZBOK's capability mapping behind it. The bundle adds two measures a capability carries: maturity, 0 to 5, which measures a capability once it operates, and the stage on the definition ladder, R0 Unrecognised to R6 In service, which measures how far it has been defined and is derived from the artefacts beneath it rather than asserted. The two are separate axes.
 
-In the bundle a capability is `CAP-NNN`, authored by `/architecture capability` to the [capability standard](https://github.com/dermot-obrien/ai-assisted-architecture/blob/main/standards/capabilities/standard-capability-document.md), with levels L1 to L3, `realised_by_abbs`, optional `flows[]` and the rung read by `/architecture rung`. Patternode's `capabilities/` has one area, AI Operations, with thirteen L2 capabilities at R1, and its L3 sub-capabilities listed inline without identifiers.
+In the bundle a capability is `CAP-NNN`, authored by `/architecture capability` to the [capability standard](https://github.com/dermot-obrien/ai-assisted-architecture/blob/main/standards/capabilities/standard-capability-document.md), with levels L1 to L3, `realised_by_abbs`, optional `flows[]` and the stage read by `/architecture stage`. Patternode's `capabilities/` has one area, AI Operations, with thirteen L2 capabilities at R1, and its L3 sub-capabilities listed inline without identifiers.
 
 ### Product
 
@@ -162,7 +162,7 @@ The golden thread the bundle has always drawn, Outcome to Service, extended with
 | Product | runs | Service | Product `runs`; service `run_by` |
 | Capability | is realised by | Bounded context | Context `realises_capabilities` |
 | Capability | is realised by | Architecture building block | ABB `realises_capabilities`, capability `realised_by_abbs` |
-| Capability | is realised by | Architecture pattern, reference architecture | `realises` on either, read by `/architecture rung` |
+| Capability | is realised by | Architecture pattern, reference architecture | `realises` on either, read by `/architecture stage` |
 | Bounded context | contains | Architecture building block | Context `contains`, ABB `part_of` |
 | Bounded context | relates to | Bounded context | Context `relationships`, with the context map pattern |
 | Architecture building block | requires | Architecture building block | ABB `requires` |
@@ -217,7 +217,7 @@ The diagram is meant to be read as current practice, so each element is marked h
 | Outcome, driver, goal | Standard | ArchiMate 3.2 motivation elements; TOGAF Architecture Vision |
 | Use case with owned scenarios | Standard | UML |
 | Capability, four dimensions, levels L1 to L3, maturity 0 to 5 | Standard | TOGAF Series Guide: Business Capabilities, version 2 (2022); BIZBOK |
-| The rung on the definition ladder | Choice | This bundle. Industry has capability maturity, not a definition ladder |
+| The stage on the definition ladder | Choice | This bundle. Industry has capability maturity, not a definition ladder |
 | Domain, subdomain, core, supporting, generic | Standard | Evans; Vernon; Khononov, Learning Domain-Driven Design (2021); Tune, Architecture Modernization (2024) |
 | Subdomain maps to bounded context, ideally one to one | Practice | Vernon; the Azure Architecture Center's strategic and tactical DDD; AWS Prescriptive Guidance, decompose by subdomain; Team Topologies' Independent Service Heuristics |
 | Bounded context, ubiquitous language, context map relationships | Standard | Evans; the context map patterns are Evans's; O-AA (2020) adopts them into Open Group practice; AWS Well-Architected REL03-BP02 and the bubble context |
@@ -280,7 +280,7 @@ The same words, as each repository uses them on 16 October 2026.
 | Landscape, layer | Not an entity | Not in scope | Platform of platforms, L0 to L4, still in patternode-platform | Platform architecture, L0 to L4, PL-01 to PL-08 |
 | Platform | `PL-NNN`, replaces domain as the grouping | Not in scope; `platform` is a pattern scope | No platform page yet; products name a platform "not yet in the topology" | PL-01 to PL-08 in layers, each holding contexts |
 | Domain | Replaced by platform | `domain` is a pattern scope | Four groups of contexts: trading, data, knowledge, platform | Core and supporting contexts |
-| Capability | `CAP-NNN`, L1 to L3, maturity and rung | `realises: [CAP-NNN]` on an architecture pattern or a reference architecture | One area, thirteen L2 at R1, L3 inline | Not used |
+| Capability | `CAP-NNN`, L1 to L3, maturity and stage | `realises: [CAP-NNN]` on an architecture pattern or a reference architecture | One area, thirteen L2 at R1, L3 inline | Not used |
 | Product | Vendor offering on an SBB; "platform as a product" | Product is a kind of box | `PRD-NNN`, the consumable offering; technology; deliverable | Three products over one core platform |
 | Bounded context | `BC-NNN`, one platform, contains ABBs | Not in scope | Ten target contexts; eight as built; no `BC-NNN` pages | Sixteen contexts, the authoritative master document |
 | ABB | `ABB-NNN` inside a BC, with `requires` | A kind of box, catalogue level logical | Placeholder; every box local | Six, for persistence technology only |
@@ -321,7 +321,7 @@ In the order the work should be done.
 
 1. The metamodel. Consolidate groupings 2 (Organisation and Platform, with Layer and Product), 5 (Solution Boundary), 6 (Runtime, with Service, Store and Deployment Node) and 8 (Guidance, with Architecture pattern and Reference architecture) against this page.
 2. The frontmatter standard and schemas. Done: `DN-NNN` is defined; the `product`, `feature`, `store` and `landscape` kinds exist; the platform has `landscape` and `layer`, the service `run_by` and `stores`, the SBB `technologies`; the use case links its capabilities, features and realising pattern; and patterns list the blocks they compose. [The schema on the continuum](https://github.com/dermot-obrien/ai-assisted-architecture/blob/main/docs/schema.md) draws the schemas in this page's layout and is checked against its picture.
-3. The skills. `/architecture service` writes a folder per service as every other skill does, and links the product that runs it; a new `/architecture product` writes a product with its state and required capabilities and checks the state against the rungs; `/architecture platform` records the layer.
+3. The skills. `/architecture service` writes a folder per service as every other skill does, and links the product that runs it; a new `/architecture product` writes a product with its state and required capabilities and checks the state against the stages; `/architecture platform` records the layer.
 4. The documents. The concepts page and the framework document point here for definitions; the traceability standard carries the relationships table above.
 5. The exemplar. Patternode's architecture repository applies the runtime level first: a register of its services and nodes as built and as targeted, each service carrying its context, its code path and its findings against the target, and one service traced back through solution building block, architecture building block, bounded context and capability to the platform that owns it.
 

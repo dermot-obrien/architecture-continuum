@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """The definition ladder, derived from the artefacts that exist.
 
-A capability sits on the highest rung for which it, and every rung below, has evidence.
-Each rung's check returns the specific artefacts that are missing or say the wrong thing,
-so the result is never just a number: it is the rung held and what blocks the next one.
+A capability sits at the highest definition stage for which it, and every stage below, has
+evidence. Each stage's check returns the specific artefacts that are missing or say the wrong
+thing, so the result is never just a number: it is the stage held and what blocks the next one.
 
 The rules are those of the Definition Ladder Standard
 (standards/capabilities/standard-definition-ladder.md, section 2).
@@ -17,7 +17,7 @@ import re
 from . import docs
 from .docs import as_list, text
 
-RUNGS = (
+STAGES = (
     ("R0", "Unrecognised"),
     ("R1", "Named"),
     ("R2", "Bounded"),
@@ -26,7 +26,7 @@ RUNGS = (
     ("R5", "Proven"),
     ("R6", "In service"),
 )
-RUNG_NAMES = dict(RUNGS)
+STAGE_NAMES = dict(STAGES)
 LIVE = ("accepted", "active")
 
 # A capability's identifier, unless [suite.architecture] capabilityIdPattern binds another.
@@ -56,11 +56,11 @@ KIND_LEVELS = {
 BOX_SECTION_RE = re.compile(r"^(required\s+)?building\s+blocks$", re.I)
 
 
-def rung_index(rung: str) -> int:
-    return int(rung[1:])
+def stage_index(stage: str) -> int:
+    return int(stage[1:])
 
 
-def rung_id(i: int) -> str:
+def stage_id(i: int) -> str:
     return f"R{i}"
 
 
@@ -301,13 +301,13 @@ def _prefer(new, old) -> bool:
     return score(new) < score(old)
 
 
-# ------------------------------------------------------------------------ the rungs
+# ----------------------------------------------------------------------- the stages
 
 class Derivation:
     """One capability, or one flow of it."""
 
     def __init__(self, checks: dict, recorded: str = ""):
-        self.checks = checks                # rung index -> list of blockers
+        self.checks = checks                # stage index -> list of blockers
         held = 0
         for i in range(1, 7):
             if checks[i]:
@@ -316,23 +316,25 @@ class Derivation:
         self.held = held
         self.next = held + 1 if held < 6 else None
         self.blockers = checks[self.next] if self.next else []
-        self.latent = [rung_id(i) for i in range(held + 2, 7) if not checks[i]]
+        self.latent = [stage_id(i) for i in range(held + 2, 7) if not checks[i]]
         self.recorded = recorded
         if recorded and re.fullmatch(r"R[0-6]", recorded):
-            r = rung_index(recorded)
+            r = stage_index(recorded)
             self.claim = "matches" if r == held else ("above" if r > held else "below")
         else:
             self.claim = None
 
     def to_dict(self):
         return {
-            "rung": rung_id(self.held), "name": RUNG_NAMES[rung_id(self.held)],
-            "next": rung_id(self.next) if self.next else None,
+            # rung is the former name of stage, written as well for one release.
+            "stage": stage_id(self.held), "rung": stage_id(self.held),
+            "name": STAGE_NAMES[stage_id(self.held)],
+            "next": stage_id(self.next) if self.next else None,
             "blockers": list(self.blockers),
             "latent": list(self.latent),
             "recorded": self.recorded or None,
             "claim": self.claim,
-            "checks": {rung_id(i): list(v) for i, v in self.checks.items()},
+            "checks": {stage_id(i): list(v) for i, v in self.checks.items()},
         }
 
 
@@ -374,7 +376,7 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
         fid = text(f.get("id"))
         declared.append(fid)
         pats = [p for p in patterns if not p.flows or fid in p.flows]
-        d = Derivation(checks_for(pats, f" for flow {fid}"), text(f.get("rung")))
+        d = Derivation(checks_for(pats, f" for flow {fid}"), recorded_stage(f))
         flows_out.append({"id": fid, "name": text(f.get("name")), **d.to_dict(),
                           "patterns": [p.id for p in pats]})
 
@@ -385,9 +387,9 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
                 warnings.append(f"pattern {p.id} names flow {fl}, which {cid} does not declare")
 
     if flows_out:
-        lowest = min(flows_out, key=lambda f: rung_index(f["rung"]))
-        summary = {k: lowest[k] for k in ("rung", "name", "next", "blockers")}
-        summary["latent"] = sorted({x for f in flows_out for x in f["latent"]}, key=rung_index)
+        lowest = min(flows_out, key=lambda f: stage_index(f["stage"]))
+        summary = {k: lowest[k] for k in ("stage", "rung", "name", "next", "blockers")}
+        summary["latent"] = sorted({x for f in flows_out for x in f["latent"]}, key=stage_index)
         summary["limited_by_flow"] = lowest["id"]
         summary["checks"] = whole.to_dict()["checks"]
     else:
@@ -408,6 +410,11 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
         "considerations": [c.id for c in considerations],
         "warnings": warnings,
     }
+
+
+def recorded_stage(flow) -> str:
+    """A flow's recorded stage: its stage key, else the former rung key."""
+    return text(flow.get("stage")) or text(flow.get("rung"))
 
 
 def capability_field(doc, key):
@@ -540,7 +547,7 @@ def derive_all(ws: Workspace, only: list | None = None) -> dict:
     for c in caps:
         warnings.extend(c.get("warnings", []))
     return {
-        "ladder": [{"rung": r, "name": n} for r, n in RUNGS],
+        "ladder": [{"stage": r, "rung": r, "name": n} for r, n in STAGES],
         "capabilities": caps,
         "unbound": list(ws.unbound),
         "warnings": warnings,
