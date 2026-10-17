@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 From 0.4.1 on, releases are made by Release Please from the pull requests merged to `main`: a pull request's title is its line here, and the release pull request adds the next section, bumps the version and, when merged, tags `vX.Y.Z` and publishes the GitHub Release. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#releases). Do not add lines here by hand. The skills' own versions, in each `SKILL.md` and in `bundle.json`, stay separate and are bumped in the pull request that changes the skill.
 
+## [0.6.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.5.0...v0.6.0) (2026-10-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **architecture:** the ten aaa-* skills are removed from the bundle. A workspace reinstalls (the installer replaces the old copies with architecture), moves its [suite.aaa-*] keys into [suite.architecture], and changes any script that calls .agents/skills/aaa-*/ paths to .agents/skills/architecture/.
+* **schemas:** an SBB must name technologies and map each component to a technology; products, sbb_product, realised_by_abbs on a use case, realised_by_use_cases, subdomain_kind on a capability, contributes_to_transition and sequenced_decisions are no longer schema fields.
+
+### Added
+
+* **aaa-workspace:** initialise or reinitialise a repository for the skills, with a build that runs without them ([03d81bc](https://github.com/dermot-obrien/architecture-continuum/commit/03d81bc1d81761d26b6053c60b81ab1e9b4d50d2))
+* **architecture:** call the definition ladder's steps stages, with rung kept as an alias ([3f6f2e9](https://github.com/dermot-obrien/architecture-continuum/commit/3f6f2e9f54f56e182c3d377b9eebe49ab9296c17))
+* **architecture:** call the definition ladder's steps stages, with rung kept as an alias ([26a0847](https://github.com/dermot-obrien/architecture-continuum/commit/26a084703e4f2a9161ee08cb8d04997661c60a9c))
+* **architecture:** capabilityIdPattern binding for capability ids other than CAP-NNN ([e61afef](https://github.com/dermot-obrien/architecture-continuum/commit/e61afef6a9395feda5d0e4b9d9c00b5ef28eba83))
+* **architecture:** capabilityIdPattern binding for capability ids other than CAP-NNN ([cf0399f](https://github.com/dermot-obrien/architecture-continuum/commit/cf0399fe18908e90282e96034ae69ef7c224c2bc))
+* **architecture:** the ten aaa-* skills become one architecture skill with a flow per level ([ae2ed1c](https://github.com/dermot-obrien/architecture-continuum/commit/ae2ed1cbcbe009be54559bf00f709297b339f722))
+* **schemas:** align the front matter schemas with the continuum, add technical debt, and draw the schemas in the continuum's layout ([#40](https://github.com/dermot-obrien/architecture-continuum/issues/40)) ([1fa0beb](https://github.com/dermot-obrien/architecture-continuum/commit/1fa0beb0f091956af5c3452887ac72d5d97bcf1e))
+
+
+### Fixed
+
+* **architecture:** read a capability's level and parent from a nested capability: block ([4ab8317](https://github.com/dermot-obrien/architecture-continuum/commit/4ab83172e9132a1a8ae3ab0745d28cbb4f858107))
+* **workspace:** install the site's packages before the skills', and carry the installer whose check ignores packages and caches ([7465aeb](https://github.com/dermot-obrien/architecture-continuum/commit/7465aeba188982743312b9fe01ebc6da92eebabc))
+* **workspace:** say a locked retired skill comes back only if the declared release has it ([361fc71](https://github.com/dermot-obrien/architecture-continuum/commit/361fc71610e2bfba94955aa4500c018f57359313))
+* **workspace:** say an installed copy the lock does not name comes back only if it is declared ([8f8bc62](https://github.com/dermot-obrien/architecture-continuum/commit/8f8bc62239004ac35fe70b1ab8a92f8f109dbe70))
+
 ## [0.5.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.4.1...v0.5.0) (2026-10-17)
 
 
