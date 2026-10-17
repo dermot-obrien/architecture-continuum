@@ -398,7 +398,7 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
         "id": cid,
         "title": text(doc.get("title")),
         "path": doc.path,
-        "level": text(doc.get("level")),
+        "level": text(capability_field(doc, "level")),
         "status": text(doc.get("status")),
         **summary,
         "recorded": None,
@@ -410,12 +410,24 @@ def derive_capability(ws: Workspace, cid: str) -> dict:
     }
 
 
+def capability_field(doc, key):
+    """A capability's own field: the top-level key, else the same key in a nested capability:
+    block, which some repositories use to keep the capability's attributes apart from the
+    page's. A top-level key always wins."""
+    value = doc.get(key)
+    if value is None:
+        block = doc.get("capability")
+        if isinstance(block, dict):
+            value = block.get(key)
+    return value
+
+
 def _r1(doc, cid) -> list:
     out = []
-    level = text(doc.get("level"))
+    level = text(capability_field(doc, "level"))
     if level not in ("L1", "L2", "L3"):
         out.append(f"{cid} has no level (L1, L2 or L3)")
-    if level in ("L2", "L3") and not text(doc.get("parent")):
+    if level in ("L2", "L3") and not text(capability_field(doc, "parent")):
         out.append(f"{cid} is {level} but names no parent")
     purpose = text(doc.get("description"))
     if not purpose:

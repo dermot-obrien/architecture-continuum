@@ -198,8 +198,8 @@ means, and who writes the fix.
 | Blocker | Fix | Skill |
 |---|---|---|
 | `no capability document for <CAP> under capabilityDir` | Create the capability | `/architecture capability` |
-| `<CAP> has no level (L1, L2 or L3)` | Add `level` | `/architecture capability` |
-| `<CAP> is <level> but names no parent` | Add `parent` for L2 and L3 | `/architecture capability` |
+| `<CAP> has no level (L1, L2 or L3)` | Add `level`, at the top level or in a nested `capability:` block | `/architecture capability` |
+| `<CAP> is <level> but names no parent` | Add `parent` for L2 and L3, at the top level or in a nested `capability:` block | `/architecture capability` |
 | `<CAP> states no purpose: add a description, or a Purpose section` | Add `description` or a Purpose section | `/architecture capability` |
 | `<CAP> names no demand: add required_by_outcomes, or record demand_assumption` | Link an outcome, or record the demand as an assumption | `/architecture strategy`, `/architecture capability` |
 | `<CAP> names no ABB in realised_by_abbs` | Name the ABBs that realise it | `/architecture abb` |

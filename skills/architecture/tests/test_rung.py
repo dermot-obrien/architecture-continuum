@@ -362,7 +362,10 @@ class CapabilityIdPattern(unittest.TestCase):
             self.assertEqual(set(ws.capabilities), {"CP-102", "CP-103"})
             self.assertEqual(set(caps), {"CP-102", "CP-103", "CP-200"})
             self.assertEqual(caps["CP-102"]["rung"], "R0")
-            self.assertIn("CP-102 has no level (L1, L2 or L3)", caps["CP-102"]["blockers"])
+            # Its level is in a nested capability: block, so R1 is blocked by the parent instead.
+            self.assertNotIn("CP-102 has no level (L1, L2 or L3)", caps["CP-102"]["blockers"])
+            self.assertIn("CP-102 is L2 but names no parent", caps["CP-102"]["blockers"])
+            self.assertIn("CP-103 has no level (L1, L2 or L3)", caps["CP-103"]["blockers"])
             self.assertEqual(caps["CP-200"]["evidence_elsewhere"], ["pattern AP-001"])
 
     def test_pattern_must_match_in_full(self):
@@ -391,6 +394,50 @@ class CapabilityIdPattern(unittest.TestCase):
             with self.assertRaises(bindings.BindingError) as cm:
                 bindings.load(p)
             self.assertIn("capabilityIdPattern '^CP-(' is not a valid regex", str(cm.exception))
+
+
+class NestedCapabilityBlock(unittest.TestCase):
+    """level and parent may sit in a nested capability: block instead of at the top level."""
+
+    def r1(self, front):
+        doc = derive.docs.Doc("index.md", front, "# CAP-001\n\n## Purpose\n\nDo a thing.\n")
+        return derive._r1(doc, "CAP-001")
+
+    def test_nested_level_and_parent_pass_r1(self):
+        got = self.r1({"capability": {"level": "L2", "parent": "CAP-000"},
+                       "demand_assumption": "assumed"})
+        self.assertEqual(got, [])
+
+    def test_nested_level_without_parent_needs_one(self):
+        got = self.r1({"capability": {"level": "L3"}, "demand_assumption": "assumed"})
+        self.assertEqual(got, ["CAP-001 is L3 but names no parent"])
+
+    def test_top_level_wins_over_nested(self):
+        got = self.r1({"level": "L1", "capability": {"level": "L9"},
+                       "demand_assumption": "assumed"})
+        self.assertEqual(got, [])
+        got = self.r1({"level": "L9", "capability": {"level": "L1"},
+                       "demand_assumption": "assumed"})
+        self.assertIn("CAP-001 has no level (L1, L2 or L3)", got)
+
+    def test_a_scalar_capability_key_is_not_a_block(self):
+        got = self.r1({"capability": "L2", "demand_assumption": "assumed"})
+        self.assertEqual(got, ["CAP-001 has no level (L1, L2 or L3)"])
+
+    def test_report_shows_the_nested_level(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cap = os.path.join(tmp, "capabilities", "CAP-001-thing")
+            os.makedirs(cap)
+            with open(os.path.join(cap, "index.md"), "w", encoding="utf-8") as fh:
+                fh.write('---\ntitle: "CAP-001 Thing"\ndemand_assumption: assumed\n'
+                         "capability:\n  level: L1\n---\n"
+                         "# CAP-001 Thing\n\n## Purpose\n\nDo a thing.\n")
+            p = os.path.join(tmp, "skill-bindings.toml")
+            with open(p, "w", encoding="utf-8") as fh:
+                fh.write('[suite.architecture]\ncapabilityDir = "capabilities"\n')
+            caps, _, _ = derived(p)
+            self.assertEqual(caps["CAP-001"]["level"], "L1")
+            self.assertEqual(caps["CAP-001"]["rung"], "R1")
 
 
 class PartlyBound(unittest.TestCase):

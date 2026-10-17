@@ -46,7 +46,7 @@ These are the checks from the Definition Ladder Standard (section 2; this skill'
 
 | Rung | Passes when |
 |---|---|
-| R1 Named | The capability document has `level`; `parent` if L2 or L3; a purpose, as `description` or a Purpose section; and `required_by_outcomes` or `demand_assumption` |
+| R1 Named | The capability document has `level`; `parent` if L2 or L3 (either may sit in a nested `capability:` block instead of at the top level); a purpose, as `description` or a Purpose section; and `required_by_outcomes` or `demand_assumption` |
 | R2 Bounded | `realised_by_abbs` is non-empty; each ABB has a document that declares `requires` (an empty list is enough); and a consideration affects the capability or one of its ABBs, or the capability declares `open_questions: none` |
 | R3 Decided | Every consideration affecting the capability or its ABBs, other than withdrawn ones, is `resolved` by a decision record whose status is `accepted` or `active`; and a realising pattern has every box an ABB (or is already physical) |
 | R4 Buildable | Every ABB is realised by an SBB whose status is `accepted` or `active`; and a realising pattern is physical, every box an SBB, with a `cost-model` reference |

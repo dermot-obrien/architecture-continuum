@@ -107,6 +107,18 @@ capabilityIdPattern = '^CP-\d{3}$'
 
 A capability page with no `id` in its front matter takes its identifier from its folder when it is an `index.md` or `README.md` (`CP-102-agent-orchestration/index.md` is `CP-102`), and otherwise from the first word of its `title` or H1. A page whose identifier matches neither way is not a capability, so a capability area's own page (`CA-04-agent-interaction/README.mdx`) is passed over.
 
+A capability's own fields, `level` and `parent`, are read from the top level of its front matter, or, when the top level has no such key, from a nested `capability:` block. No binding is needed for this: a repository that keeps the capability's attributes apart from the page's writes
+
+```yaml
+title: "CP-102 Agent Orchestration"
+status: Draft
+capability:
+  level: L2
+  parent: CA-04
+```
+
+and the rung reads it as `level: L2`, `parent: CA-04`. A top-level key wins over the nested one.
+
 
 ### What the check reads
 

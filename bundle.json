@@ -9,8 +9,8 @@
     {
       "name": "architecture",
       "path": "skills/architecture",
-      "version": "0.8.0",
-      "purl": "pkg:generic/dermot-obrien/ai-assisted-architecture/architecture@0.8.0",
+      "version": "0.8.1",
+      "purl": "pkg:generic/dermot-obrien/ai-assisted-architecture/architecture@0.8.1",
       "requires": [],
       "check": {
         "command": [
