@@ -24,6 +24,7 @@ It needs Python 3.11 or later. PyYAML is used when installed and is not required
 | `considerationDir` | Considerations | R2 needs `open_questions: none` |
 | `patternDir` | Patterns | R3 and above cannot be evidenced |
 | `localPattern` | Regex for a local box id in a pattern's Building Blocks table | `[model] local_pattern`, then `[0-9]{1,3}` |
+| `capabilityIdPattern` | Regex a capability id matches in full, such as `'^CP-\d{3}$'`. A page with no `id` takes it from its folder name, then its title | `^CAP-\d{3}$` |
 
 Every binding is optional. Leave one unset when the workspace does not keep that kind; the
 report then names it, so a blocker it causes reads as a gap in the workspace, not in the

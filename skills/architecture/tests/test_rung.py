@@ -27,7 +27,7 @@ BINDINGS = os.path.join(FIXTURE, "skill-bindings.toml")
 
 def derived(bindings_path=BINDINGS):
     b = bindings.load(bindings_path)
-    ws = derive.Workspace(b.paths, b.local_pattern)
+    ws = derive.Workspace(b.paths, b.local_pattern, b.capability_id_pattern)
     report = derive.derive_all(ws)
     return {c["id"]: c for c in report["capabilities"]}, ws, report
 
@@ -318,6 +318,79 @@ class Cli(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(set(json.loads(out)["resolved"]),
                          {"capabilityDir", "abbDir", "sbbDir", "decisionDir", "considerationDir", "patternDir"})
+
+
+class CapabilityIdPattern(unittest.TestCase):
+    """A repository that numbers its capabilities other than CAP-NNN binds capabilityIdPattern."""
+
+    def workspace(self, tmp, pattern=None):
+        cap = os.path.join(tmp, "capabilities", "CA-04-agent-interaction", "CP-102-agent-orchestration")
+        os.makedirs(cap)
+        # No id in the front matter: the folder names it.
+        with open(os.path.join(cap, "index.md"), "w", encoding="utf-8") as fh:
+            fh.write('---\ntitle: "CP-102 Agent Orchestration"\ncapability:\n  level: L2\n---\n'
+                     "# CP-102 Agent Orchestration\n\n## 1  Purpose\n\nCoordinate agents.\n")
+        # No id and a folder that names none: the title does.
+        other = os.path.join(tmp, "capabilities", "CA-04-agent-interaction", "tools")
+        os.makedirs(other)
+        with open(os.path.join(other, "tools.md"), "w", encoding="utf-8") as fh:
+            fh.write('---\ntitle: "CP-103 Tool Integration"\n---\n# CP-103 Tool Integration\n')
+        # The capability area's own page is not a capability.
+        with open(os.path.join(tmp, "capabilities", "CA-04-agent-interaction", "README.mdx"), "w",
+                  encoding="utf-8") as fh:
+            fh.write('---\ntitle: "CA-04 Agent Interaction"\n---\n# CA-04 Agent Interaction\n')
+        pats = os.path.join(tmp, "patterns", "AP-001")
+        os.makedirs(pats)
+        with open(os.path.join(pats, "index.md"), "w", encoding="utf-8") as fh:
+            fh.write("---\nid: AP-001\nkind: pattern\nrealises: [CP-102, CP-200]\n---\n# AP-001\n")
+        p = os.path.join(tmp, "skill-bindings.toml")
+        with open(p, "w", encoding="utf-8") as fh:
+            fh.write('[suite.architecture]\ncapabilityDir = "capabilities"\npatternDir = "patterns"\n')
+            if pattern:
+                fh.write(f"capabilityIdPattern = '{pattern}'\n")
+        return p
+
+    def test_default_reads_only_cap_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            caps, ws, _ = derived(self.workspace(tmp))
+            self.assertEqual(ws.capabilities, {})
+            self.assertEqual(caps, {})
+
+    def test_bound_pattern_reads_the_repositorys_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            caps, ws, _ = derived(self.workspace(tmp, r"^CP-\d{3}$"))
+            self.assertEqual(set(ws.capabilities), {"CP-102", "CP-103"})
+            self.assertEqual(set(caps), {"CP-102", "CP-103", "CP-200"})
+            self.assertEqual(caps["CP-102"]["rung"], "R0")
+            self.assertIn("CP-102 has no level (L1, L2 or L3)", caps["CP-102"]["blockers"])
+            self.assertEqual(caps["CP-200"]["evidence_elsewhere"], ["pattern AP-001"])
+
+    def test_pattern_must_match_in_full(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _, ws, _ = derived(self.workspace(tmp, r"CP-\d{2}"))
+            self.assertEqual(ws.capabilities, {})
+
+    def test_cli_filters_and_reports_the_pattern(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self.workspace(tmp, r"^CP-\d{3}$")
+            out = io.StringIO()
+            with redirect_stdout(out), redirect_stderr(io.StringIO()):
+                code = cli.main(["--bindings", p, "CP-103", "--json"])
+            self.assertEqual(code, 0)
+            data = json.loads(out.getvalue())
+            self.assertEqual([c["id"] for c in data["capabilities"]], ["CP-103"])
+            self.assertEqual(data["bindings"]["capabilityIdPattern"], r"^CP-\d{3}$")
+
+    def test_default_is_reported(self):
+        b = bindings.load(BINDINGS)
+        self.assertEqual(b.capability_id_pattern, derive.DEFAULT_CAPABILITY_ID)
+
+    def test_invalid_regex_is_a_binding_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self.workspace(tmp, "^CP-(")
+            with self.assertRaises(bindings.BindingError) as cm:
+                bindings.load(p)
+            self.assertIn("capabilityIdPattern '^CP-(' is not a valid regex", str(cm.exception))
 
 
 class PartlyBound(unittest.TestCase):
