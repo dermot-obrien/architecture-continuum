@@ -409,9 +409,42 @@ export function applyInstall(repo, plan, log = console.log) {
 }
 
 /** Run the repository's installer: the locked commits when there is a lock. */
+/**
+ * The declared sources the lock does not record at their declared ref: a bundle or repository
+ * whose ref has moved, or one added since the lock was written. Empty when the lock matches, or
+ * when there is no lock or no declaration. A skill kept in a folder of the workspace is never locked.
+ */
+export function lockMismatches(repo) {
+  const decl = readJson(path.join(repo, ".agents", "skills.json"));
+  const lock = readJson(path.join(repo, ".agents", "skills.lock.json"));
+  if (!decl || !lock) return [];
+  const entries = Object.entries(lock.skills ?? {});
+  const out = [];
+  for (const src of decl.sources ?? []) {
+    const ref = src.ref ?? null;
+    if (src.bundle) {
+      const hit = entries.some(([, e]) => e.source === "bundle" && e.bundle === src.bundle && (e.bundleRef ?? null) === ref);
+      if (!hit) out.push(`${src.bundle} at ${ref ?? "its default branch"}`);
+    } else if (src.repo) {
+      const name = src.name ?? path.basename(src.path ?? src.repo).replace(/\.git$/, "");
+      const e = lock.skills?.[name];
+      if (!e || e.source !== src.repo || (e.ref ?? null) !== ref) out.push(`${name} at ${ref ?? "its default branch"}`);
+    }
+  }
+  return out;
+}
+
+/**
+ * Run the repository's installer. With a lock that matches the declaration, exactly the locked
+ * commits (--locked); with no lock, or one the declaration has moved past, what the declaration
+ * names, and the lock is rewritten to match.
+ */
 export function runInstaller(repo, { from = null, log = console.log } = {}) {
   const installer = installerPath(repo);
-  const args = [path.join(repo, installer), "sync", ...(exists(path.join(repo, ".agents", "skills.lock.json")) ? ["--locked"] : []), "--copy"];
+  const hasLock = exists(path.join(repo, ".agents", "skills.lock.json"));
+  const moved = hasLock ? lockMismatches(repo) : [];
+  if (moved.length) log(`  the lock does not match .agents/skills.json (${moved.join("; ")}), so the declared refs are installed and the lock rewritten`);
+  const args = [path.join(repo, installer), "sync", ...(hasLock && !moved.length ? ["--locked"] : []), "--copy"];
   if (from) args.push("--from", path.resolve(from));
   log(`  running node ${installer} ${args.slice(1).join(" ")}`);
   return spawnSync(process.execPath, args, { cwd: repo, stdio: "inherit" }).status ?? 1;

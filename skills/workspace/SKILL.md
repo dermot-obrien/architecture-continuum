@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Node.js 18 or newer and git; no npm packages. The build needs the repository's own Docusaurus packages. Regeneration runs the pattern and model skills (Python 3.11 or newer, PyYAML) and markdown-deck (its npm packages, and a Chromium-based browser for PDFs) when they are installed, and skips each one that is not.
 metadata:
   author: dermot-obrien
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Workspace
