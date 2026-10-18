@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pkg:generic/dermot-obrien/ai-assisted-architecture/architecture-ontology@2.0.0",
+  "$id": "pkg:generic/dermot-obrien/architecture-continuum/architecture-ontology@2.0.0",
   "title": "Architecture ontology",
   "description": "The architecture layer of the layered ontology in DD-11 of AI-Assisted Work. It builds on the work layer, pkg:generic/dermot-obrien/ai-assisted-work/work-ontology, by $ref and allOf, and names the architecture concepts of this bundle's base ontology (standards/ontology/ontology-schema.json) by $ref, so they have one definition. Additive: the base ontology is unchanged, and a repository that validates against it validates exactly as before. The seam with work management is standards/aaw-work-seam.md: a decision deliverable becomes a Decision Record, a cross-cutting intervention creates or revises capabilities and building blocks, and a deliverable evidences a definition stage through the kind of artefact it produces.",
   "$comment": "The base ontology's Initiative, Programme, InitiativePhase, Milestone, Criterion, Commitment, DeliveryGate, ScheduleConstraint, DeliveryStatus, Slip, Stakeholder, ExternalReference and Notes are deliberately not named here: DD-11 places them in the work and delivery layers, and they move there with the base ontology's next major version.",
