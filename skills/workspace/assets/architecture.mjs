@@ -34,7 +34,9 @@ if (cmd === "reinit") {
     const locked = existsSync(path.join(root, ".agents", "skills.lock.json")) ? ["--locked"] : [];
     const at = rest.indexOf("--from");
     const from = at >= 0 && rest[at + 1] ? ["--from", path.resolve(rest[at + 1])] : [];
-    const status = node([installer, "sync", ...locked, "--copy", ...from]);
+    let status = node([installer, "sync", ...locked, "--copy", ...from]);
+    // A lock written for an older declaration may not hold the workspace skill: install what is declared.
+    if (status === 0 && !existsSync(tool) && locked.length) status = node([installer, "sync", "--copy", ...from]);
     if (status !== 0 || !existsSync(tool)) {
       console.error("reinit stopped: the skills did not install, or .agents/skills.json does not declare workspace");
       process.exit(status || 1);

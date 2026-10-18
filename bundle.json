@@ -24,8 +24,8 @@
     {
       "name": "workspace",
       "path": "skills/workspace",
-      "version": "0.1.1",
-      "purl": "pkg:generic/dermot-obrien/architecture-continuum/workspace@0.1.1",
+      "version": "0.1.2",
+      "purl": "pkg:generic/dermot-obrien/architecture-continuum/workspace@0.1.2",
       "requires": [],
       "check": {
         "command": [

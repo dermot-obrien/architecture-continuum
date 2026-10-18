@@ -1,6 +1,6 @@
 # Installation
 
-Architecture Continuum is a bundle of two standalone [Agent Skills](https://agentskills.io), listed in [`bundle.json`](../bundle.json): `architecture`, with a flow per level of the continuum, and `workspace`, which sets a repository up for it. They work with any agent that reads Agent Skills: VS Code with GitHub Copilot, Cursor, Claude Code, Codex, Gemini CLI and others. The architecture skill is complete on its own: it carries the standards it reads, the configuration template and its own binding resolver. The [quick start](quick-start.md) walks through the first route below end to end.
+Architecture Continuum is a bundle of two standalone [Agent Skills](https://agentskills.io), listed in [`bundle.json`](../bundle.json): `architecture`, with a flow per level of the continuum, and `workspace`, which sets a repository up for it. They work with any agent that reads Agent Skills: VS Code with GitHub Copilot, Cursor, Claude Code, Codex, Gemini CLI and others. The architecture skill is complete on its own: it carries the standards it reads, the configuration template and its own binding resolver. The [install quick start](quick-install.md) installs the continuum with every related skill in one command, and reinstalls over an installation; the [quick start](quick-start.md) walks through the first route below end to end.
 
 Whichever route you take, you need:
 
