@@ -2,7 +2,7 @@
 
 `architecture.schema.json` is the architecture layer of the layered ontology that DD-11 of
 [AI-Assisted Work](https://github.com/dermot-obrien/ai-assisted-work) sets out, identified as
-`pkg:generic/dermot-obrien/ai-assisted-architecture/architecture-ontology@2.0.0`. `bundle.json`
+`pkg:generic/dermot-obrien/architecture-continuum/architecture-ontology@2.0.0`. `bundle.json`
 names it and the range of the work layer it builds on.
 
 | Layer | Module | Holds |

@@ -1,16 +1,16 @@
 {
   "$schema": "pkg:generic/dermot-obrien/ai-assisted-work/bundle-schema@1.0.0",
-  "name": "ai-assisted-architecture",
+  "name": "architecture-continuum",
   "owner": "dermot-obrien",
-  "description": "AI-Assisted Architecture: TOGAF-aligned authoring of strategy, capabilities, contexts, platforms, building blocks, services and runtime agents as Agent Skills, the definition ladder, and the architecture layer of the ontology.",
+  "description": "Architecture Continuum: TOGAF-aligned authoring of strategy, capabilities, contexts, platforms, building blocks, services and runtime agents as Agent Skills, the definition ladder, and the architecture layer of the ontology.",
   "license": "CC-BY-4.0 AND Apache-2.0",
-  "homepage": "https://github.com/dermot-obrien/ai-assisted-architecture",
+  "homepage": "https://github.com/dermot-obrien/architecture-continuum",
   "skills": [
     {
       "name": "architecture",
       "path": "skills/architecture",
       "version": "0.9.0",
-      "purl": "pkg:generic/dermot-obrien/ai-assisted-architecture/architecture@0.9.0",
+      "purl": "pkg:generic/dermot-obrien/architecture-continuum/architecture@0.9.0",
       "requires": [],
       "check": {
         "command": [
@@ -25,7 +25,7 @@
       "name": "workspace",
       "path": "skills/workspace",
       "version": "0.1.1",
-      "purl": "pkg:generic/dermot-obrien/ai-assisted-architecture/workspace@0.1.1",
+      "purl": "pkg:generic/dermot-obrien/architecture-continuum/workspace@0.1.1",
       "requires": [],
       "check": {
         "command": [
@@ -38,7 +38,7 @@
     }
   ],
   "ontology": {
-    "id": "pkg:generic/dermot-obrien/ai-assisted-architecture/architecture-ontology@2.0.0",
+    "id": "pkg:generic/dermot-obrien/architecture-continuum/architecture-ontology@2.0.0",
     "path": "ontology/architecture.schema.json",
     "extends": [
       {
