@@ -48,7 +48,7 @@ The layout (where each box sits and how each line is routed) is declared in the 
 | API | `API-NNN, placeholder` | [`_placeholders/api.schema.json`](../standards/schemas/v1.1.0/_placeholders/api.schema.json) |  |
 | Store | `ST-NNN` | [`store.schema.json`](../standards/schemas/v1.1.0/store.schema.json) |  |
 
-Not drawn: `view` and `event`, placeholders with no relationship fields yet. Two fields name artefacts of any kind and are not drawn as lines: `decision-record.affects_artefacts` and `technical-debt.affects`.
+Not drawn: `view` and `event`, placeholders with no relationship fields yet; `candidate`, not an artefact: a possible pattern, noted until it is promoted. Two fields name artefacts of any kind and are not drawn as lines: `decision-record.affects_artefacts` and `technical-debt.affects`.
 
 ## The lines
 

@@ -40,6 +40,8 @@ Each finding is one line: the level, a code, the file relative to the root, and 
 | `FM-001` to `FM-003` | Every `index.md` has front matter with a `kind`, the kind has a schema, and the front matter validates against it, error by error |
 | `FM-005` | An identifier names one page |
 | `ID-001` to `ID-003` | An identifier matches a scheme, the scheme's kind is the page's kind, and the page lives where the scheme's `home` says, `{id}` substituted |
+
+The portfolio's pages (the standard's §2.9 and §6.23) are read the same way, with three allowances: a candidate (`kind: candidate`) mints no identifier, so it is held to no scheme; a page whose `portfolio.state` is `archived` keeps its place in the tree under the archive folder, not its scheme's `home`; and a stub left where an archived page was, front matter with `moved_to` and no `kind`, is not a page at all. A placeholder (`portfolio.state: placeholder`) validates without the fields its kind requires once it has content.
 | `REG-001` to `REG-005` | A scheme's register exists, every row's identifier is in the series, every row that is not retired has a page where the scheme has a home, every page has a row, a `path` column resolves, a status on both sides agrees, and no identifier is a row of two registers |
 | `REL-001` | Every identifier in a relation field names a page or a register row; a service field names a service's slug; a citation `ns:ID` names a registered namespace, and resolves locally when the namespace is this catalogue's own |
 | `REL-002` | A relation with an inverse is recorded on both sides: `realises` and `realised_by`, `part_of` and `contains`, `implements` and `implemented_by`, `resolved_by` and `resolves`, and the rest |

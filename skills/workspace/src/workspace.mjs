@@ -483,7 +483,7 @@ const architectureRoot = (b) => b.suite("architecture").root ?? b.suite("aaa-con
 
 /**
  * Regenerate what the pages derive: diagrams, their stamped exports and walkthroughs (the pattern
- * skill over the model skill), then decks and PDFs (markdown-deck). A step whose skill or binding is
+ * skill over the model skill), the portfolio's inventory page, then decks and PDFs (markdown-deck). A step whose skill or binding is
  * missing is skipped in one line; a step that runs and fails returns its exit code.
  */
 export function regenerate(repo, { env = process.env } = {}) {
@@ -511,6 +511,16 @@ export function regenerate(repo, { env = process.env } = {}) {
       const s = run(`diagram regeneration (${posix(path.relative(repo, f))})`, py, [publishPy, posix(path.relative(repo, f)), "--recursive", "--render", String(ws.render ?? "never"), "--no-deck"]);
       if (s) return s;
     }
+  }
+
+  // The portfolio's inventory page, so a site always shows every pattern as it is now.
+  const portfolioPy = skillPath(repo, "portfolio", "scripts", "portfolio.py");
+  if (!b.suite("portfolio").inventory) skip("inventory", "no inventory page is bound ([suite.portfolio] inventory)");
+  else if (!exists(portfolioPy)) skip("inventory", "the portfolio skill is not installed");
+  else if (!py) skip("inventory", "no python on PATH");
+  else {
+    const s = run("inventory", py, [portfolioPy, "inventory"]);
+    if (s) return s;
   }
 
   const deck = skillPath(repo, "markdown-deck", "bin", "markdown-deck.mjs");

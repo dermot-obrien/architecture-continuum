@@ -35,7 +35,7 @@ Install writes two files and replaces either only when the skill wrote it, unles
 
 It adds the npm scripts that are missing (`skills`, `skills:check`, `check:architecture`, `regenerate`, `prebuild`, `reinit`, and `build` as `docusaurus build` when there is none), and the `.gitignore` lines for the installed copies, then installs the skills from the lock and any npm packages they need.
 
-Build runs `npm ci`, then `npm run build`. Its `prebuild` regenerates: the pattern skill's diagrams, exports and walkthroughs for each bound folder, then the decks and PDFs. Each step is skipped in one line when its skill is not installed, so a contributor or CI without the skills builds the same site from what is committed; a step that runs and fails stops the build, and `REGENERATE=0` builds without it.
+Build runs `npm ci`, then `npm run build`. Its `prebuild` regenerates: the pattern skill's diagrams, exports and walkthroughs for each bound folder, then the portfolio skill's inventory page of every pattern when `[suite.portfolio] inventory` is bound, then the decks and PDFs. Each step is skipped in one line when its skill is not installed, so a contributor or CI without the skills builds the same site from what is committed; a step that runs and fails stops the build, and `REGENERATE=0` builds without it.
 
 ## After a run
 

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "candidate.schema.json",
+  "title": "Candidate (v1.1.0): a possible pattern, not formally one yet",
+  "description": "A light page noting a possible architecture pattern, reference architecture, collaboration or use case. It is not an artefact of its kind yet, so it does not carry the envelope's required fields, mints no identifier and carries no portfolio.state but needs-conversion, set when its source cannot be converted yet: it becomes a pattern when it is committed and promoted to a placeholder.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "candidate"
+    },
+    "id": {
+      "$ref": "envelope.schema.json#/$defs/serviceId",
+      "description": "Optional: a kebab-case slug, never a series identifier."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_type": {
+      "type": "string",
+      "enum": [
+        "architecture-pattern",
+        "reference-architecture",
+        "collaboration",
+        "use-case"
+      ],
+      "description": "What it would be, if it is known."
+    },
+    "description": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "created": {
+      "$ref": "envelope.schema.json#/$defs/isoDate"
+    },
+    "last_modified": {
+      "$ref": "envelope.schema.json#/$defs/isoDate"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "portfolio": {
+      "allOf": [
+        {
+          "$ref": "envelope.schema.json#/$defs/portfolio"
+        },
+        {
+          "properties": {
+            "state": {
+              "const": "needs-conversion"
+            }
+          }
+        }
+      ]
+    },
+    "unlisted": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "kind",
+    "title"
+  ]
+}
