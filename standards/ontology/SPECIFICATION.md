@@ -772,7 +772,7 @@ erDiagram
   Pattern         ||--|| ContinuumRef     : "Architecture Continuum (reference)"
 ```
 
-Pattern is an Architecture Continuum artefact — a reusable arrangement of building blocks, at any scope from one recurring problem up to a whole domain, which is what is elsewhere called a reference architecture. In TOGAF terms, a Pattern is **not** a building block itself; it informs ABB design without being one. Advisory by default (compare to Standard which is binding). Components implement patterns; decisions apply patterns; changes can propose patterns.
+Pattern is an Architecture Continuum artefact: a reusable arrangement of building blocks, at any scope from one recurring problem up to a whole domain. Architecture pattern and reference architecture are two types of pattern, not two constructs. An architecture pattern is technology-agnostic, its boxes architecture building blocks and local roles; a reference architecture is technology-specific, its boxes mainly solution building blocks and technologies, and it names the architecture patterns it implements. A repository decides whether to bind the two types, and [the continuum](../../docs/continuum.md#architecture-pattern-and-reference-architecture) holds the definitions. In TOGAF terms a Pattern is not a building block itself; it informs ABB design without being one. Advisory by default (compare to Standard, which is binding). Components implement patterns; decisions apply patterns; changes can propose patterns.
 
 `status` lifecycle (proposed / current / deprecated) reflects that patterns evolve. Deprecation is significant — *"which components still implement deprecated pattern X?"* is a useful query.
 
