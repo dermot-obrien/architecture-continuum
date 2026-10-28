@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 From 0.4.1 on, releases are made by Release Please from the pull requests merged to `main`: a pull request's title is its line here, and the release pull request adds the next section, bumps the version and, when merged, tags `vX.Y.Z` and publishes the GitHub Release. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#releases). Do not add lines here by hand. The skills' own versions, in each `SKILL.md` and in `bundle.json`, stay separate and are bumped in the pull request that changes the skill.
 
+## [0.9.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.8.0...v0.9.0) (2026-10-28)
+
+
+### Added
+
+* **assessment:** publish a page per criterion, bring the method to 2026 practice, and gather the ServiceNow exemplar into one folder ([#70](https://github.com/dermot-obrien/architecture-continuum/issues/70)) ([f9b245f](https://github.com/dermot-obrien/architecture-continuum/commit/f9b245fbfb9a9cd15bd2bc5901f474ae1a531b76))
+* **standards:** the portfolio signature: collaboration, candidates, the portfolio block and site fields ([#62](https://github.com/dermot-obrien/architecture-continuum/issues/62)) ([6fc8738](https://github.com/dermot-obrien/architecture-continuum/commit/6fc8738198503350b7f93b9e11a6392618ca1835))
+
+
+### Documentation
+
+* say why merge commits keep a blank body ([0c9bcdb](https://github.com/dermot-obrien/architecture-continuum/commit/0c9bcdb8ca2e1f9f0efe2a904e883ba5e126fc52))
+* squash pull requests into develop, merge commits only for releases ([#69](https://github.com/dermot-obrien/architecture-continuum/issues/69)) ([94a1f4d](https://github.com/dermot-obrien/architecture-continuum/commit/94a1f4d7bbf12ac5ae5ae6e7c17effa2340506b5))
+
 ## [0.8.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.7.0...v0.8.0) (2026-10-28)
 
 
