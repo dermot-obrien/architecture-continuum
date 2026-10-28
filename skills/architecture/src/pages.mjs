@@ -16,7 +16,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import path from "node:path";
 
 const SHIPPED_SOURCE = "https://github.com/dermot-obrien/architecture-continuum/blob/main/standards/assessment";
-const ORDER = ["core", "ai-solution", "ai-agent", "production"];
+const ORDER = ["core", "ai-solution", "ai-agent", "privacy", "production"];
 const DECIDER = { tool: "A tool, by its rule", both: "A tool checks presence; a reviewer judges", reviewer: "A reviewer" };
 
 const posix = p => p.split(path.sep).join("/");

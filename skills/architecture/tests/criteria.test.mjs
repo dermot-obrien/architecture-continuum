@@ -36,7 +36,7 @@ test("unbound, the shipped lenses apply unchanged", { skip: !yaml }, () => {
   const c = loadCriteria(null, modules);
   assert.deepEqual(c.problems, []);
   assert.equal(c.set.id, "architecture-continuum");
-  assert.deepEqual(c.lenses.map(l => l.lens.id).sort(), ["ai-agent", "ai-solution", "core", "production"]);
+  assert.deepEqual(c.lenses.map(l => l.lens.id).sort(), ["ai-agent", "ai-solution", "core", "privacy", "production"]);
   assert.ok(c.lenses.every(l => l.builtin));
 });
 
@@ -61,7 +61,7 @@ test("an organisation extends the shipped lenses, excludes and overrides", { ski
   assert.equal(cst.severity, "minor");
   assert.equal(cst.default_severity, "major");
   const spec = sd001();
-  assert.deepEqual(lensesFor(spec, "new-design", c.lenses).map(l => l.lens.id), ["core", "acme-data", "ai-solution", "ai-agent"]);
+  assert.deepEqual(lensesFor(spec, "new-design", c.lenses).map(l => l.lens.id), ["core", "acme-data", "ai-solution", "ai-agent", "privacy"]);
   assert.equal(resultOf(spec, c.lenses, "CORE-CST-01").severity, "minor");
 });
 

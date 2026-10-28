@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.9.0
+version: 0.10.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -67,7 +67,7 @@ Every element has one `kind` from the continuum: `actor`, `external-system`, `lo
 
 ### 2.2 Profiles bring lenses in
 
-A design declares `profiles`, and a tool also derives them: an element with an `ai` facet implies `ai-solution`, one with an `agent` facet implies `ai-agent`. The `core` lens always applies; each other lens applies when its profile does, except the `production` lens, which applies when the assessment is a production entry assessment (section 8.1), whatever the design contains. A declared profile that the elements do not support, or a derived one that is not declared, is reported. New lenses (a data platform lens, a regulated-industry lens, a sovereign-hosting lens) are added the same way, with a profile of their own, and need no change to this standard. An organisation may keep its own lenses, and its choices about the shipped ones, in its own repository (section 10.1); the lenses an assessment applies are then the ones its criteria set puts in force.
+A design declares `profiles`, and a tool also derives them: an element with an `ai` facet implies `ai-solution`, one with an `agent` facet implies `ai-agent`, and a data set with `personal: true` implies `personal-data`, which brings the `privacy` lens in. The `core` lens always applies; each other lens applies when its profile does, except the `production` lens, which applies when the assessment is a production entry assessment (section 8.1), whatever the design contains. A declared profile that the elements do not support, or a derived one that is not declared, is reported. New lenses (a data platform lens, a regulated-industry lens, a sovereign-hosting lens) are added the same way, with a profile of their own, and need no change to this standard. An organisation may keep its own lenses, and its choices about the shipped ones, in its own repository (section 10.1); the lenses an assessment applies are then the ones its criteria set puts in force.
 
 ## 3. Depths
 
@@ -207,7 +207,7 @@ They overlap on one activity, threat modelling, because both analyse a represent
 
 The same rule applies to privacy impact, AI impact and regulatory conformity assessments: the architecture assessment names the obligation and how the design classes under it, and hands the judgement over.
 
-These assessments are not lenses, and are not to be written as lenses. A lens is a set of criteria applied by this standard's method, to a design specification, by architecture assessors, with findings in this record. A cybersecurity, privacy, AI impact or conformity assessment differs in all four: it reads the running system and its controls, follows its own method (NIST SP 800-53A, an ISO/IEC 27001 audit, ISO/IEC 42005, a notified body's procedure), often needs an accredited or legally accountable assessor, and ends in a risk acceptance, an authorisation or a certificate that only that assessor or owner can give. Written as a lens, it would let an architecture review look like assurance of controls nobody tested. What is lens-shaped is the design-facing part of each: the security architecture is in `CORE-SEC` and the agent lens, and a privacy-by-design lens, brought in by a profile for personal data, would be the equivalent for privacy. The other assessments meet this one twice: as a hand-over when the design is reviewed, and as evidence with an outcome when the solution enters production (section 8.1). [Architecture and cybersecurity assessment](../../docs/architecture-and-cybersecurity.md) sets out the line for both teams, with a test for placing any criterion or control, examples, and the questions they should agree.
+These assessments are not lenses, and are not to be written as lenses. A lens is a set of criteria applied by this standard's method, to a design specification, by architecture assessors, with findings in this record. A cybersecurity, privacy, AI impact or conformity assessment differs in all four: it reads the running system and its controls, follows its own method (NIST SP 800-53A, an ISO/IEC 27001 audit, ISO/IEC 42005, a notified body's procedure), often needs an accredited or legally accountable assessor, and ends in a risk acceptance, an authorisation or a certificate that only that assessor or owner can give. Written as a lens, it would let an architecture review look like assurance of controls nobody tested. What is lens-shaped is the design-facing part of each: the security architecture is in `CORE-SEC` and the agent lens, and the `privacy` lens, brought in by the `personal-data` profile, is the equivalent for privacy: it checks that the design gives the privacy impact assessment something to assess, and that the assessment is handed over, not that the processing is lawful. The other assessments meet this one twice: as a hand-over when the design is reviewed, and as evidence with an outcome when the solution enters production (section 8.1). [Architecture and cybersecurity assessment](../../docs/architecture-and-cybersecurity.md) sets out the line for both teams, with a test for placing any criterion or control, examples, and the questions they should agree.
 
 ## 10. Writing a lens
 
@@ -222,5 +222,4 @@ The lenses this standard ships are a default, not a requirement. An organisation
 - The identifier series `SD-NNN` for a solution design and `AS-NNN` for an assessment are proposed here and not yet in the envelope or the frontmatter standard.
 - The `pattern` skill's model is the natural source of a specification's elements, connectors and scenarios; the mapping between the two has not been written.
 - There is no worked example of a production entry assessment yet; AS-001 is a design review.
-- A privacy-by-design lens is a candidate, not written.
 - The target-state criteria read `lifecycle_state`, which is all the catalogue records of the target today. Transition architectures and the roadmap grouping are pending in the metamodel, so which transition a design belongs to cannot yet be checked.
