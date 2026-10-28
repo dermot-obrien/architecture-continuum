@@ -1,0 +1,733 @@
+# AS-004: the design review of SD-002 at version 0.1.0 (unchanged), against TR-004, by an
+# independent assessing agent. It was made without reading AS-002 or AS-003, so that it stands on
+# its own. A tool run records every criterion, so every criterion of both lenses has a result here,
+# met included; a criterion decided by both carries tool_result as well as result.
+#
+# Two inputs from the requester shaped it, and are recorded where they apply:
+#   1. The responsible architect's corrected attestation (TR-004): graph-index target only for
+#      Microsoft 365 content, sbb-kb-connection not-target, with the enterprise knowledge store as
+#      successor for both.
+#   2. A method update: an exception for a not-target block is approved only by the organisation's
+#      exception authority after escalation, not by the responsible architect alone. CORE-TGT-05 in
+#      core 0.4.0 still names the responsible architect; the update was applied as stated. The
+#      result is the same under either reading, because no departure exists at all.
+# The responsible architect has also said he is not inclined to endorse, "as we have defined a
+# target state and those two are not it". Nothing has been escalated or approved.
+schema: assessment/0.1.0
+
+assessment:
+  id: AS-004
+  title: Design review of the ServiceNow knowledge agent in Teams, against the corrected target-state attestation
+  subject:
+    design: SD-002
+    version: 0.1.0
+    path: SD-002-servicenow-knowledge-agent.design.yaml
+    digest: sha256:b6ac13d464b9a6a083466ad0acda63cb0e7dad1bf0c6440c40686ca91b88767c
+  trigger: new-design
+  triage:
+    ref: TR-004
+    type: ai-solution
+    tier: AT3
+    derived_tier: AT3
+  depth: review
+  lenses:
+    - { id: core, version: 0.4.0 }
+    - { id: ai-solution, version: 0.3.0 }
+  date: "2026-10-28"
+  assessors:
+    - { name: Architecture agent (Claude Opus 5.5), role: agent, independent: true }
+  out_of_scope:
+    - Whether the controls named in the design are implemented and effective, including the servicenowkb3 permission settings; handed over to the cybersecurity assessment.
+    - The privacy of staff questions and transcripts beyond naming the obligation; handed over to the privacy impact assessment.
+    - The enterprise knowledge store the architect names as the successor. It is not in the specification or the catalogue, so this review cannot judge whether it can carry ServiceNow permissions; a redesign onto it is a new version, triaged and assessed again.
+    - Evaluation depth and the utility tree; the triage set review depth.
+    - AS-002 and AS-003, deliberately not read.
+    - An agent assessed alone. At AT3 the review needs an independent lead assessor and a security architect, both people; they must review these findings before the record is relied on.
+  provenance:
+    origin: ai-generated
+    authored_by: Architecture agent (Claude Opus 5.5), independent assessor
+    review_state: ai-raw
+
+findings:
+  # Core lens 0.4.0: demand and drivers
+  - id: F-001
+    criterion: CORE-DEM-01
+    tool_result: met
+    result: met
+    statement: Two goals, two non-goals, and four stakeholders each with concerns. The concerns are specific enough to judge the design against.
+    evidence: [drivers.goals, drivers.non_goals, drivers.stakeholders]
+    status: resolved
+  - id: F-002
+    criterion: CORE-DEM-02
+    tool_result: met
+    result: met
+    statement: The goals trace to OC-004, UC-031 and CAP-033.
+    evidence: [context.outcomes, context.serves, context.realises]
+    status: resolved
+  - id: F-003
+    criterion: CORE-DEM-03
+    result: partly-met
+    type: gap
+    severity: minor
+    statement: Both constraints name a source. The one assumption, about 2,000 questions a working day across 9,000 staff, has none, yet the cost cap and the latency scenario rest on it.
+    evidence: [drivers.constraints, drivers.assumptions.asm-volume, operations.cost, scenarios.sc-latency]
+    recommendation: Give the volume assumption its source, such as service desk contact data or portal search logs.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+
+  # Place on the continuum
+  - id: F-004
+    criterion: CORE-TRC-01
+    result: met
+    statement: Realises CAP-033, on platform PL-005, in bounded context BC-012.
+    evidence: [context.realises, context.platform, context.bounded_contexts]
+    status: resolved
+  - id: F-005
+    criterion: CORE-TRC-02
+    result: met
+    statement: The in-scope elements are all sbb, technology, service or deployment-node, so the abstraction is physical, as a solution design must be.
+    evidence: [design.type, elements]
+    status: resolved
+  - id: F-006
+    criterion: CORE-TRC-03
+    result: met
+    statement: Implements RA-007.
+    evidence: [design.implements]
+    status: resolved
+  - id: F-007
+    criterion: CORE-TRC-04
+    result: met
+    statement: The one functional scenario names UC-031, the one use case served.
+    evidence: [scenarios.sc-answer.use_case, context.serves]
+    status: resolved
+
+  # Target state
+  - id: F-008
+    criterion: CORE-TGT-01
+    result: not-met
+    type: gap
+    severity: major
+    elements: [sbb-kb-connection, graph-index]
+    statement: >-
+      Positions read from TR-004, none inferred. Nothing is retired. Two elements need a decision with departure set and have none: sbb-kb-connection is attested not-target, and graph-index is target only for content that originates in Microsoft 365, while the design uses it for ServiceNow articles, which is beyond its permitted use. No decision has departure set (d-copilot-connector and d-reuse-kb3 affect the connection but record no departure; no decision affects graph-index). node-pp-prod is limited to what is needed to run Copilot Studio agents; the design deploys only the agent there, with its transcripts in Dataverse, which this reviewer judges within the limit. Teams, Entra ID and Copilot Studio are attested target. The architect names one successor for both departures: the target state's separate enterprise knowledge store, using vector and graph retrieval. The design's source document describes servicenowkb3 as an existing tenant-wide connection, which the architect and the owner should reconcile with the attestation; the attestation is applied as given.
+    evidence: [triage.target_state, decisions.d-copilot-connector, decisions.d-reuse-kb3, elements.svc-kb-agent.ai.grounding.sources, data.data-kb-index, elements.node-pp-prod, data.data-transcripts, design.source]
+    recommendation: Ground the agent on the enterprise knowledge store instead of the connection and the Microsoft 365 index, which removes both departures. Only if that cannot wait, record each departure as a decision, with the escalation that the not-target connection needs (see F-012).
+    disposition: { action: fix-design, owner: "Digital workplace team, with the responsible architect" }
+    status: open
+  - id: F-009
+    criterion: CORE-TGT-02
+    tool_result: met
+    result: not-met
+    type: gap
+    severity: major
+    elements: [sbb-kb-connection, graph-index]
+    statement: The tool half is met only because no decision has departure set, so there is nothing to check. The reviewer half fails. Two departures from the target state have gone unrecorded, the not-target connection and the use of the Microsoft 365 index beyond its permitted use, so there is no expiry and no path back for either.
+    evidence: [decisions, triage.target_state]
+    recommendation: As F-008. If a departure is kept, make it time-bound with the enterprise knowledge store as its path back.
+    disposition: { action: fix-design, owner: "Digital workplace team, with the responsible architect" }
+    status: open
+  - id: F-010
+    criterion: CORE-TGT-03
+    result: partly-met
+    type: risk
+    severity: major
+    elements: [sbb-kb-connection, graph-index, svc-kb-agent]
+    statement: >-
+      The agent, its channel, its sign-in and its platform are where the organisation is heading. The grounding path is not: it copies ServiceNow content into the Microsoft 365 index, the pattern the target state excludes, and makes the agent depend on that copy, which adds to what the target means to replace with the enterprise knowledge store. The alternatives in d-copilot-connector do not include the knowledge store.
+    evidence: [decisions.d-copilot-connector.alternatives, connectors.c-connection-index, connectors.c-agent-index, triage.target_state]
+    recommendation: Redesign the grounding onto the enterprise knowledge store and record the choice as a decision with the Microsoft options as alternatives set aside.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-011
+    criterion: CORE-TGT-04
+    result: not-met
+    type: gap
+    severity: minor
+    elements: [sbb-kb-connection]
+    statement: The design argues that the connector is the best grounding route (d-copilot-connector) but never asks whether the target's enterprise knowledge store can serve, or whether the target should change. If the author believes the knowledge store cannot meet this need yet, that is a question to raise, not to work around.
+    evidence: [decisions.d-copilot-connector.rationale, considerations, triage.target_state]
+    recommendation: Raise a consideration with the responsible architect, whether the knowledge store can ground this agent now, and if not, when.
+    disposition: { action: raise-consideration, owner: Digital workplace team }
+    status: open
+  - id: F-012
+    criterion: CORE-TGT-05
+    result: not-met
+    type: gap
+    severity: blocker
+    elements: [sbb-kb-connection]
+    statement: >-
+      sbb-kb-connection is attested not-target and no decision with status accepted and departure set names it, so the rule fails. Applied with the escalation requirement as the requester stated it in a method update: an exception for a not-target block is approved only by the organisation's exception authority (for example the architecture board or its delegate) after escalation, and approved_by must name that authority with the escalation recorded. Core 0.4.0 still names the responsible architect as approver; the result is the same under either reading, because no departure exists. The responsible architect has said he is not inclined to endorse, "as we have defined a target state and those two are not it", so nothing has been escalated or approved. graph-index is target, so this criterion does not apply to it; its use beyond its permitted use is F-008.
+    evidence: [triage.target_state, decisions, decisions.d-copilot-connector, decisions.d-reuse-kb3]
+    recommendation: Change the design so the agent is grounded on the enterprise knowledge store, which is the target state's path and removes the connection. The only other route is an exception escalated to the exception authority and approved by it, recorded as an accepted decision with a departure naming that authority.
+    disposition: { action: fix-design, owner: "Digital workplace team, with the responsible architect" }
+    status: open
+
+  # Structure
+  - id: F-013
+    criterion: CORE-STR-01
+    result: met
+    statement: The building blocks are at container grain. Copilot Studio is a catalogued SBB (SBB-044), so its grain is the catalogue's.
+    evidence: [elements]
+    status: resolved
+  - id: F-014
+    criterion: CORE-STR-02
+    result: met
+    statement: Both SBBs and the service are part of BC-012.
+    evidence: [elements.sbb-kb-connection.part_of, elements.sbb-copilot-studio.part_of, elements.svc-kb-agent.part_of]
+    status: resolved
+  - id: F-015
+    criterion: CORE-STR-03
+    result: met
+    statement: The agent service realises the Copilot Studio SBB, the abstraction above it.
+    evidence: [elements.svc-kb-agent.realises]
+    status: resolved
+  - id: F-016
+    criterion: CORE-STR-04
+    result: met
+    statement: The service is deployed to node-pp-prod, and each data set's owner resolves to an element.
+    evidence: [elements.svc-kb-agent.deployed_to, data.data-kb-articles.owner, data.data-kb-index.owner, data.data-transcripts.owner]
+    status: resolved
+  - id: F-017
+    criterion: CORE-STR-05
+    result: met
+    statement: Every local reference resolves and every id is unique, checked across elements, connectors, scenarios, data, fitness functions, decisions, considerations, risks, SLOs and evidence.
+    evidence: [connectors, scenarios.steps, elements, fitness_functions, decisions, operations.slos, evidence]
+    status: resolved
+  - id: F-018
+    criterion: CORE-STR-06
+    result: met
+    statement: Every SBB, service and deployment node has an owner.
+    evidence: [elements.owner]
+    status: resolved
+  - id: F-019
+    criterion: CORE-STR-07
+    result: not-assessed
+    statement: The specification has no context.landscape, so whether platform dependencies run down the landscape cannot be judged. The contract half of the question is answered by F-030.
+    evidence: [context]
+    status: open
+
+  # Quality attributes
+  - id: F-020
+    criterion: CORE-QA-01
+    tool_result: met
+    result: met
+    statement: Three quality scenarios, one failure and one misuse scenario, each with stimulus, response, a measurable response measure and importance.
+    evidence: [scenarios]
+    status: resolved
+  - id: F-021
+    criterion: CORE-QA-02
+    tool_result: partly-met
+    result: partly-met
+    type: gap
+    severity: major
+    statement: Reliability, security and performance are covered. No scenario covers maintainability or cost, and neither omission is said to be deliberate, although the design caps spend at 600 USD a month and depends on a platform model that changes without a release.
+    evidence: [scenarios.quality_attribute, operations.cost.budget, elements.svc-kb-agent.ai.model.version_pinned]
+    recommendation: Add a cost scenario (credit use against the cap at peak) and a maintainability scenario (a platform model change, caught by the gating evals), or say why each is left out.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-022
+    criterion: CORE-QA-03
+    tool_result: met
+    result: met
+    statement: Every scenario has importance and difficulty, and the high-importance, high-difficulty ones (correct answers, restricted HR article) have design responses in the gating evals.
+    evidence: [scenarios.sc-correct, scenarios.sc-restricted, fitness_functions]
+    status: resolved
+  - id: F-023
+    criterion: CORE-QA-04
+    tool_result: met
+    result: partly-met
+    type: gap
+    severity: major
+    statement: The one failure scenario covers the crawl stopping. The design depends on others it cannot control, Copilot Studio and its model, Microsoft 365 search and Entra ID, and their failure is covered only by a sentence in the fallback, with no scenario or measure.
+    evidence: [scenarios.sc-crawl-stops, elements.svc-kb-agent.ai.fallback, operations.recovery]
+    recommendation: Add a failure scenario for the agent platform or the search being unavailable, with a measure for how fast staff are sent to the portal search.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-024
+    criterion: CORE-QA-05
+    result: partly-met
+    type: trade-off-point
+    severity: major
+    elements: [sbb-kb-connection, svc-kb-agent]
+    statement: The precision and recall trade-off is set in the eval ceilings, but not recorded as a decision. The trade between index-speed answers and permission freshness, where a knowledge base permission change can take up to a day to reach answers, is stated in the grounding but decided nowhere.
+    evidence: [elements.svc-kb-agent.ai.grounding.freshness, elements.svc-kb-agent.ai.evals.eval-answer-or-abstain, decisions]
+    recommendation: Record both trade-offs as decisions, naming the qualities each moves and who accepts the permission lag.
+    disposition: { action: record-decision, owner: Digital workplace team }
+    status: open
+
+  # Decisions and open questions
+  - id: F-025
+    criterion: CORE-DEC-01
+    tool_result: met
+    result: met
+    statement: Both accepted decisions have chosen, alternatives and rationale. Decisions the design leaves unrecorded are taken under the criteria that ask for them (F-024, F-054, F-073).
+    evidence: [decisions.d-copilot-connector, decisions.d-auth-microsoft]
+    status: resolved
+  - id: F-026
+    criterion: CORE-DEC-02
+    result: partly-met
+    type: gap
+    severity: major
+    statement: Two open questions are named (knowledge base scope, HR bases). Two more are not. Whether Graph connector knowledge is returned under Authenticate with Microsoft is left "to confirm in the tenant" inside an accepted decision. And whether the target's enterprise knowledge store can ground the agent is not asked (F-011).
+    evidence: [considerations, decisions.d-auth-microsoft.rationale, design.source]
+    recommendation: Raise both as considerations, and reopen d-auth-microsoft until the tenant check is done.
+    disposition: { action: raise-consideration, owner: Digital workplace team }
+    status: open
+  - id: F-027
+    criterion: CORE-DEC-03
+    result: met
+    type: observation
+    statement: Met as the rule is written, because the design is proposed. Both open considerations must be resolved by accepted decisions before it is accepted.
+    evidence: [design.status, considerations.cn-kb-scope, considerations.cn-hr-bases]
+    status: resolved
+  - id: F-028
+    criterion: CORE-DEC-04
+    tool_result: met
+    result: met
+    statement: Every accepted decision has reversibility; all are two-way doors, which is plausible for configured platform choices.
+    evidence: [decisions.reversibility]
+    status: resolved
+  - id: F-029
+    criterion: CORE-DEC-05
+    result: met
+    statement: No debt is declared, and none was found taken on knowingly. The shortfalls found are gaps, not debt.
+    evidence: [decisions]
+    status: resolved
+
+  # Interfaces and contracts
+  - id: F-030
+    criterion: CORE-INT-01
+    result: not-met
+    type: gap
+    severity: major
+    statement: All six connectors cross the design's boundary (each has an actor, an external system or a technology at one end) and none names a contract, even the channel or the vendor's published interface and version.
+    evidence: [connectors.c-staff-teams, connectors.c-teams-agent, connectors.c-agent-index, connectors.c-connection-servicenow, connectors.c-connection-index, connectors.c-staff-portal]
+    recommendation: Name each connector's contract, for example the Microsoft Graph search API version and the ServiceNow table API version.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-031
+    criterion: CORE-INT-02
+    tool_result: met
+    result: met
+    statement: No connector joins two different bounded contexts of the design, so no context-map relationship is needed.
+    evidence: [connectors, elements.part_of]
+    status: resolved
+  - id: F-032
+    criterion: CORE-INT-03
+    result: met
+    statement: The coupling to a connection shared with other Microsoft 365 uses is deliberate, named in d-reuse-kb3 and cn-kb-scope.
+    evidence: [decisions.d-reuse-kb3, considerations.cn-kb-scope]
+    status: resolved
+
+  # Data
+  - id: F-033
+    criterion: CORE-DAT-01
+    tool_result: met
+    result: partly-met
+    type: gap
+    severity: major
+    statement: The three data sets named are owned and classified. Telemetry sent to Application Insights, which will hold staff questions and answers, is not named as a data set, nor are the audit records in Purview.
+    evidence: [data, operations.observability.conventions, data.data-transcripts.retention]
+    recommendation: Name the telemetry and audit data sets with owner, classification, residency and retention, and pass them to the privacy impact assessment.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-034
+    criterion: CORE-DAT-02
+    result: met
+    statement: Every confidential or personal data set has residency, retention and lineage.
+    evidence: [data.data-kb-articles, data.data-kb-index, data.data-transcripts]
+    status: resolved
+  - id: F-035
+    criterion: CORE-DAT-03
+    result: met
+    statement: The index has one owner and one writer, the connection, through the owner's external items interface.
+    evidence: [data.data-kb-index.owner, connectors.c-connection-index]
+    status: resolved
+
+  # Security architecture
+  - id: F-036
+    criterion: CORE-SEC-01
+    result: met
+    statement: Three trust zones, and every element other than the actor is in one.
+    evidence: [trust_zones, elements.trust_zone]
+    status: resolved
+  - id: F-037
+    criterion: CORE-SEC-02
+    result: met
+    statement: Every connector that crosses a trust zone is authenticated and authorised.
+    evidence: [connectors.c-teams-agent, connectors.c-agent-index, connectors.c-connection-servicenow]
+    status: resolved
+  - id: F-038
+    criterion: CORE-SEC-03
+    tool_result: not-met
+    result: not-met
+    type: gap
+    severity: major
+    statement: Three connectors with an actor or an external system at one end do not say whether they carry untrusted content. Staff questions arrive through the Teams connector, and the connection pulls the article text from ServiceNow that the design itself treats as untrusted further along.
+    evidence: [connectors.c-staff-teams, connectors.c-staff-portal, connectors.c-connection-servicenow, connectors.c-agent-index.carries_untrusted_content]
+    recommendation: State carries_untrusted_content on all three, and say where article text and staff input are contained before the model acts on them.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-039
+    criterion: CORE-SEC-04
+    result: not-met
+    type: gap
+    severity: major
+    statement: There is no threat model for this version; the only evidence is the design research. The cybersecurity hand-over is recorded in this assessment.
+    evidence: [evidence, evidence.ev-design-research]
+    recommendation: Produce a threat model for version 0.1.0, or for the redesigned version, covering permission fidelity from ServiceNow into the grounding store and injection through article text.
+    disposition: { action: fix-design, owner: "Digital workplace team, with a security architect" }
+    status: open
+  - id: F-040
+    criterion: CORE-SEC-05
+    result: met
+    type: sensitivity-point
+    statement: The connection runs as its own machine integration user with a custom read role, and the agent retrieves as the asking user. Every answer's confidentiality turns on one thing, that ServiceNow user criteria survive the copy into the index, including the email-based identity mapping. A redesign onto the knowledge store must keep this property.
+    evidence: [connectors.c-connection-servicenow.authentication, connectors.c-agent-index.authentication, data.data-kb-index.lineage, risks.rsk-overshare]
+    status: resolved
+
+  # Operability
+  - id: F-041
+    criterion: CORE-OPS-01
+    result: met
+    statement: SLOs for answer latency and index freshness.
+    evidence: [operations.slos]
+    status: resolved
+  - id: F-042
+    criterion: CORE-OPS-02
+    result: met
+    statement: Logs, metrics and traces are on, with conventions named.
+    evidence: [operations.observability]
+    status: resolved
+  - id: F-043
+    criterion: CORE-OPS-03
+    result: met
+    statement: Deployment strategy, rollback, recovery objectives and a degraded mode are set.
+    evidence: [operations.deployment, operations.recovery]
+    status: resolved
+  - id: F-044
+    criterion: CORE-OPS-04
+    result: not-applicable
+    statement: Applies only to an active design; this one is proposed.
+    evidence: [design.status]
+    status: resolved
+
+  # Cost and sustainability
+  - id: F-045
+    criterion: CORE-CST-01
+    result: not-met
+    type: gap
+    severity: major
+    statement: A unit cost and a 600 USD monthly budget are stated, but there is no cost model in the evidence. The rule says a sentence describing how cost will be modelled is not a cost model.
+    evidence: [operations.cost, evidence]
+    recommendation: Add a cost model as evidence, from the question volume and the share of staff without a Microsoft 365 Copilot licence, showing the cap holds at peak.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-046
+    criterion: CORE-CST-02
+    result: not-assessed
+    statement: The specification says nothing about environmental cost, and its materiality for a managed-platform assistant at this volume cannot be judged from the specification. A person decides whether it is material.
+    evidence: [scenarios.quality_attribute, decisions]
+    status: open
+
+  # Evolvability
+  - id: F-047
+    criterion: CORE-EVO-01
+    tool_result: met
+    result: met
+    statement: Three automated fitness functions, covering every high-importance scenario, with the gating evals rerun weekly as well as at deploy.
+    evidence: [fitness_functions, elements.svc-kb-agent.ai.drift_monitoring]
+    status: resolved
+  - id: F-048
+    criterion: CORE-EVO-02
+    result: met
+    type: non-risk
+    statement: The part most likely to change, the grounding source, is a knowledge source configured in the agent, separate from the channel, sign-in and platform. Moving it to the enterprise knowledge store changes that source, not the rest of the design.
+    evidence: [elements.svc-kb-agent.ai.grounding, connectors.c-agent-index]
+    status: resolved
+
+  # Risk and obligations
+  - id: F-049
+    criterion: CORE-RSK-01
+    result: met
+    statement: Both risks have a mitigation and an owner.
+    evidence: [risks]
+    status: resolved
+  - id: F-050
+    criterion: CORE-RSK-02
+    result: met
+    statement: The AI Act transparency duty and GDPR as employer are named, each with how the design classes under it.
+    evidence: [drivers.obligations]
+    status: resolved
+  - id: F-051
+    criterion: CORE-RSK-03
+    result: met
+    statement: The one evidence item exists, covers the three decisions it claims, and dates from version 0.1.0. It is documentation research, not tested in a tenant, which it says itself.
+    evidence: [evidence.ev-design-research, design.source]
+    status: resolved
+
+  # AI solution lens 0.3.0
+  - id: F-052
+    criterion: AIS-FIT-01
+    result: partly-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: The goals imply why a model is used (an answer, not a search result), but no decision compares it with a deterministic alternative such as better portal search, which the design already uses as its degraded mode.
+    evidence: [drivers.goals, decisions, operations.recovery.degraded_mode]
+    recommendation: Record a decision on why a generative agent is needed, with the cost and benefit of improving search instead.
+    disposition: { action: record-decision, owner: Digital workplace team }
+    status: open
+  - id: F-053
+    criterion: AIS-FIT-02
+    tool_result: met
+    result: met
+    statement: The model's role is generative and limited to answering from articles the user may read, with citations.
+    evidence: [elements.svc-kb-agent.ai.role, elements.svc-kb-agent.responsibilities]
+    status: resolved
+  - id: F-054
+    criterion: AIS-MOD-01
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: The model is not pinned and has no version. The rule's alternative for a managed platform needs a decision accepting the platform-managed model with gating evals rerun on any platform model change. There is none; drift monitoring reruns weekly and on a change to the connection, not on a model change.
+    evidence: [elements.svc-kb-agent.ai.model, elements.svc-kb-agent.ai.drift_monitoring, decisions]
+    recommendation: Record that decision, with the rerun on every platform model change as its condition.
+    disposition: { action: record-decision, owner: Digital workplace team }
+    status: open
+  - id: F-055
+    criterion: AIS-MOD-02
+    tool_result: not-met
+    result: not-met
+    type: gap
+    severity: minor
+    elements: [svc-kb-agent]
+    statement: No model card or system card is cited.
+    evidence: [elements.svc-kb-agent.ai.model]
+    recommendation: Cite the platform vendor's published transparency documentation as the model card.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-056
+    criterion: AIS-MOD-03
+    tool_result: met
+    result: met
+    statement: The fallback is to say so and link to the portal search, which is enough for a staff knowledge assistant.
+    evidence: [elements.svc-kb-agent.ai.fallback]
+    status: resolved
+  - id: F-057
+    criterion: AIS-EVAL-01
+    result: met
+    statement: Six evals, each with a metric and a threshold.
+    evidence: [elements.svc-kb-agent.ai.evals]
+    status: resolved
+  - id: F-058
+    criterion: AIS-EVAL-02
+    result: met
+    statement: Four offline evals gate release.
+    evidence: [elements.svc-kb-agent.ai.evals.gating]
+    status: resolved
+  - id: F-059
+    criterion: AIS-EVAL-03
+    result: partly-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: The evals cover correct answers, declining, citations and permission leakage. None tests instructions planted in article text, which the design names as untrusted input; the adversarial prompts come from users. Latency has no planned test, and the staff population (languages, roles) is not described in any test set.
+    evidence: [elements.svc-kb-agent.ai.evals, connectors.c-agent-index.carries_untrusted_content, scenarios.sc-latency]
+    recommendation: Plan an injection eval with instructions planted in test articles, a load test against the latency scenario, and say which staff groups the test set represents.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-060
+    criterion: AIS-EVAL-04
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: The correctness eval uses an AI judge that is not calibrated against human labels, so its 90 percent pass rate is not yet evidence. The source document plans calibration on at least 50 labelled cases, but the specification does not.
+    evidence: [elements.svc-kb-agent.ai.evals.eval-correctness.judge_calibrated, design.source]
+    recommendation: Calibrate the judge on human-labelled cases and record it in the specification.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-061
+    criterion: AIS-EVAL-05
+    tool_result: not-met
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: The agent takes mixed-trust input, so a red-team eval or report is required. Neither is planned; the report itself is due at production entry, but the plan is due now.
+    evidence: [elements.svc-kb-agent.ai.input_trust, elements.svc-kb-agent.ai.evals, evidence]
+    recommendation: Add a red-team eval to the plan, against the OWASP LLM risks that apply.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-062
+    criterion: AIS-EVAL-06
+    tool_result: met
+    result: met
+    type: non-risk
+    statement: Both classifying evals name their positive class and set separate ceilings on each error, and the ceilings lean the way the costs do (a wrong answer capped at 2 percent, a missed answer at 20 percent, F0.5 reported).
+    evidence: [elements.svc-kb-agent.ai.evals.eval-answer-or-abstain, elements.svc-kb-agent.ai.evals.eval-citation]
+    status: resolved
+  - id: F-063
+    criterion: AIS-EVAL-07
+    tool_result: met
+    result: met
+    statement: The answer-or-abstain eval has answering as its positive class, and 40 percent of its 400 questions (160) are unanswerable or out of scope. Whether 160 is enough to prove the 2 percent ceiling is F-065.
+    evidence: [elements.svc-kb-agent.ai.evals.eval-answer-or-abstain]
+    status: resolved
+  - id: F-064
+    criterion: AIS-EVAL-08
+    result: met
+    statement: A gating, zero-tolerance leakage eval as test users with different access.
+    evidence: [elements.svc-kb-agent.ai.evals.eval-permission-leakage]
+    status: resolved
+  - id: F-065
+    criterion: AIS-EVAL-09
+    result: partly-met
+    type: gap
+    severity: minor
+    elements: [svc-kb-agent]
+    statement: The 300 clean leakage probes bound the rate below about 1 percent, which is enough. The 160 unanswerable questions show a wrong-answer rate below 2 percent only if almost none fail, and no eval reports an interval.
+    evidence: [elements.svc-kb-agent.ai.evals.sample_size, elements.svc-kb-agent.ai.evals.eval-answer-or-abstain.errors]
+    recommendation: Size the unanswerable questions for the ceiling (about 190 with none failing, more if some may), and report intervals.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+  - id: F-066
+    criterion: AIS-DATA-01
+    result: met
+    statement: The grounding source resolves to a named, owned, classified data set used for grounding.
+    evidence: [elements.svc-kb-agent.ai.grounding.sources, data.data-kb-index]
+    status: resolved
+  - id: F-067
+    criterion: AIS-DATA-02
+    result: met
+    type: observation
+    statement: Retrieval of confidential content is trimmed to the caller. In this design the trimming is done by the Microsoft 365 index; a redesign onto the enterprise knowledge store must trim to the caller in the same way, or it fails this blocker criterion.
+    evidence: [elements.svc-kb-agent.ai.grounding.access_control, data.data-kb-index.classification]
+    status: resolved
+  - id: F-068
+    criterion: AIS-DATA-03
+    tool_result: met
+    result: met
+    statement: Drift monitoring and freshness are stated, and crawl freshness is a continuous fitness function.
+    evidence: [elements.svc-kb-agent.ai.drift_monitoring, elements.svc-kb-agent.ai.grounding.freshness, fitness_functions.ff-crawl-freshness]
+    status: resolved
+  - id: F-069
+    criterion: AIS-DATA-04
+    result: met
+    statement: No data is used for training or fine-tuning. The eval sets are built from internal articles and answers written by knowledge base owners.
+    evidence: [data.used_for_ai, elements.svc-kb-agent.ai.evals]
+    status: resolved
+  - id: F-070
+    criterion: AIS-IO-01
+    result: met
+    statement: The agent declares mixed input trust, and does not claim trusted input while receiving untrusted article text.
+    evidence: [elements.svc-kb-agent.ai.input_trust, connectors.c-agent-index.carries_untrusted_content]
+    status: resolved
+  - id: F-071
+    criterion: AIS-IO-02
+    result: met
+    statement: Output is displayed text with citation links, and is validated.
+    evidence: [elements.svc-kb-agent.ai.output_handling]
+    status: resolved
+  - id: F-072
+    criterion: AIS-IO-03
+    result: met
+    type: non-risk
+    statement: Confidentiality rests on retrieval as the user, not on the system prompt.
+    evidence: [connectors.c-agent-index.authorisation, elements.svc-kb-agent.ai.grounding.access_control]
+    status: resolved
+  - id: F-073
+    criterion: AIS-OPS-01
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-kb-agent]
+    statement: A monthly budget is set but no timeout, and no decision accepts the platform's own call limits, which the rule's managed-platform alternative requires.
+    evidence: [elements.svc-kb-agent.ai.limits, decisions]
+    recommendation: Record a decision accepting the platform's limits, with the budget cap.
+    disposition: { action: record-decision, owner: Digital workplace team }
+    status: open
+  - id: F-074
+    criterion: AIS-OPS-02
+    tool_result: partly-met
+    result: partly-met
+    type: gap
+    severity: minor
+    elements: [svc-kb-agent]
+    statement: Traces are on and the platform's telemetry is named, but the design does not show that it records prompts, outputs and cost per call, and no decision records the gap from the GenAI conventions.
+    evidence: [operations.observability]
+    recommendation: Record that decision, saying what the platform telemetry captures.
+    disposition: { action: record-decision, owner: Digital workplace team }
+    status: open
+  - id: F-075
+    criterion: AIS-OPS-03
+    result: met
+    statement: A latency budget, a fallback and the portal search as degraded mode.
+    evidence: [scenarios.sc-latency, elements.svc-kb-agent.ai.fallback, operations.recovery.degraded_mode]
+    status: resolved
+  - id: F-076
+    criterion: AIS-HUM-01
+    tool_result: met
+    result: met
+    statement: Staff read every answer before acting on it, which is proportionate for an assistant that makes no decision about people.
+    evidence: [elements.svc-kb-agent.ai.human_oversight, drivers.non_goals]
+    status: resolved
+  - id: F-077
+    criterion: AIS-HUM-02
+    tool_result: met
+    result: met
+    statement: The agent's name and first message say it is an AI assistant.
+    evidence: [elements.svc-kb-agent.ai.disclosure]
+    status: resolved
+  - id: F-078
+    criterion: AIS-HUM-03
+    tool_result: partly-met
+    result: partly-met
+    type: gap
+    severity: major
+    statement: The AI Act obligation is named and classed as limited risk, but there is no AI impact assessment and the obligation does not say why none is needed.
+    evidence: [drivers.obligations.obl-ai-transparency, evidence]
+    recommendation: State in the obligation why no impact assessment is required, or attach one.
+    disposition: { action: fix-design, owner: Digital workplace team }
+    status: open
+
+risk_themes:
+  - id: RT-01
+    statement: The agent is grounded off the target state. It copies ServiceNow content into Microsoft 365's index, which the target excludes, instead of using the enterprise knowledge store the target plans, and no exception has been sought.
+    findings: [F-008, F-009, F-010, F-011, F-012]
+    threatens: [The move toward the target state, "OC-004", "Staff get a correct, cited answer from a published ServiceNow knowledge article in Teams"]
+  - id: RT-02
+    statement: Wrong answers with authoritative citations are not yet shown to be rare, because the judge is uncalibrated, the model can change unseen, injection through articles is untested and the abstain sample is small.
+    findings: [F-054, F-059, F-060, F-065]
+    threatens: ["Staff get a correct, cited answer from a published ServiceNow knowledge article in Teams", Fewer service desk contacts for questions an article already answers]
+  - id: RT-03
+    statement: The security architecture is not yet shown. There is no threat model, untrusted paths and contracts are unstated, red-teaming is unplanned and the telemetry data set is unnamed.
+    findings: [F-030, F-033, F-038, F-039, F-061]
+    threatens: [No article shown to someone ServiceNow would not show it to]
+  - id: RT-04
+    statement: The value and cost of the model are asserted rather than shown. There is no cost model, no decision on platform limits or telemetry, and no comparison with better search.
+    findings: [F-045, F-052, F-073, F-074]
+    threatens: [Fewer service desk contacts for questions an article already answers]
+
+handovers:
+  - to: cybersecurity
+    scope: Permission fidelity from ServiceNow into whichever grounding store the design settles on (user criteria, the HR content reader role, identity mapping), injection through article text, and the threat model for the version assessed next.
+    findings: [F-038, F-039, F-040, F-061]
+  - to: privacy
+    scope: Staff questions and answers in transcripts, telemetry and audit records, their retention and residency, under GDPR as employer.
+    findings: [F-033]
+
+verdict:
+  outcome: not-endorsed
+  conditions:
+    - "Move the agent's grounding onto the enterprise knowledge store the target state names, so that ServiceNow content is no longer copied into Microsoft 365's index (F-008, F-009, F-010, F-012). The only other route is an exception escalated to the organisation's exception authority and approved by it, recorded as an accepted decision with a departure naming that authority; the responsible architect is not inclined to seek one. Owner: Digital workplace team, with the responsible architect."
+    - "Raise a consideration on whether the enterprise knowledge store can ground this agent now, and if not, when (F-011, F-026)."
+    - "Close the important gaps: a threat model, a cost model, contracts on every connector, untrusted paths stated, failure and coverage scenarios, the trade-off and model decisions, judge calibration, red-team, injection and load test plans, the telemetry data set, and the AI impact rationale (F-021, F-023, F-024, F-030, F-033, F-038, F-039, F-045, F-052, F-054, F-059, F-060, F-061, F-073, F-078). Owner: Digital workplace team. Due dates are the owner's to set; this assessor proposes the next design review as the date for all of them."
+    - "Catalogue entries, or onboarding assessments, for Teams, Entra ID and the Microsoft 365 index, and for the enterprise knowledge store once it is in the design (TR-004)."
+    - "The architect and the owner reconcile the source document's description of servicenowkb3 as an existing connection with the attestation."
+    - "An independent lead assessor and a security architect, both people, review these findings, and a person confirms the outcome."
+  summary: >-
+    Proposed, for a person to confirm: not endorsed. Rule 2 of section 7 decides it: one blocker is open (CORE-TGT-05, the not-target connection with no approved exception), and 19 majors are open, most of them design fixes with no due date. Of 78 criteria, 50 are met, 12 partly met, 13 not met, 1 not applicable and 2 not assessed; the open findings are 1 blocker, 19 majors and 5 minors. The agent, Teams, Entra ID, Copilot Studio and its environment are where the organisation is heading. What is not is copying ServiceNow articles into Microsoft 365's search index, and the target-aligned way is to ground the agent on the enterprise knowledge store instead. The design cannot be endorsed while it relies on that copy: the route to endorsement is that redesign, and the only alternative is an exception escalated to and approved by the exception authority, which the responsible architect is not inclined to seek. No conformance level is recorded: the assess flow records one only when the catalogue is available, and it is not; the attestation alone shows the design has features the target does not cover, so it could be no better than consistent.
+  next_assessment: A design review of the redesigned version, re-triaged first. AT3 at review depth while any not-target block remains; AT2 if the agent is grounded on a catalogued target knowledge store and Teams, Entra ID and the Microsoft 365 index have catalogue refs.

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lens.schema.json",
+  "title": "Assessment lens (draft 0.1.0)",
+  "description": "A set of criteria an assessment applies to a design specification. The core lens applies to every design; further lenses apply when a design declares, or is found to have, a profile. Each criterion says what it asks, why, what in the specification it reads, whether a tool can decide it or a reviewer must, how severe a failure is by default, and where it comes from. Draft: see standards/assessment/standard-architecture-assessment.md.",
+  "type": "object",
+  "required": ["schema", "lens", "criteria"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "lens/0.1.0" },
+    "lens": {
+      "type": "object",
+      "required": ["id", "title", "version", "applies_when"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "prefix": { "type": "string", "pattern": "^[A-Z]+$", "description": "The first part of every criterion id in the lens." },
+        "title": { "type": "string" },
+        "version": { "$ref": "envelope.schema.json#/$defs/semver" },
+        "applies_when": {
+          "description": "always, the profile that brings the lens in, or the assessment trigger that does (the production lens applies to every production entry assessment).",
+          "anyOf": [ { "const": "always" }, { "type": "object", "required": ["profile"], "additionalProperties": false, "properties": { "profile": { "type": "string" } } }, { "type": "object", "required": ["trigger"], "additionalProperties": false, "properties": { "trigger": { "type": "string" } } } ]
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "areas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title"],
+        "additionalProperties": false,
+        "properties": { "id": { "type": "string", "pattern": "^[A-Z]+$" }, "title": { "type": "string" }, "question": { "type": "string" } }
+      }
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "area", "question", "decided_by", "severity", "reads"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-\\d{2}$" },
+          "area": { "type": "string", "pattern": "^[A-Z]+$" },
+          "question": { "type": "string" },
+          "why": { "type": "string" },
+          "reads": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "The parts of the design specification the criterion reads, as dotted paths." },
+          "decided_by": { "enum": ["tool", "reviewer", "both"], "description": "tool: decidable from the specification without judgement. reviewer: needs judgement. both: a tool decides whether the answer is present, a reviewer whether it is good enough." },
+          "rule": { "type": "string", "description": "For a tool-decided criterion, the check in words precise enough to implement." },
+          "applies_to": { "type": "string", "description": "When the criterion applies, if not always." },
+          "severity": { "enum": ["blocker", "major", "minor", "advisory"], "description": "The default severity of a not-met result. An assessor may change it with a reason." },
+          "sources": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Short source keys used by the criteria, each mapped to the full citation."
+    }
+  }
+}
