@@ -45,9 +45,22 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      # The manifest names the version main is at. When that version has no tag it was cut by
-      # hand (the 0.4.1 baseline, or a release-as), so publish it from its CHANGELOG.md section,
-      # at this commit, and let Release Please start from it. Once the tag exists this does nothing.
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          # develop is the default branch (Git Flow); releases are cut on main only.
+          target-branch: main
+
+      # Runs after Release Please, which tags and publishes every release its own pull request
+      # makes, and marks that pull request released. When the manifest's version still has no tag
+      # after that, it was cut by hand (the 0.4.1 baseline, or a release-as): publish it from its
+      # CHANGELOG.md section, at this commit. Once the tag exists this does nothing. It used to run
+      # first, which published Release Please's own releases before Release Please could mark
+      # their pull requests, so the next run failed on a duplicate tag.
       - name: Publish a version cut by hand
         id: baseline
         env:
@@ -55,6 +68,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(node -p 'require("./.release-please-manifest.json")["."]')
+          git fetch --quiet --tags origin
           if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null; then
             echo "v$version is tagged"
             exit 0
@@ -66,14 +80,3 @@ jobs:
           fi
           gh release create "v$version" --target "$GITHUB_SHA" --title "Architecture Continuum $version" --notes-file "$RUNNER_TEMP/notes.md"
           echo "v$version published at $GITHUB_SHA"
-          echo "created=true" >> "$GITHUB_OUTPUT"
-
-      - name: Release Please
-        if: steps.baseline.outputs.created != 'true'
-        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
-        with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-          # develop is the default branch (Git Flow); releases are cut on main only.
-          target-branch: main
