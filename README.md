@@ -161,7 +161,7 @@ skill-standards.json   Which standards each skill carries a copy of
 
 ## Lineage
 
-This repository was AI-Assisted Architecture from its first commit to version 0.4.0, and was renamed Architecture Continuum in October 2026. The history, the release tags (`aaa-create-abb--v0.5.0` and the rest) and the issues are this repository's, and the old repository URL redirects here. The ten `aaa-*` skills became the one `architecture` skill in the release after 0.5.0; the bundle's name and purls keep the old identifiers. The name changed because the old one named the tool rather than the method: in a practice where every artefact is written with an agent, "AI-assisted" says nothing, and the thing this bundle defines is the continuum.
+This repository was AI-Assisted Architecture from its first commit to version 0.4.0, and was renamed Architecture Continuum in October 2026. The history, the release tags (`aaa-create-abb--v0.5.0` and the rest) and the issues are this repository's, and the old repository URL redirects here. The ten `aaa-*` skills became the one `architecture` skill in the release after 0.5.0; the bundle's name and purls took the new name later, and only the history and the ontology's IRIs keep the old one. The name changed because the old one named the tool rather than the method: in a practice where every artefact is written with an agent, "AI-assisted" says nothing, and the thing this bundle defines is the continuum.
 
 The related bundles keep their names: [AI-Assisted Work](https://github.com/dermot-obrien/ai-assisted-work) for the installer, the bundle format and the `work` skill, and [AI-Assisted Research](https://github.com/dermot-obrien/ai-assisted-research) for research lineage.
 

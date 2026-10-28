@@ -384,7 +384,7 @@
           "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
           "design_version": { "$ref": "envelope.schema.json#/$defs/semver", "description": "The version of this design the evidence was produced against. A production entry assessment relies only on evidence for the version being released." },
           "outcome": { "enum": ["passed", "passed-with-conditions", "failed"], "description": "For a test or a handed-over assessment: what it concluded." },
-          "covers": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The scenarios, elements or evals the evidence speaks to." }
+          "covers": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The scenarios, elements, evals or decisions the evidence speaks to." }
         }
       }
     }
