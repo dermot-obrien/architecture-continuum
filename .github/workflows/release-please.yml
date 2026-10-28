@@ -26,6 +26,9 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Release Please marks a merged release pull request released by changing its labels, which
+  # is the issues API; without this the label stays pending and the next run fails on it.
+  issues: write
 
 concurrency:
   group: release-please
