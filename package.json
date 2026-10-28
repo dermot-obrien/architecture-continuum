@@ -1,6 +1,6 @@
 {
   "name": "architecture-continuum",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
   "description": "AI-Assisted Architecture: a bundle of standalone Agent Skills for TOGAF-aligned architecture authoring, with the standards and ontology they are built from. This file holds the dependencies of the repository's own tools (the ontology validators and checks).",
