@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assessment-config.schema.json",
+  "title": "Organisation assessment criteria (draft 0.1.0)",
+  "description": "The assessment.yaml in the folder the [suite.architecture] binding assessment names: which criteria an organisation's assessments apply. Its own lenses (valid against lens.schema.json) extend the lenses the architecture skill ships, or replace them; it may leave out shipped criteria and change their severities, and supply its own assessment and triage standards. The method, results and record formats stay the skill's.",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "assessment-config/0.1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "The criteria set's id, recorded in every assessment that uses it."
+    },
+    "version": {
+      "$ref": "envelope.schema.json#/$defs/semver",
+      "description": "The criteria set's version: bump it when a lens, an exclusion or an override changes, so a record says which it was assessed against."
+    },
+    "title": {
+      "type": "string"
+    },
+    "builtin": {
+      "enum": [
+        "extend",
+        "replace"
+      ],
+      "default": "extend",
+      "description": "extend: the shipped lenses apply too, less what exclude names. replace: only the organisation's lenses apply."
+    },
+    "lenses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The organisation's lens files, relative to this file. Default: every .yaml in lenses/ next to it."
+    },
+    "exclude": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "Criterion ids, or whole lens ids, that do not apply."
+    },
+    "overrides": {
+      "type": "object",
+      "description": "By criterion id: the organisation's default severity, and why.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "severity": {
+            "enum": [
+              "blocker",
+              "major",
+              "minor",
+              "advisory"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "standards": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The organisation's own assessment and triage standards, relative to this file, read by the flows in place of the shipped ones. They must keep the shipped standards' results, outcomes and record formats, which the scripts depend on.",
+      "properties": {
+        "assessment": {
+          "type": "string"
+        },
+        "triage": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

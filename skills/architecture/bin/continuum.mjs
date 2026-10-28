@@ -17,6 +17,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { check, INSTALL_HINT, loadConfig, loadModules, scaffold, SKILL, SKILL_DIR } from "../src/continuum.mjs";
+import { loadCriteria } from "../src/criteria.mjs";
 
 if (Number(process.versions.node.split(".")[0]) < 18) {
   console.error(`Node.js ${process.versions.node} is too old: ${SKILL} needs 18 or newer.`);
@@ -61,6 +62,8 @@ if (command === "doctor") {
   const config = loadConfig({ cwd: process.cwd(), root: flags.root, bindings: flags.bindings, schemas: flags.schemas });
   for (const w of config.warnings) console.error(`warning: ${w}`);
   const modules = loadModules(config.workspace);
+  const criteria = modules ? loadCriteria(config.assessment, modules) : null;
+  for (const w of criteria?.warnings ?? []) console.error(`warning: ${w}`);
   const out = {
     skill: SKILL,
     skillDir: SKILL_DIR,
@@ -69,8 +72,10 @@ if (command === "doctor") {
     schemes: config.schemes,
     namespaces: config.namespaces,
     schemas: config.schemas,
+    assessment: config.assessment ?? "(shipped criteria)",
+    criteria: criteria?.set ? `${criteria.set.id}${criteria.set.version ? " " + criteria.set.version : ""}: ${criteria.lenses.map(l => `${l.lens.id} ${l.lens.version}`).join(", ")}` : null,
     modules: modules ? "ok" : "missing",
-    problems: [...config.problems, ...(modules ? [] : [INSTALL_HINT])],
+    problems: [...config.problems, ...(criteria?.problems ?? []), ...(modules ? [] : [INSTALL_HINT])],
   };
   if (flags.json) console.log(JSON.stringify(out, null, 2));
   else {

@@ -6,7 +6,7 @@ It never changes the record, the triage or the design.
 
 ## What it needs
 
-No bindings are required; `catalogueUrl`, when declared or given, turns identifiers into links (see Links to the catalogue below). It reads the assessment record (`AS-NNN-<slug>.assessment.yaml`), the triage record it cites and any that supersede it, the design specification for the names of things, and the lenses at the versions the record names, for what each criterion asks.
+No bindings are required; `catalogueUrl`, when declared or given, turns identifiers into links (see Links to the catalogue below). It reads the assessment record (`AS-NNN-<slug>.assessment.yaml`), the triage record it cites and any that supersede it, the design specification for the names of things, and the lenses at the versions the record names, for what each criterion asks: from the organisation's criteria set when the record names one in `criteria_set` (the `assessment` binding), else the shipped lenses.
 
 ## Steps
 
@@ -34,7 +34,7 @@ The report and the readout are read by the people who decide, and most of them d
 
 1. **Summary.** The subject and version, the proposed outcome, the tier, the number of blockers and majors, and the two or three things that decide the outcome.
 2. **How much scrutiny, and why** (the triage). The drivers as declared and as derived, with the tier each gives; the resulting type, tier and plan; anything that would move the tier.
-3. **How the review was done** (the assessment path). What was done and in what order: the depth and why, the lenses and versions, the check (schema validation and the tool criteria), the review, whether an evaluation was held, the evidence read, and what an agent could not decide and left to a person.
+3. **How the review was done** (the assessment path). What was done and in what order: the depth and why, the criteria set when it is an organisation's, the lenses and versions, the check (schema validation and the tool criteria), the review, whether an evaluation was held, the evidence read, and what an agent could not decide and left to a person.
 4. **How the checks came out** (results by lens). For each lens, the count of `met`, `partly-met`, `not-met`, `not-applicable` and `not-assessed`.
 5. **Findings.** What blocks the design first, then the important gaps, then the minor ones, grouped by what they put at risk. Each says what is wrong, why it matters, what to do and who does it, in plain words.
 6. **What it puts at risk, and what goes to other teams** (risk themes and hand-overs).
