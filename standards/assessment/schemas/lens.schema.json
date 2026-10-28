@@ -18,8 +18,8 @@
         "title": { "type": "string" },
         "version": { "$ref": "envelope.schema.json#/$defs/semver" },
         "applies_when": {
-          "description": "always, or the profile that brings the lens in.",
-          "anyOf": [ { "const": "always" }, { "type": "object", "required": ["profile"], "additionalProperties": false, "properties": { "profile": { "type": "string" } } } ]
+          "description": "always, the profile that brings the lens in, or the assessment trigger that does (the production lens applies to every production entry assessment).",
+          "anyOf": [ { "const": "always" }, { "type": "object", "required": ["profile"], "additionalProperties": false, "properties": { "profile": { "type": "string" } } }, { "type": "object", "required": ["trigger"], "additionalProperties": false, "properties": { "trigger": { "type": "string" } } } ]
         },
         "description": { "type": "string" }
       }

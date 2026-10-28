@@ -1,0 +1,235 @@
+schema: lens/0.1.0
+lens:
+  id: production
+  prefix: PRD
+  title: Production entry lens
+  version: 0.1.0
+  applies_when:
+    trigger: production-entry
+  description: >-
+    The criteria a solution must meet before it goes into production, applied in the production entry assessment (standard, section 8.1) on top of the core lens and whichever AI lenses its profiles bring in. The core lens asks whether the design is fit for purpose; this lens asks whether what was built is that design, whether the evidence for this version exists and says what it must, whether the assessments the design handed over have returned, whether the solution can be run, released and recovered, and whether what remains has been accepted by someone entitled to accept it. It reads evidence of the build. It does not repeat the cybersecurity, privacy, AI impact or conformity assessments; it reads their outcomes.
+
+areas:
+  - id: BLD
+    title: As built
+    question: Is what was built the design that was assessed, at the version being released?
+  - id: EVD
+    title: Evidence
+    question: Was the evidence produced against this version, and does it cover what it must?
+  - id: HND
+    title: Hand-overs
+    question: Have the assessments this one does not make returned, with acceptable outcomes?
+  - id: OPS
+    title: Run
+    question: Is there a team, a runbook, alerting and an operational readiness review behind the solution?
+  - id: REL
+    title: Release and recovery
+    question: Have rollback, recovery, load and cutover been exercised rather than written down?
+  - id: RSK
+    title: Residual risk
+    question: Is everything carried into production owned and accepted by someone entitled to accept it?
+  - id: AI
+    title: Model and agent readiness
+    question: Do the release candidate's evals pass, and do an agent's limits and kill switch work in fact?
+
+criteria:
+  # As built
+  - id: PRD-BLD-01
+    area: BLD
+    question: Is the design a solution design, accepted, with no open consideration, and has this version had an endorsed design review whose conditions are closed?
+    why: The production entry assessment builds on the design review; it is not a way to review a design for the first time on the day it ships.
+    reads: [design.type, design.status, considerations.status, evidence.type, evidence.design_version]
+    decided_by: tool
+    rule: design.type is solution-design; design.status is accepted; no consideration has status open; evidence has an entry of type prior-assessment whose design_version equals design.version.
+    severity: blocker
+    sources: [standard, togaf-phase-g]
+  - id: PRD-BLD-02
+    area: BLD
+    question: Does an as-built record show the built solution matches this version of the design, with every departure either designed in a new version or recorded as a decision?
+    why: TOGAF's compliance review compares implementation with architecture; a solution that departs from its design has not been assessed, whatever its design review said.
+    reads: [evidence.type, evidence.design_version, decisions]
+    decided_by: both
+    rule: evidence has an entry of type as-built-record whose design_version equals design.version. A reviewer reads it and sets the verdict's as_built level.
+    severity: blocker
+    sources: [togaf-compliance, togaf-phase-g]
+  - id: PRD-BLD-03
+    area: BLD
+    question: Are the automated fitness functions running in the delivery pipeline or continuously, and passing on the release candidate?
+    why: A characteristic protected only on paper is not protected; production is where a fitness function starts to earn its place.
+    reads: [fitness_functions.automated, fitness_functions.runs, evidence]
+    decided_by: both
+    rule: Every fitness function with automated true has runs other than manual. A reviewer confirms from the pipeline or its evidence that they pass on the release candidate.
+    severity: major
+    sources: [bea, oaa]
+
+  # Evidence
+  - id: PRD-EVD-01
+    area: EVD
+    question: Was every piece of evidence the assessment relies on produced against the version being released?
+    why: Evidence from an earlier version describes a different solution.
+    reads: [evidence.design_version, design.version]
+    decided_by: tool
+    rule: Every evidence entry cited by a finding or required by a criterion of this lens has design_version equal to design.version; any other is reported, and the criterion it would have answered is not-assessed.
+    severity: blocker
+    sources: [standard, ladder]
+  - id: PRD-EVD-02
+    area: EVD
+    question: Do acceptance tests show the functional scenarios work end to end?
+    reads: [evidence.type, evidence.covers, scenarios]
+    decided_by: both
+    rule: evidence has an entry of type acceptance-test with outcome passed or passed-with-conditions whose covers includes every functional scenario.
+    severity: major
+    sources: [ladder, standard]
+
+  # Hand-overs
+  - id: PRD-HND-01
+    area: HND
+    question: Has every assessment the design handed over returned an outcome for this version that is not a failure?
+    why: The architecture assessment does not judge controls, privacy impact, AI impact or conformity; it may not let a solution into production before the assessments that do have spoken.
+    reads: [evidence.type, evidence.outcome, evidence.design_version, data.personal, drivers.obligations, profiles]
+    decided_by: tool
+    rule: >-
+      evidence has a security-assessment for this version; a privacy-impact-assessment when any data set has personal true; an ai-impact-assessment when profiles include ai-solution and an obligation requires one; a conformity-assessment when an obligation's classification requires one. Each has an outcome, and no outcome is failed.
+    severity: blocker
+    sources: [standard, nist-800-37, iso27001, iso42005, eu-aiact]
+  - id: PRD-HND-02
+    area: HND
+    question: Are the conditions and residual risks those assessments returned accepted by the person each one names?
+    reads: [evidence.outcome, risks]
+    decided_by: reviewer
+    severity: major
+    sources: [nist-800-37, togaf-risk]
+
+  # Run
+  - id: PRD-OPS-01
+    area: OPS
+    question: Is a team named to run the solution, with its hours, on-call cover and escalation?
+    reads: [operations.support]
+    decided_by: tool
+    rule: operations.support has team, hours and escalation; on_call is true when any SLO applies outside the stated hours.
+    severity: blocker
+    sources: [sre-prr, ladder]
+  - id: PRD-OPS-02
+    area: OPS
+    question: Does every SLO alert the support team when it is at risk, and is the solution in the monitoring it will be run with?
+    reads: [operations.slos.alerting, operations.observability]
+    decided_by: both
+    rule: Every SLO has alerting true; observability has logs, metrics, traces and audit_trail true. A reviewer confirms the dashboards and alerts exist for this version.
+    severity: major
+    sources: [sre-prr, wa-aws]
+  - id: PRD-OPS-03
+    area: OPS
+    question: Is there a runbook, and has an operational readiness review of this version passed?
+    why: Operational readiness reviews turn the causes of past incidents into questions asked before launch; architecture reads their outcome rather than repeating them.
+    reads: [operations.runbook, evidence.type, evidence.outcome]
+    decided_by: tool
+    rule: operations.runbook is set; evidence has an operational-readiness entry for this version with outcome passed or passed-with-conditions.
+    severity: major
+    sources: [orr, sre-prr]
+
+  # Release and recovery
+  - id: PRD-REL-01
+    area: REL
+    question: Has rollback of this release been tested, and is the point after which rollback becomes recovery known?
+    reads: [operations.deployment.rollback, operations.transition.point_of_no_return, evidence.type]
+    decided_by: tool
+    rule: operations.deployment.rollback is set; evidence has a rollback-test for this version with outcome passed; operations.transition.point_of_no_return is set when there is a data migration.
+    severity: blocker
+    sources: [dora, sre-prr]
+  - id: PRD-REL-02
+    area: REL
+    question: Has recovery been tested against the stated recovery time and recovery point objectives?
+    reads: [operations.recovery, evidence.type, evidence.outcome]
+    decided_by: tool
+    rule: recovery.rto and recovery.rpo are set; evidence has a recovery-test for this version with outcome passed.
+    severity: major
+    sources: [wa-aws, iso25010]
+  - id: PRD-REL-03
+    area: REL
+    question: Has a load test exercised the high-importance performance and reliability scenarios at the expected peak?
+    reads: [scenarios, evidence.type, evidence.covers]
+    decided_by: both
+    rule: evidence has a load-test for this version whose covers includes every quality scenario with importance high and quality_attribute performance-efficiency or reliability. A reviewer checks the load matched the stated peak.
+    severity: major
+    sources: [sre-prr, atam]
+  - id: PRD-REL-04
+    area: REL
+    question: Are the cutover, any data migration, and the retirement of what the solution replaces planned and owned?
+    reads: [operations.transition]
+    decided_by: reviewer
+    severity: major
+    sources: [togaf-phase-g, g253]
+
+  # Residual risk
+  - id: PRD-RSK-01
+    area: RSK
+    question: Does every risk, debt item and accepted finding carried into production have an owner entitled to accept it, and a date?
+    why: TOGAF has residual risk accepted through governance before it is monitored in Phase G; production is where acceptance stops being hypothetical.
+    reads: [risks.owner, decisions.technical_debt]
+    decided_by: both
+    rule: Every risk has owner and mitigation. A reviewer confirms each owner is entitled to accept it, and that each debt item has an owner and a repayment expectation.
+    severity: blocker
+    sources: [togaf-risk, standard]
+  - id: PRD-RSK-02
+    area: RSK
+    question: Are the conditions of this assessment each owned and dated, and is the first periodic assessment scheduled?
+    reads: [verdict.conditions, verdict.next_assessment]
+    decided_by: reviewer
+    severity: major
+    sources: [standard]
+
+  # Model and agent readiness
+  - id: PRD-AI-01
+    area: AI
+    question: Do the gating evals pass on the release candidate?
+    reads: [elements.ai.evals, evidence.type, evidence.covers, evidence.outcome]
+    decided_by: tool
+    rule: For every eval with gating true, evidence has an eval-report for this version whose covers includes the eval and whose outcome is passed.
+    applies_to: profiles include ai-solution
+    severity: blocker
+    sources: [nist-ai-600-1, wa-aws-genai]
+  - id: PRD-AI-02
+    area: AI
+    question: Are drift monitoring and at least one online eval switched on for every model-backed element?
+    reads: [elements.ai.drift_monitoring, elements.ai.evals.kind]
+    decided_by: tool
+    rule: Every element with an ai facet has drift_monitoring and at least one eval of kind online.
+    applies_to: profiles include ai-solution
+    severity: major
+    sources: [nist-ai-600-1, azure-ai]
+  - id: PRD-AI-03
+    area: AI
+    question: Have the agent's limits, approval gates and kill switch been shown to work, without the agent's cooperation?
+    why: A kill switch nobody has pulled is a hope. The agent lens asks whether the controls are designed; production asks whether they work.
+    reads: [elements.agent.limits, elements.agent.guardrails, evidence.type, evidence.covers]
+    decided_by: tool
+    rule: For every element with an agent facet, evidence has a control-test for this version, with outcome passed, whose covers includes the element.
+    applies_to: profiles include ai-agent
+    severity: blocker
+    sources: [operating-model, aws-agentic, imda-agentic]
+
+sources:
+  standard: This bundle, standards/assessment/standard-architecture-assessment.md, section 8.1
+  ladder: This bundle, standards/capabilities/standard-definition-ladder.md
+  operating-model: This bundle, standards/agent-native/operating-model.md
+  togaf-compliance: The Open Group, TOGAF Standard 10th Edition, Enterprise Architecture Capability and Governance, chapter 6, Architecture Compliance
+  togaf-phase-g: The Open Group, TOGAF Standard 10th Edition, ADM, Phase G, Implementation Governance
+  togaf-risk: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, chapter 8, Risk Management
+  g253: The Open Group, G253, Architecture Compliance Review Checklists (2025)
+  orr: AWS, Operational Readiness Reviews (2022)
+  sre-prr: Google, Site Reliability Engineering, chapter 32, Production Readiness Review
+  wa-aws: AWS Well-Architected Framework
+  wa-aws-genai: AWS Well-Architected Generative AI Lens
+  aws-agentic: AWS Well-Architected Agentic AI Lens (2026)
+  azure-ai: Azure Well-Architected Framework, AI workloads
+  imda-agentic: IMDA, Model AI Governance Framework for Agentic AI, version 1.5 (2026)
+  dora: DORA, capabilities and metrics
+  bea: Ford, Parsons, Kua and Sadalage, Building Evolutionary Architectures, 2nd edition (2022)
+  oaa: The Open Group, Open Agile Architecture Standard, Version 2.0 (C262), 11.3.2 and 11.3.3
+  atam: SEI, Architecture Tradeoff Analysis Method
+  iso25010: ISO/IEC 25010:2023, Product quality model
+  iso27001: ISO/IEC 27001:2022, Information security management systems
+  iso42005: ISO/IEC 42005:2025, AI system impact assessment
+  nist-800-37: NIST SP 800-37 Rev. 2, Risk Management Framework
+  nist-ai-600-1: NIST AI 600-1, Generative AI Profile (2024)
+  eu-aiact: Regulation (EU) 2024/1689, the AI Act

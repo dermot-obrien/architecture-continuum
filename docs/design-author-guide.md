@@ -1,6 +1,6 @@
 # Preparing a design for assessment
 
-A guide for the author of a design that is about to be assessed under the draft [Architecture Assessment Standard](../standards/assessment/standard-architecture-assessment.md): the architect, the team, or the agent that wrote an architecture pattern, a reference architecture or a solution design. It says what the assessment will read, how to write it so that the review spends its time on judgement rather than on finding what is missing, what to clear before you ask for a review, and what to do with the findings. The standard is the rule; this guide is the practical reading of it, and where the two differ the standard wins. The reasoning behind both is in [Architecture assessment on the continuum](architecture-assessment.md).
+A guide for the author of a design that is about to be assessed, whether as a design or as a solution going into production, under the draft [Architecture Assessment Standard](../standards/assessment/standard-architecture-assessment.md): the architect, the team, or the agent that wrote an architecture pattern, a reference architecture or a solution design. It says what the assessment will read, how to write it so that the review spends its time on judgement rather than on finding what is missing, what to clear before you ask for a review, and what to do with the findings. The standard is the rule; this guide is the practical reading of it, and where the two differ the standard wins. The reasoning behind both is in [Architecture assessment on the continuum](architecture-assessment.md).
 
 ## What the assessment is, from your side
 
@@ -15,9 +15,9 @@ Three things are outside it, and you should plan for them separately: whether se
 | Ask | Why it matters | Where to find it |
 |---|---|---|
 | What type is my design? | An architecture pattern is conceptual or logical, its boxes local roles or ABBs; a reference architecture or a solution design is physical, every box an SBB, a technology, a service, a store or a node. A design whose boxes do not fit its type is reported (`CORE-TRC-02`) | [The continuum](continuum.md) |
-| Which gate is it for? | R2 to R3 assesses the logical pattern and its decisions; R3 to R4 the reference architecture with its cost model; R4 to R5 the evidence, not the design | Section 8 of the standard; [definition ladder](../standards/capabilities/standard-definition-ladder.md) |
+| Which gate is it for? | R2 to R3 assesses the logical pattern and its decisions; R3 to R4 the reference architecture with its cost model; R4 to R5 the evidence, not the design; production entry the solution as built, formally | Section 8 of the standard; [definition ladder](../standards/capabilities/standard-definition-ladder.md) |
 | At what depth? | A check is a tool run; a review answers every criterion; an evaluation adds a workshop with your stakeholders. Expect an evaluation if a decision is costly to reverse, the design is high-risk, or people disagree about it | Section 3 of the standard |
-| Which lenses? | `core` always. Any element that uses a model brings in `ai-solution`; any element whose model chooses its own steps and calls tools brings in `ai-agent`. Declare the profiles; a tool also derives them and reports a mismatch | Section 2.2; the [lenses](../standards/assessment/lenses/) |
+| Which lenses? | `core` always. Any element that uses a model brings in `ai-solution`; any element whose model chooses its own steps and calls tools brings in `ai-agent`. Declare the profiles; a tool also derives them and reports a mismatch. A production entry assessment adds `production` | Section 2.2; the [lenses](../standards/assessment/lenses/) |
 
 Read the lenses that apply before you write, not after. Each criterion says what it reads, so the lens is also a list of what to write.
 
@@ -81,6 +81,7 @@ Then clear the blockers. A review with an open blocker ends `not-endorsed` whate
 | `core` | `CORE-DEM-01` goals, non-goals and stakeholders with concerns; `CORE-STR-05` every reference resolves; `CORE-QA-01` measurable quality scenarios; `CORE-SEC-02` every trust-boundary connector authenticated and authorised |
 | `ai-solution` | `AIS-EVAL-01` evals with metric and threshold; `AIS-DATA-02` retrieval trimmed to the caller; `AIS-IO-02` model output constrained and validated |
 | `ai-agent` | `AGT-JUS-02` autonomy proportionate; `AGT-ACT-01` every action listed; `AGT-ACT-02` dangerous actions approved or limited; `AGT-ACT-03` limits outside the agent; `AGT-ACT-04` sandboxed code; `AGT-INJ-01` no lethal trifecta; `AGT-ID-01` its own identity; `AGT-MAS-01` authenticated agent-to-agent traffic; `AGT-CTL-01` limits and a kill switch |
+| `production` | `PRD-BLD-01` accepted design with an endorsed review of this version; `PRD-BLD-02` as-built record; `PRD-EVD-01` evidence for this version; `PRD-HND-01` hand-overs returned and not failed; `PRD-OPS-01` a support team; `PRD-REL-01` rollback tested; `PRD-RSK-01` residual risk owned; `PRD-AI-01` gating evals pass; `PRD-AI-03` agent controls tested |
 
 Finally, read the reviewer criteria and answer them for yourself, briefly, as a draft. Where you cannot answer one, raise it as a consideration in the design rather than hoping it is not asked; a known open question is a sign of a design that has been thought about, an unlisted one is a finding.
 
@@ -109,6 +110,26 @@ The outcome summarises the dispositions: `endorsed` when no blocker or major fin
 
 An endorsed assessment is evidence that a stage on the definition ladder can cite, and it holds only while the design matches the digest it assessed. Change the design and the stage that relied on it is lost until the change is checked and, if material, reviewed. Keep each assessment record beside the design; together they are its history.
 
+## When the solution is going into production
+
+Before a solution first goes into production, and before a change goes live that alters a one-way-door decision, a trust boundary, an agent's actions or the data a model sees, it has a production entry assessment (section 8.1 of the standard). It is formal: the lead assessor is always independent, the service owner approves or declines in the record, and a check alone is never enough. It does not review your design again. It needs an endorsed review of the version you are releasing, with its conditions closed, and asks whether what was built is that design and whether it can be run.
+
+Prepare it as evidence, not as prose. Every piece of evidence must name the version of the design it was produced against (`design_version`); anything from an earlier version does not count. The [`production` lens](../standards/assessment/lenses/production.yaml) reads:
+
+| Evidence or field | What it shows | Criteria |
+|---|---|---|
+| `as-built-record` | What was built, against this version, with every departure. A departure is a new version of the design, assessed, or a decision record; it is never a condition | `PRD-BLD-02` |
+| `acceptance-test`, `load-test` | The functional scenarios work end to end; the high-importance performance and reliability scenarios hold at the stated peak | `PRD-EVD-02`, `PRD-REL-03` |
+| `rollback-test`, `recovery-test` | Rollback and recovery have been done, not only written down, against your RTO and RPO | `PRD-REL-01`, `PRD-REL-02` |
+| `operational-readiness`, `operations.runbook` | An operational or production readiness review of this version passed, and the runbook exists | `PRD-OPS-03` |
+| `operations.support`, `slos.alerting` | A named team with hours, on-call cover and escalation; every SLO alerts that team | `PRD-OPS-01`, `PRD-OPS-02` |
+| `operations.transition` | Cutover, data migration and its point of no return, and the retirement of what the solution replaces | `PRD-REL-01`, `PRD-REL-04` |
+| `security-assessment`, `privacy-impact-assessment`, `ai-impact-assessment`, `conformity-assessment` | The assessments the design handed over have returned for this version, each with its `outcome`. A failed outcome is a blocker | `PRD-HND-01`, `PRD-HND-02` |
+| `eval-report`, `control-test` | Gating evals pass on the release candidate; an agent's limits, approval gates and kill switch work without its cooperation | `PRD-AI-01`, `PRD-AI-03` |
+| `risks`, debt items | Everything carried into production is owned by someone entitled to accept it, with a date | `PRD-RSK-01` |
+
+Start the hand-over assessments early. They are not lenses and the production entry assessment does not do their work: a cybersecurity assessment reads the running system and its controls, and its outcome, with the residual risk it reports, has to be in the evidence before the production entry assessment can be endorsed. The verdict adds `as_built`, the same conformance scale applied to what you built against your design; only full conformance, or conformance with every extra feature recorded as a decision, can be endorsed. Conditions are allowed only with an owner and a due date, never on a blocker, and the record schedules the first periodic assessment.
+
 ## A short list to finish with
 
 - The specification validates, every reference resolves, and the source document says the same thing.
@@ -122,3 +143,4 @@ An endorsed assessment is evidence that a stage on the definition ladder can cit
 - The threat model is for this version, and the cybersecurity assessment has been asked for.
 - For a model: evals with thresholds gate release, retrieval is trimmed to the caller, output is validated.
 - For an agent: every action is listed, dangerous ones are approved or limited outside the agent, no session holds the trifecta, it has its own identity, and a kill switch works without it.
+- Going into production: an endorsed review of this version, an as-built record, rollback and recovery tested, a support team with alerting, every hand-over returned with an outcome, and every residual risk owned, all as evidence for the version being released.

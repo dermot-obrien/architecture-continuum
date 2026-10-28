@@ -5,6 +5,12 @@
   "description": "The record of one assessment of one version of a design: what was assessed, at what depth, against which lenses, by whom, what was found, where each finding went on the continuum, and the verdict. A finding names the criterion it answers, so a record can be compared with the next assessment of the same design. Draft: see standards/assessment/standard-architecture-assessment.md.",
   "type": "object",
   "required": ["schema", "assessment", "findings", "verdict"],
+  "allOf": [
+    {
+      "if": { "properties": { "assessment": { "properties": { "trigger": { "const": "production-entry" } }, "required": ["trigger"] } } },
+      "then": { "required": ["approval"], "properties": { "verdict": { "required": ["as_built"] }, "assessment": { "properties": { "depth": { "enum": ["review", "evaluation"] } } } } }
+    }
+  ],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "assessment/0.1.0" },
@@ -27,7 +33,7 @@
             "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "The digest of the design specification assessed, so a finding cannot be read against a later version by mistake." }
           }
         },
-        "trigger": { "enum": ["new-design", "change", "stage-gate", "periodic", "incident", "request"] },
+        "trigger": { "enum": ["new-design", "change", "stage-gate", "production-entry", "periodic", "incident", "request"], "description": "production-entry: the formal assessment of a solution as built, before it goes into production (standard, section 8.1). It brings in the production lens, and the record then needs an approval and an as-built conformance level." },
         "stage_gate": { "type": "string", "pattern": "^R[0-6]$", "description": "The definition stage the assessment gates, when it gates one." },
         "depth": {
           "enum": ["check", "review", "evaluation"],
@@ -136,6 +142,20 @@
       }
     },
 
+    "approval": {
+      "type": "object",
+      "description": "Production entry only: the accountable owner's decision on the verdict. A person, never an agent.",
+      "required": ["by", "role", "decision", "date"],
+      "additionalProperties": false,
+      "properties": {
+        "by": { "type": "string" },
+        "role": { "type": "string", "description": "For example service owner." },
+        "decision": { "enum": ["approved", "approved-with-conditions", "declined"] },
+        "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+        "statement": { "type": "string" }
+      }
+    },
+
     "handovers": {
       "type": "array",
       "description": "What this assessment does not decide and passes to an assessment that does: a cybersecurity assessment, a privacy impact assessment, an AI impact assessment, a regulatory conformity assessment.",
@@ -161,6 +181,10 @@
         "conformance": {
           "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],
           "description": "TOGAF's levels of conformance (figure 6-1, as corrected by Technical Corrigendum 1), judged against the continuum and its standards: how far the design's features and the standards' requirements coincide, and whether what they share is in accordance."
+        },
+        "as_built": {
+          "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],
+          "description": "Production entry only: the same TOGAF levels, applied to the built solution against this version of the design, which is the comparison TOGAF's compliance review makes."
         },
         "conditions": { "type": "array", "items": { "type": "string" } },
         "summary": { "type": "string" },

@@ -298,7 +298,7 @@
             "type": "object",
             "required": ["name", "objective"],
             "additionalProperties": false,
-            "properties": { "name": { "type": "string" }, "objective": { "type": "string" }, "applies_to": { "type": "array", "items": { "$ref": "#/$defs/localId" } } }
+            "properties": { "name": { "type": "string" }, "objective": { "type": "string" }, "applies_to": { "type": "array", "items": { "$ref": "#/$defs/localId" } }, "alerting": { "type": "boolean", "description": "An alert fires, to the support team, when the objective is at risk." } }
           }
         },
         "observability": {
@@ -327,7 +327,29 @@
           "additionalProperties": false,
           "properties": { "model": { "type": "string", "description": "Reference to the cost model." }, "unit_cost": { "type": "string" }, "budget": { "type": "string" } }
         },
-        "runbook": { "type": "string" }
+        "runbook": { "type": "string" },
+        "support": {
+          "type": "object",
+          "description": "Who runs the solution in production.",
+          "additionalProperties": false,
+          "properties": {
+            "team": { "type": "string" },
+            "hours": { "type": "string", "description": "For example 24x7, or business hours in a named time zone." },
+            "on_call": { "type": "boolean" },
+            "escalation": { "type": "string" }
+          }
+        },
+        "transition": {
+          "type": "object",
+          "description": "How the solution goes into production and what it replaces.",
+          "additionalProperties": false,
+          "properties": {
+            "cutover": { "type": "string" },
+            "data_migration": { "type": "string" },
+            "point_of_no_return": { "type": "string", "description": "The step after which going back means a recovery, not a rollback." },
+            "decommissions": { "type": "array", "items": { "type": "string" }, "description": "What the solution replaces, and the plan to retire it." }
+          }
+        }
       }
     },
 
@@ -339,9 +361,11 @@
         "additionalProperties": false,
         "properties": {
           "id": { "$ref": "#/$defs/localId" },
-          "type": { "enum": ["cost-model", "load-test", "eval-report", "red-team-report", "threat-model", "security-assessment", "privacy-impact-assessment", "ai-impact-assessment", "conformity-assessment", "experiment", "runbook", "prior-assessment", "other"] },
+          "type": { "enum": ["cost-model", "load-test", "eval-report", "red-team-report", "threat-model", "security-assessment", "privacy-impact-assessment", "ai-impact-assessment", "conformity-assessment", "experiment", "runbook", "prior-assessment", "as-built-record", "acceptance-test", "operational-readiness", "rollback-test", "recovery-test", "control-test", "other"], "description": "as-built-record: what was built, against which version of the design, with every departure from it. operational-readiness: the outcome of an operational or production readiness review. control-test: a test that a limit, an approval gate or a kill switch works as designed." },
           "ref": { "type": "string" },
           "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+          "design_version": { "$ref": "envelope.schema.json#/$defs/semver", "description": "The version of this design the evidence was produced against. A production entry assessment relies only on evidence for the version being released." },
+          "outcome": { "enum": ["passed", "passed-with-conditions", "failed"], "description": "For a test or a handed-over assessment: what it concluded." },
           "covers": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The scenarios, elements or evals the evidence speaks to." }
         }
       }

@@ -55,7 +55,7 @@ For **agent-native** workspaces (AI-majority engineering), also load:
 For reviewing a design (draft, not yet read by any skill):
 - `standards/assessment/standard-architecture-assessment.md` *(depths, lenses, findings and verdict; the line with cybersecurity assessment)*
 - `standards/assessment/schemas/` *(design specification, lens and assessment record schemas)*
-- `standards/assessment/lenses/` *(the core, ai-solution and ai-agent lenses)*
+- `standards/assessment/lenses/` *(the core, ai-solution, ai-agent and production lenses)*
 
 ## Scope Routing
 
