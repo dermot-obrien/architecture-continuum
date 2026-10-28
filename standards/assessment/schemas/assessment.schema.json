@@ -160,7 +160,7 @@
         "outcome": { "enum": ["endorsed", "endorsed-with-conditions", "not-endorsed", "deferred"] },
         "conformance": {
           "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],
-          "description": "TOGAF's levels of conformance, judged against the continuum and its standards: how far the design's features and the standards' requirements coincide."
+          "description": "TOGAF's levels of conformance (figure 6-1, as corrected by Technical Corrigendum 1), judged against the continuum and its standards: how far the design's features and the standards' requirements coincide, and whether what they share is in accordance."
         },
         "conditions": { "type": "array", "items": { "type": "string" } },
         "summary": { "type": "string" },

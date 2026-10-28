@@ -88,7 +88,7 @@ The steps follow the architecture evaluation process of ISO/IEC/IEEE 42020, clau
 5. Evaluate, at that depth. Build the utility tree with the stakeholders, walk the high-importance scenarios through the design, and record sensitivity points, trade-off points, risks and non-risks.
 6. Dispose. Give every `partly-met` or `not-met` finding a severity and a disposition (section 6). Group related risks into risk themes, each naming the goals or outcomes it threatens.
 7. Decide. Reach the verdict by the rules in section 7, with conditions where needed.
-8. Record and hand over. Write the assessment record beside the design, and open the hand-overs to the assessments this one does not make.
+8. Record and hand over. Write the assessment record beside the design, and open the hand-overs to the assessments this one does not make. The records beside a design are its history of assessments, the part TOGAF's Governance Repository keeps as compliance assessments.
 
 ## 5. Results and findings
 
@@ -126,7 +126,7 @@ An assessment does not keep its own backlog. Every finding that is not met goes 
 | `not-endorsed` | Any blocker is open |
 | `deferred` | The assessment could not be completed: the specification does not validate, or the evidence it relies on is missing |
 
-The verdict also records a conformance level against the continuum and its standards, using TOGAF's six levels with the specification in the place of the implementation: `irrelevant` (nothing in common with the standards), `consistent` (some in common, some required features missing and some unaddressed), `compliant` (everything the design specifies is in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence), and `non-conformant` (something specified is not in accordance). Conformance answers whether the design follows the standards; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed.
+The verdict also records a conformance level against the continuum and its standards, using TOGAF's six levels (Enterprise Architecture Capability and Governance, 6.2, figure 6-1, as corrected by Technical Corrigendum 1) with the specification in the place of the implementation: `irrelevant` (nothing in common with the standards), `consistent` (what the design shares with the standards is in accordance, but some required features are missing and the design has features the standards do not cover), `compliant` (everything the design has is covered by the standards and in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence in both directions), and `non-conformant` (any of the above in which something the standards require is present but not in accordance). "In accordance" carries TOGAF's meaning: it supports the stated strategy, adheres to the stated standards and principles, and provides the stated functionality. Conformance answers whether the design follows the standards; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed.
 
 ## 8. Where assessment sits on the continuum
 
