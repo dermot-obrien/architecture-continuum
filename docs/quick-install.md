@@ -48,12 +48,12 @@ Steps 1 to 3 do the same by hand.
 Take the latest release from the [releases page](https://github.com/dermot-obrien/architecture-continuum/releases); the commands below name the one current when this page was written.
 
 ```powershell
-$Version = 'v0.13.0'  # x-release-please-version
+$Version = 'v0.13.1'  # x-release-please-version
 git clone --quiet --depth 1 --branch $Version https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
 ```bash
-VERSION=v0.13.0  # x-release-please-version
+VERSION=v0.13.1  # x-release-please-version
 git clone --quiet --depth 1 --branch "$VERSION" https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
