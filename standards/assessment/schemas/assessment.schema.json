@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assessment.schema.json",
+  "title": "Architecture assessment record (draft 0.1.0)",
+  "description": "The record of one assessment of one version of a design: what was assessed, at what depth, against which lenses, by whom, what was found, where each finding went on the continuum, and the verdict. A finding names the criterion it answers, so a record can be compared with the next assessment of the same design. Draft: see standards/assessment/standard-architecture-assessment.md.",
+  "type": "object",
+  "required": ["schema", "assessment", "findings", "verdict"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "assessment/0.1.0" },
+
+    "assessment": {
+      "type": "object",
+      "required": ["id", "title", "subject", "depth", "lenses", "date", "assessors"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^AS-\\d{3}$", "description": "AS-NNN. Proposed by this draft and not yet in the envelope." },
+        "title": { "type": "string" },
+        "subject": {
+          "type": "object",
+          "required": ["design", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "design": { "type": "string", "pattern": "^(AP|RA|SD)-\\d{3}$" },
+            "version": { "$ref": "envelope.schema.json#/$defs/semver" },
+            "path": { "type": "string" },
+            "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "The digest of the design specification assessed, so a finding cannot be read against a later version by mistake." }
+          }
+        },
+        "trigger": { "enum": ["new-design", "change", "stage-gate", "periodic", "incident", "request"] },
+        "stage_gate": { "type": "string", "pattern": "^R[0-6]$", "description": "The definition stage the assessment gates, when it gates one." },
+        "depth": {
+          "enum": ["check", "review", "evaluation"],
+          "description": "check: the automatic criteria only, run against the specification. review: every applicable criterion, automatic and reviewer. evaluation: a review plus scenario-based analysis with stakeholders (utility tree, sensitivity and trade-off points)."
+        },
+        "lenses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "version"],
+            "additionalProperties": false,
+            "properties": { "id": { "type": "string" }, "version": { "$ref": "envelope.schema.json#/$defs/semver" } }
+          }
+        },
+        "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+        "assessors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "role", "independent"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "role": { "enum": ["lead-assessor", "assessor", "domain-expert", "security-architect", "stakeholder", "agent"] },
+              "independent": { "type": "boolean", "description": "Not an author of the design and not accountable for its delivery." }
+            }
+          }
+        },
+        "out_of_scope": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "type": "object" }
+      }
+    },
+
+    "utility_tree": {
+      "type": "array",
+      "description": "Evaluation depth only: the scenarios the stakeholders prioritised, by quality attribute, with the design's own scenario ids where they exist.",
+      "items": {
+        "type": "object",
+        "required": ["quality_attribute", "scenario", "importance", "difficulty"],
+        "additionalProperties": false,
+        "properties": {
+          "quality_attribute": { "type": "string" },
+          "refinement": { "type": "string" },
+          "scenario": { "type": "string" },
+          "importance": { "enum": ["high", "medium", "low"] },
+          "difficulty": { "enum": ["high", "medium", "low"] }
+        }
+      }
+    },
+
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "criterion", "result", "statement"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^F-\\d{3}$" },
+          "criterion": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-\\d{2}$", "description": "The lens criterion the finding answers, for example CORE-QA-01." },
+          "result": { "enum": ["met", "partly-met", "not-met", "not-applicable", "not-assessed"] },
+          "type": {
+            "enum": ["gap", "risk", "non-risk", "sensitivity-point", "trade-off-point", "observation"],
+            "description": "gap: the design does not say what it must. risk and non-risk, sensitivity and trade-off points: as ATAM defines them. observation: worth recording, not a defect."
+          },
+          "severity": { "enum": ["blocker", "major", "minor", "advisory"] },
+          "elements": { "type": "array", "items": { "type": "string" } },
+          "statement": { "type": "string" },
+          "evidence": { "type": "array", "items": { "type": "string" }, "description": "The design paths, evidence ids or documents the finding rests on." },
+          "recommendation": { "type": "string" },
+          "disposition": {
+            "type": "object",
+            "required": ["action"],
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "enum": ["fix-design", "raise-consideration", "record-decision", "accept-as-debt", "accept-risk", "hand-over"],
+                "description": "Where the finding goes on the continuum: a change to the design, a consideration (CN), a decision record (DR), a technical debt item (TD), a risk accepted by its owner, or a hand-over to another assessment (security, privacy, regulatory)."
+              },
+              "ref": { "type": "string", "description": "The CN, DR, TD or hand-over reference, once it exists." },
+              "owner": { "type": "string" },
+              "due": { "$ref": "envelope.schema.json#/$defs/isoDate" }
+            }
+          },
+          "status": { "enum": ["open", "resolved", "accepted", "withdrawn"] }
+        },
+        "allOf": [
+          { "if": { "properties": { "result": { "enum": ["partly-met", "not-met"] } } }, "then": { "required": ["severity", "disposition"] } }
+        ]
+      }
+    },
+
+    "risk_themes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement", "findings"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "statement": { "type": "string" },
+          "findings": { "type": "array", "items": { "type": "string", "pattern": "^F-\\d{3}$" } },
+          "threatens": { "type": "array", "items": { "type": "string" }, "description": "The design's goals or the outcomes (OC-NNN) the theme puts at risk." }
+        }
+      }
+    },
+
+    "handovers": {
+      "type": "array",
+      "description": "What this assessment does not decide and passes to an assessment that does: a cybersecurity assessment, a privacy impact assessment, an AI impact assessment, a regulatory conformity assessment.",
+      "items": {
+        "type": "object",
+        "required": ["to", "scope"],
+        "additionalProperties": false,
+        "properties": {
+          "to": { "enum": ["cybersecurity", "privacy", "ai-impact", "regulatory-conformity", "safety", "other"] },
+          "scope": { "type": "string" },
+          "findings": { "type": "array", "items": { "type": "string", "pattern": "^F-\\d{3}$" } },
+          "ref": { "type": "string" }
+        }
+      }
+    },
+
+    "verdict": {
+      "type": "object",
+      "required": ["outcome", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "outcome": { "enum": ["endorsed", "endorsed-with-conditions", "not-endorsed", "deferred"] },
+        "conformance": {
+          "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],
+          "description": "TOGAF's levels of conformance, judged against the continuum and its standards: how far the design's features and the standards' requirements coincide."
+        },
+        "conditions": { "type": "array", "items": { "type": "string" } },
+        "summary": { "type": "string" },
+        "next_assessment": { "type": "string" }
+      }
+    }
+  }
+}

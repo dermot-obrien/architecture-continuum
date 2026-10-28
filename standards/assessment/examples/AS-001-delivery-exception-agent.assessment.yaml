@@ -1,0 +1,220 @@
+# The assessment of SD-001 at review depth, against the core, AI solution and AI agent lenses.
+# Criteria found met are recorded only where the result is worth keeping (a non-risk);
+# a tool run records every criterion.
+schema: assessment/0.1.0
+
+assessment:
+  id: AS-001
+  title: Design review of the delivery exception agent
+  subject:
+    design: SD-001
+    version: 0.1.0
+    path: SD-001-delivery-exception-agent.design.yaml
+  trigger: new-design
+  stage_gate: R4
+  depth: review
+  lenses:
+    - { id: core, version: 0.1.0 }
+    - { id: ai-solution, version: 0.1.0 }
+    - { id: ai-agent, version: 0.1.0 }
+  date: 2026-10-28
+  assessors:
+    - { name: Lead assessor, role: lead-assessor, independent: true }
+    - { name: Security architect, role: security-architect, independent: true }
+    - { name: Architecture agent, role: agent, independent: true }
+  out_of_scope:
+    - Whether the controls named in the design are implemented and effective; handed over to the cybersecurity assessment.
+    - The carrier partner's own security.
+  provenance:
+    origin: ai-assisted
+    review_state: human-reviewed
+
+findings:
+  - id: F-001
+    criterion: AGT-INJ-01
+    result: not-met
+    type: risk
+    severity: blocker
+    elements: [svc-exception-agent]
+    statement: >-
+      One agent session holds all three of the lethal trifecta: it reads carrier remarks an outsider can write (input_trust mixed; reschedule_delivery reads_untrusted), it reads confidential personal order data through get_order, and it sends email and writes bookings autonomously. Plan-then-execute fixes the plan before the remark is read, which is the right pattern, but the email body is still generated after the remark is in context.
+    evidence: [elements.svc-exception-agent.agent.tools, connectors.c-gateway-agent, data.data-orders]
+    recommendation: >-
+      Remove one leg. Either render the customer email from a fixed template whose only variables are the confirmed slot and the order reference (no model-written text reaches the outside), or strip carrier free text before the agent sees it and hand remarks to a quarantined model whose output is a closed set of reason codes (dual LLM).
+    disposition: { action: fix-design, owner: Fulfilment platform team }
+    status: open
+  - id: F-002
+    criterion: AGT-ACT-02
+    result: not-met
+    type: gap
+    severity: blocker
+    elements: [svc-exception-agent]
+    statement: email_customer is irreversible external communication, approved autonomously, behind a T2 limit the agent can edit.
+    evidence: [elements.svc-exception-agent.agent.tools]
+    recommendation: Put the email's recipient and frame behind a T1 limit enforced in the email gateway, not in the agent, and settle d-email-autonomous as a decision record with this limit as its condition.
+    disposition: { action: record-decision, ref: d-email-autonomous, owner: Fulfilment architect }
+    status: open
+  - id: F-003
+    criterion: AGT-JUS-02
+    result: not-met
+    type: gap
+    severity: blocker
+    elements: [svc-exception-agent]
+    statement: The design declares the approver level, where the user approves consequential actions, but the agent books and emails without approval. For those actions it is at the observer level.
+    recommendation: Declare the level the agent actually runs at, and justify it against the reversibility of each action, or add the approvals the declared level implies.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-004
+    criterion: AGT-CTL-01
+    result: partly-met
+    type: gap
+    severity: major
+    elements: [svc-exception-agent]
+    statement: Step and time limits and a kill switch are set; there is no cost limit per run, so a loop is bounded by steps only.
+    recommendation: Add max_cost per exception, enforced by the runtime.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-005
+    criterion: AGT-MEM-01
+    result: not-met
+    type: risk
+    severity: major
+    elements: [svc-exception-agent, st-case-notes]
+    statement: Case notes are written from untrusted content and read back on later exceptions for the same customer; nothing addresses memory poisoning.
+    recommendation: Write only structured fields to case notes, attribute each to its source, and never replay free text from notes into the plan.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-006
+    criterion: AIS-EVAL-05
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-exception-agent]
+    statement: The model receives untrusted input but no red-team eval or report exists. The misuse scenario sc-injected-remark sets a measure (zero exfiltrations) with nothing measuring it.
+    recommendation: Run an injection suite in the style of AgentDojo against sc-injected-remark and make it gating.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-007
+    criterion: AGT-EVAL-01
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-exception-agent]
+    statement: Evals score the final action and the email; none scores the trajectory, so a right answer reached by a wrong tool sequence passes.
+    recommendation: Add a trajectory eval over the 400 reference cases, and report pass^k over repeated runs.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-008
+    criterion: AIS-EVAL-04
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-exception-agent]
+    statement: eval-tone uses a model as judge without measured agreement with human raters.
+    recommendation: Calibrate on a human-labelled sample before relying on it, or keep it advisory and say so.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-009
+    criterion: CORE-INT-01
+    result: not-met
+    type: gap
+    severity: major
+    elements: [svc-exception-agent, email-provider]
+    statement: The connector to the email provider crosses the design's boundary without a contract.
+    recommendation: Route email through the organisation's notification service and its published contract, which also gives F-002 a place to enforce the limit.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-010
+    criterion: CORE-DAT-02
+    result: not-met
+    type: gap
+    severity: major
+    elements: [st-case-notes]
+    statement: Case notes are personal and confidential but state no residency or lineage.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-011
+    criterion: CORE-CST-01
+    result: partly-met
+    type: gap
+    severity: major
+    statement: A unit cost and a budget are stated, but no cost model sits behind them; R4 needs one.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-012
+    criterion: CORE-EVO-01
+    result: partly-met
+    type: gap
+    severity: minor
+    statement: Only the latency scenario has a fitness function; the two other high-importance scenarios (carrier down, injected remark) have none.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-013
+    criterion: CORE-QA-02
+    result: partly-met
+    type: observation
+    severity: minor
+    statement: No scenario covers maintainability or cost. Cost is bounded by the budget; maintainability of prompts and policy is not addressed.
+    disposition: { action: raise-consideration }
+    status: open
+  - id: F-014
+    criterion: CORE-SEC-04
+    result: partly-met
+    type: observation
+    severity: major
+    statement: A threat model for this version exists. No security assessment has been made, which is expected for a proposed design and is handed over.
+    disposition: { action: hand-over, ref: handover-cyber }
+    status: open
+  - id: F-015
+    criterion: AIS-HUM-03
+    result: partly-met
+    type: observation
+    severity: minor
+    statement: The design records its class under the AI Act (limited risk, Article 50) but not why no AI impact assessment is needed.
+    disposition: { action: fix-design }
+    status: open
+  - id: F-016
+    criterion: AGT-ACT-03
+    result: met
+    type: non-risk
+    statement: The reschedule limit (two per order) is T1 and enforced outside the agent, so the agent cannot raise it.
+  - id: F-017
+    criterion: AGT-ID-01
+    result: met
+    type: non-risk
+    statement: The agent runs as its own SPIFFE identity, and its MCP tokens are audience-bound.
+  - id: F-018
+    criterion: CORE-DEC-01
+    result: met
+    type: sensitivity-point
+    statement: >-
+      DR-041's choice of an agent over a rules engine is the decision the resolution rate and the injection exposure both turn on. Its evidence is the trial, which is sound; it should be revisited if the rules engine's rate rises or the trifecta cannot be broken.
+
+risk_themes:
+  - id: RT-1
+    statement: The agent's consequential actions are bounded by its own judgement more than by limits it cannot change.
+    findings: [F-001, F-002, F-003, F-005]
+    threatens: [OC-002, "No wrong promises made in the company's name"]
+  - id: RT-2
+    statement: The evidence that the agent is safe and correct measures outcomes, not behaviour.
+    findings: [F-006, F-007, F-008]
+    threatens: [OC-002]
+
+handovers:
+  - to: cybersecurity
+    scope: Control assessment of the agent runtime, the MCP servers and the email path; penetration test of the injection path before go-live.
+    findings: [F-001, F-014]
+    ref: handover-cyber
+  - to: privacy
+    scope: Data protection impact assessment for case notes and generated customer email.
+    findings: [F-010]
+
+verdict:
+  outcome: not-endorsed
+  conformance: compliant
+  conditions:
+    - Resolve F-001, F-002 and F-003, and record d-email-autonomous as an accepted decision.
+    - Close the major findings, or record each as accepted debt with an owner.
+  summary: >-
+    A well-traced design whose structure, identity and operational design are sound. It is not endorsed for R4 because its most consequential action, emailing a customer, is generated after untrusted text is in context and is bounded only by limits the agent itself holds. Templating the email and moving its limit into the gateway would remove the blockers without losing the fifteen-minute goal.
+  next_assessment: A check-depth run on the next version, then a review of the changed elements only.
