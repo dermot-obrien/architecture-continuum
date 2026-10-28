@@ -5,7 +5,7 @@ license: CC-BY-4.0 AND Apache-2.0
 compatibility: Node.js 18 or newer for the binding check and the continuum check (which also needs ajv, ajv-formats and js-yaml, from npm install here or the workspace); Python 3.11 or newer for the stage flow. PNG export needs draw.io desktop. Carries its own copy of the standards in references/standards/. Artefact locations come from [suite.architecture] of the repository's .agents/skill-bindings.toml; the skill ships no layout of its own.
 metadata:
   author: dermot-obrien
-  version: "0.14.0"
+  version: "0.15.0"
 ---
 
 # Architecture
@@ -30,7 +30,7 @@ This skill was ten skills, `aaa-create-platform` to `aaa-create-runtime-agent`, 
 | `/architecture check`, "is this compliant", `/architecture scaffold` | Read-only. Every page and register against the continuum's standards; or the layout of a new root | [references/flows/check.md](references/flows/check.md) |
 | `/architecture specify`, "turn this design into a specification", "write the design as data" | Writes only the specification. A design document turned into a design specification valid against the schema, with a list of what the document does not say. A solution design written from the pattern skill's template is translated table by table | [references/flows/specify.md](references/flows/specify.md) |
 | `/architecture triage`, "what assessment does this need", "which tier is this agent" | Read-only except for the triage record. The assessment type and risk tier, AT1 to AT4, and the plan they set | [references/flows/triage.md](references/flows/triage.md) |
-| `/architecture assess`, "assess this design", "review this agent", "is it ready for production" | Read-only except for the record. A design specification against the lenses, at the depth its triage set, with findings, dispositions and a proposed outcome. The check depth runs as `bin/assess.mjs check`, and `bin/assess.mjs changed` lists what a change must re-check | [references/flows/assess.md](references/flows/assess.md) |
+| `/architecture assess`, "assess this design", "review this agent", "is it ready for production" | Read-only except for the record. A design specification against the lenses, at the depth its triage set, with findings, dispositions and a proposed outcome. The check depth runs as `bin/assess.mjs check`, and `bin/assess.mjs changed` lists what a change must re-check. The criteria are the shipped lenses, or an organisation's own set named by the `assessment` binding ([references/organisation-criteria.md](references/organisation-criteria.md)): `bin/assess.mjs criteria` lists them and `bin/assess.mjs pages` publishes them | [references/flows/assess.md](references/flows/assess.md) |
 | `/architecture report`, "write up this assessment", "make the readout" | Read-only except for the report and readout. An assessment record turned into a plain-language report and a slide readout for the people who decide | [references/flows/report.md](references/flows/report.md) |
 
 Read the flow's reference before acting, and the references it names when it names them. With no flow named, ask which artefact the user means; never guess a level.

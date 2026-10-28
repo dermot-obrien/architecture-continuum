@@ -234,7 +234,8 @@ const list = (v) => (Array.isArray(v) ? v : v === undefined || v === null || v =
  * Where the architecture is: [suite.architecture] of .agents/skill-bindings.toml, found upward
  * from `cwd`, with `root` overriding the bound root. A key that table lacks is read from the old
  * [suite.aaa-continuum], with a warning. Returns { root, schemes, namespaces,
- * schemas, bindingsFile, workspace, problems }.
+ * schemas, assessment, bindingsFile, workspace, problems }: assessment is the organisation's
+ * criteria folder, or null for the criteria the skill ships.
  */
 export function loadConfig({ cwd = process.cwd(), root, bindings, schemas } = {}) {
   const problems = [];
@@ -274,6 +275,7 @@ export function loadConfig({ cwd = process.cwd(), root, bindings, schemas } = {}
     schemes: opt("schemes", path.join("registers", "identifier-schemes.csv")),
     namespaces: opt("namespaces", path.join("registers", "identifier-namespaces.csv")),
     schemas: schemas ? path.resolve(cwd, schemas) : section.schemas ? path.resolve(base, section.schemas) : SCHEMA_DIR,
+    assessment: section.assessment ? path.resolve(base, section.assessment) : null,
     bindingsFile,
     workspace,
     problems,

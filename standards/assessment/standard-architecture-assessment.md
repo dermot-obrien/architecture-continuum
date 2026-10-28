@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.8.0
+version: 0.9.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -67,7 +67,7 @@ Every element has one `kind` from the continuum: `actor`, `external-system`, `lo
 
 ### 2.2 Profiles bring lenses in
 
-A design declares `profiles`, and a tool also derives them: an element with an `ai` facet implies `ai-solution`, one with an `agent` facet implies `ai-agent`. The `core` lens always applies; each other lens applies when its profile does, except the `production` lens, which applies when the assessment is a production entry assessment (section 8.1), whatever the design contains. A declared profile that the elements do not support, or a derived one that is not declared, is reported. New lenses (a data platform lens, a regulated-industry lens, a sovereign-hosting lens) are added the same way, with a profile of their own, and need no change to this standard.
+A design declares `profiles`, and a tool also derives them: an element with an `ai` facet implies `ai-solution`, one with an `agent` facet implies `ai-agent`. The `core` lens always applies; each other lens applies when its profile does, except the `production` lens, which applies when the assessment is a production entry assessment (section 8.1), whatever the design contains. A declared profile that the elements do not support, or a derived one that is not declared, is reported. New lenses (a data platform lens, a regulated-industry lens, a sovereign-hosting lens) are added the same way, with a profile of their own, and need no change to this standard. An organisation may keep its own lenses, and its choices about the shipped ones, in its own repository (section 10.1); the lenses an assessment applies are then the ones its criteria set puts in force.
 
 ## 3. Depths
 
@@ -213,11 +213,14 @@ These assessments are not lenses, and are not to be written as lenses. A lens is
 
 A lens is a YAML file valid against `lens.schema.json`. Each criterion asks one question that a design can answer, reads named paths of the specification, and says whether a tool can decide it. A tool criterion carries a `rule` precise enough to implement without judgement; a reviewer criterion says what the reviewer should look for. A tool criterion may read the catalogue as well as the specification, through the identifiers the specification cites, as `CORE-TGT-01` does for `lifecycle_state`; its rule says so. Criteria ids are `<PREFIX>-<AREA>-NN` and never reused; a changed criterion keeps its id and the lens's minor version moves, a removed criterion's id is retired, and a change that would turn earlier results wrong moves the major version. Every criterion cites its sources by key, and the keys resolve in the lens's `sources`.
 
+### 10.1 An organisation's criteria
+
+The lenses this standard ships are a default, not a requirement. An organisation keeps its criteria set in its own repository, an `assessment.yaml` valid against `assessment-config.schema.json` beside its own lenses, and the architecture skill's `assessment` binding names that folder. The set may extend the shipped lenses or replace them, leave out shipped criteria, change their default severities with a reason, and supply the organisation's own assessment and triage standards. Its own lenses are valid against `lens.schema.json` like the shipped ones, and a criterion a tool decides carries a declarative `check` that the tool applies as written; one without a check is applied by hand. What a set cannot change is this standard's method: results, finding types, dispositions, the outcome rules of section 7 and the record schemas. A record names the set and its version in `criteria_set`, and each lens with its version, so it stays readable against the criteria it was assessed with. [An organisation's own assessment criteria](../../docs/organisation-criteria.md) is the guide.
+
 ## 11. Open items
 
 - The identifier series `SD-NNN` for a solution design and `AS-NNN` for an assessment are proposed here and not yet in the envelope or the frontmatter standard.
 - The `pattern` skill's model is the natural source of a specification's elements, connectors and scenarios; the mapping between the two has not been written.
-- The tool criteria are specified, not implemented.
 - There is no worked example of a production entry assessment yet; AS-001 is a design review.
 - A privacy-by-design lens is a candidate, not written.
 - The target-state criteria read `lifecycle_state`, which is all the catalogue records of the target today. Transition architectures and the roadmap grouping are pending in the metamodel, so which transition a design belongs to cannot yet be checked.

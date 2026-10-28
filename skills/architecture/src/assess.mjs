@@ -4,14 +4,17 @@
 /**
  * The assessment's check depth, as a tool: applies every criterion decided by `tool`, and the
  * presence half of every criterion decided by `both`, to a design specification, exactly as
- * the lenses write their rules (standards/assessment/lenses/). Every such criterion is automated; one
- * added to a lens before it is automated here is reported as `manual`, never guessed. With a previous version of the
+ * the lenses write their rules (standards/assessment/lenses/). Every shipped criterion is coded here; an
+ * organisation's criterion is checked by the declarative `check` its lens gives it (src/criteria.mjs),
+ * and one with neither is reported as `manual`, never guessed. With a previous version of the
  * specification, it also lists the criteria a change must re-check: those whose `reads` touch a
  * field that changed.
  *
  * Results follow the standard (section 5): every clause holds is met, some is partly-met, none
  * is not-met, and a criterion whose condition the design does not trigger is not-applicable.
  */
+
+import { evaluateCheck } from "./criteria.mjs";
 
 const list = v => (Array.isArray(v) ? v : v == null ? [] : [v]);
 const has = v => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0);
@@ -378,26 +381,49 @@ Object.assign(CHECKS, {
 });
 
 /** Which lenses apply: core always; ai-solution and ai-agent by facet; production by trigger. */
-export function lensesFor(spec, trigger, lenses) {
+/** The profiles a design has: those it declares, and those its facets imply (ai, agent). */
+export function profilesOf(spec) {
   const els = list(spec.elements);
-  const want = new Set(["core"]);
-  if (els.some(e => e.ai)) want.add("ai-solution");
-  if (els.some(e => e.agent)) want.add("ai-agent");
-  if (trigger === "production-entry") want.add("production");
-  const order = ["core", "ai-solution", "ai-agent", "production"];
-  return lenses.filter(l => want.has(l.lens.id)).sort((x, y) => order.indexOf(x.lens.id) - order.indexOf(y.lens.id));
+  const out = new Set(list(spec.profiles));
+  if (els.some(e => e.ai)) out.add("ai-solution");
+  if (els.some(e => e.agent)) out.add("ai-agent");
+  return out;
 }
 
-/** Apply the lenses' tool and both criteria. */
+const SHIPPED_ORDER = ["core", "ai-solution", "ai-agent", "production"];
+const group = l => l.lens.applies_when === "always" ? 0 : l.lens.applies_when.profile ? 1 : 2;
+
+/**
+ * Which lenses apply: those that apply always, those a profile of the design brings in, and those
+ * the assessment's trigger brings in. Lenses that apply always come first, then profile lenses,
+ * then trigger lenses; the shipped ones keep their order within each, ahead of an organisation's.
+ */
+export function lensesFor(spec, trigger, lenses) {
+  const profiles = profilesOf(spec);
+  const applies = l => {
+    const w = l.lens.applies_when;
+    return w === "always" || (w.profile && profiles.has(w.profile)) || (w.trigger && w.trigger === trigger);
+  };
+  const rank = l => { const i = SHIPPED_ORDER.indexOf(l.lens.id); return i < 0 ? 99 : i; };
+  return lenses.map((l, i) => [l, i]).filter(([l]) => applies(l))
+    .sort(([x, i], [y, j]) => group(x) - group(y) || rank(x) - rank(y) || i - j).map(([l]) => l);
+}
+
+/**
+ * Apply the lenses' tool and both criteria: a criterion's declarative `check` when it has one, else
+ * the coded check for its id, else `manual`.
+ */
 export function check(spec, lenses, { triage } = {}) {
   const c = context(spec, triage);
   const results = [];
   for (const l of lenses) {
     for (const crit of l.criteria) {
       if (crit.decided_by === "reviewer") continue;
-      const fn = CHECKS[crit.id];
-      const r = fn ? fn(c) : { result: "manual", notes: ["not automated yet: apply the rule by hand"] };
-      results.push({ criterion: crit.id, lens: l.lens.id, decided_by: crit.decided_by, severity: crit.severity, ...r });
+      // A coded check answers only the shipped criterion of that id, never an organisation's namesake.
+      const fn = l.builtin === false ? undefined : CHECKS[crit.id];
+      const r = crit.check ? evaluateCheck(spec, crit.check)
+        : fn ? fn(c) : { result: "manual", notes: ["not automated: apply the rule by hand, or give the criterion a check"] };
+      results.push({ criterion: crit.id, lens: l.lens.id, decided_by: crit.decided_by, severity: crit.severity, ...(crit.default_severity ? { default_severity: crit.default_severity } : {}), ...r });
     }
   }
   return results;

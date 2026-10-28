@@ -101,8 +101,8 @@
     "profiles": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "enum": ["ai-solution", "ai-agent"] },
-      "description": "Characteristics that bring further lenses into an assessment. Declared, and also checked: an element with an ai facet implies ai-solution, one with an agent facet implies ai-agent."
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "description": "Characteristics that bring further lenses into an assessment: ai-solution and ai-agent from the shipped lenses, or a profile an organisation's lens names, such as personal-data. Declared, and also checked: an element with an ai facet implies ai-solution, one with an agent facet implies ai-agent."
     },
 
     "trust_zones": {

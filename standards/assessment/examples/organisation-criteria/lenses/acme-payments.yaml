@@ -1,0 +1,26 @@
+# A lens a profile brings in: a design that declares profiles: [payments] is assessed against it.
+schema: lens/0.1.0
+lens:
+  id: acme-payments
+  prefix: ACMEPAY
+  title: Acme payments
+  version: 1.0.0
+  applies_when:
+    profile: payments
+  description: What a design that takes or moves money meets at Acme, on top of the core lens.
+areas:
+  - id: SEC
+    title: Payment security
+criteria:
+  - id: ACMEPAY-SEC-01
+    area: SEC
+    question: Does every connector crossing a trust zone into the payments zone authenticate?
+    reads: [connectors.authentication]
+    decided_by: tool
+    rule: Every connector states authentication.
+    severity: blocker
+    check:
+      for_each: connectors
+      require:
+        authentication: { present: true, not_in: [none] }
+      message: "connector {id} states no authentication"
