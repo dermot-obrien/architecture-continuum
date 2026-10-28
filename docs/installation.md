@@ -46,7 +46,7 @@ For a team workspace, declare the skills in a committed `.agents/skills.json` an
 
 <!-- x-release-please-start-version -->
 ```json
-{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.13.0" } ] }
+{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.13.1" } ] }
 ```
 <!-- x-release-please-end -->
 

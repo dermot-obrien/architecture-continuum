@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 From 0.4.1 on, releases are made by Release Please from the pull requests merged to `main`: a pull request's title is its line here, and the release pull request adds the next section, bumps the version and, when merged, tags `vX.Y.Z` and publishes the GitHub Release. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#releases). Do not add lines here by hand. The skills' own versions, in each `SKILL.md` and in `bundle.json`, stay separate and are bumped in the pull request that changes the skill.
 
+## [0.13.1](https://github.com/dermot-obrien/architecture-continuum/compare/v0.13.0...v0.13.1) (2026-10-28)
+
+
+### Fixed
+
+* **architecture:** a diagram checked out with CRLF line endings is no longer reported as a stale view ([#94](https://github.com/dermot-obrien/architecture-continuum/issues/94)) ([71deb66](https://github.com/dermot-obrien/architecture-continuum/commit/71deb668f603d7c0084c7fabac1de3a7a94b9b79))
+
 ## [0.13.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.12.0...v0.13.0) (2026-10-28)
 
 
