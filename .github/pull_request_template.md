@@ -1,6 +1,6 @@
 <!--
-The title is this change's line in CHANGELOG.md and the GitHub Release, and its type sets the next version (CONTRIBUTING.md, "Releases"): `feat(scope): what changed` bumps the minor version, `fix(scope): what changed` the patch, and a `!` after the type marks a breaking change. `docs`, `build`, `ci`, `chore`, `refactor`, `test` and `style` never bump. Write it for someone reading the release notes.
-The description is the change record: a squash merge copies it into the commit. Update it before merging so it says what merged. Delete any section that does not apply.
+Branch from origin/develop and target develop; only a release goes from develop to main (CONTRIBUTING.md, "Releases"). Pull requests are merged with merge commits, so each commit subject is a line in CHANGELOG.md and the GitHub Release, and the title is a Conventional Commits subject too. Their types set the next version (CONTRIBUTING.md, "Releases"): `feat(scope): what changed` bumps the minor version, `fix(scope): what changed` the patch, and a `!` after the type marks a breaking change. `docs`, `build`, `ci`, `chore`, `refactor`, `test` and `style` never bump. Write it for someone reading the release notes.
+The description is the change record. Update it before merging so it says what merged. Delete any section that does not apply.
 -->
 
 ## Summary
