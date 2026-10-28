@@ -54,6 +54,8 @@ export const SCHEME_KIND = {
   pattern: "pattern",
   "architecture-pattern": "pattern",
   "reference-architecture": "pattern",
+  collaboration: "pattern",
+  candidate: "candidate",
   service: "service",
   "decision-record": "decision-record",
   adr: "decision-record",
@@ -413,6 +415,8 @@ export function check(config, modules) {
       continue;
     }
     if (typeof fm !== "object" || Array.isArray(fm)) { R.error("FM-001", file, "front matter is not a mapping"); continue; }
+    // A stub left where an archived page was says where it went, and is not an artefact.
+    if (!fm.kind && fm.moved_to) continue;
     if (!fm.kind) {
       if (isIndex) R.error("FM-001", file, "index.md front matter has no kind: name the kind so the page can be validated against its schema");
       continue;
@@ -443,12 +447,15 @@ export function check(config, modules) {
   if (schemes.length) {
     for (const p of pages) {
       const id = p.ids.find((i) => ID.test(i)) ?? p.id;
-      if (!id) continue;
+      // A candidate mints no identifier; an id it carries is a slug in no series.
+      if (!id || p.kind === "candidate") continue;
       const s = schemeOf(id);
       if (!s) { R.error("ID-001", p.file, `${id} matches no scheme in the schemes register: add the series, or correct the identifier`); continue; }
       if (s.kind && s.kind !== p.kind) R.error("ID-002", p.file, `${id} is in the ${s.scheme} series, whose pages are kind ${s.kind}, but the page is kind ${p.kind}`);
+      // An archived page keeps its place in the tree under the archive folder, not the scheme's home.
+      const archived = p.fm.portfolio?.state === "archived";
       if (s.home) {
-        if (!homeToRegExp(s.home, id).test(p.rel)) R.error("ID-003", p.file, `${id} should live at ${s.home.replace("{id}", id)} according to the schemes register, not ${p.rel}`);
+        if (!archived && !homeToRegExp(s.home, id).test(p.rel)) R.error("ID-003", p.file, `${id} should live at ${s.home.replace("{id}", id)} according to the schemes register, not ${p.rel}`);
       } else {
         R.error("ID-003", p.file, `${id} is in the ${s.scheme} series, which the schemes register says has no pages of its own; give the scheme a home, or keep ${s.scheme} to register rows`);
       }
@@ -616,6 +623,7 @@ const SCHEMES_ROWS = [
   ["sbb", "SBB", "SBB-[0-9]{3}", "Solution building block", "solution/sbbs/{id}-*/index.md", "solution/sbbs.csv", "", "linked", "One C4 container each"],
   ["architecture-pattern", "AP", "AP-[0-9]{3}", "Architecture pattern (conceptual or logical; technology-agnostic)", "solution/patterns/{id}-*/index.md", "", "pattern-logical", "linked", "The continuum's series for the kind"],
   ["reference-architecture", "RA", "RA-[0-9]{3}", "Reference architecture (physical; technology-specific; applies architecture patterns)", "solution/patterns/{id}-*/index.md", "", "pattern-physical", "linked", "The continuum's series for the kind"],
+  ["collaboration", "CL", "CL-[0-9]{3}", "Collaboration (participants working together, with lighter rules than an architecture pattern)", "solution/patterns/{id}-*/index.md", "", "", "linked", "The continuum's series for the kind"],
   ["contract", "CT", "CT-[0-9]{3}", "Contract: an interface, API, event or published artefact", "", "solution/contracts.csv", "", "off", "A row of solution/contracts.csv with no page of its own"],
   ["service", "SV", "SV-[0-9]{3}", "Service (a deployable unit)", "runtime/services/{id}-*/index.md", "runtime/services.csv", "", "linked", "The page's id is the service's slug; SV-NNN is its numeric_id"],
   ["deployment-node", "DN", "DN-[0-9]{3}", "Deployment node", "", "runtime/nodes.csv", "", "off", "A row of runtime/nodes.csv"],
@@ -718,6 +726,10 @@ idSeries = "AP"
 [suite.pattern.types.reference-architecture]
 label    = "Reference architecture"
 idSeries = "RA"
+
+[suite.pattern.types.collaboration]
+label    = "Collaboration"
+idSeries = "CL"
 
 [suite.use-case]
 outputDir = "${relRoot}/demand/use-cases"

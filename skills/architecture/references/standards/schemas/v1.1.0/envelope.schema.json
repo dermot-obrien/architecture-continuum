@@ -79,13 +79,14 @@
         "technical-debt",
         "landscape",
         "feature",
-        "store"
+        "store",
+        "candidate"
       ]
     },
     "anyId": {
-      "description": "Any valid artefact ID. Per-kind ID patterns: OC|UC|LS|PL|PRD|FE|CAP|BC|ABB|SBB|AP|RA|API|SV|VW|DR|ADR|EV|DN|ST|CN|TD followed by '-NNN' (3-digit zero-padded), OR a kebab-case slug for Service kind.",
+      "description": "Any valid artefact ID. Per-kind ID patterns: OC|UC|LS|PL|PRD|FE|CAP|BC|ABB|SBB|AP|RA|CL|API|SV|VW|DR|ADR|EV|DN|ST|CN|TD followed by '-NNN' (3-digit zero-padded), OR a kebab-case slug for Service kind.",
       "type": "string",
-      "pattern": "^(OC|UC|LS|PL|PRD|FE|CAP|BC|ABB|SBB|AP|RA|API|SV|VW|A?DR|EV|DN|ST|CN|TD)-\\d{3}$|^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+      "pattern": "^(OC|UC|LS|PL|PRD|FE|CAP|BC|ABB|SBB|AP|RA|CL|API|SV|VW|A?DR|EV|DN|ST|CN|TD)-\\d{3}$|^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
     },
     "platformId": {
       "type": "string",
@@ -149,6 +150,11 @@
       "type": "string",
       "pattern": "^RA-\\d{3}$",
       "description": "A reference architecture: technology-specific, physical; applies architecture patterns."
+    },
+    "collaborationId": {
+      "type": "string",
+      "pattern": "^CL-\\d{3}$",
+      "description": "A collaboration: participants working together, with lighter rules than an architecture pattern; its boxes need not be catalogued building blocks."
     },
     "viewId": {
       "type": "string",
@@ -365,6 +371,85 @@
           "uniqueItems": true
         }
       }
+    },
+    "portfolioState": {
+      "type": "string",
+      "enum": [
+        "placeholder",
+        "draft",
+        "needs-conversion",
+        "proposed-deprecation",
+        "archive",
+        "archived"
+      ],
+      "description": "What the portfolio is doing about the document. placeholder: committed, with no content yet. draft: an AI-generated draft from research, awaiting review. needs-conversion: not in the form its type expects. proposed-deprecation: may be retired, awaiting agreement. archive: deprecation agreed, to be moved to the archive. archived: moved there. Absent: live, nothing pending."
+    },
+    "portfolio": {
+      "type": "object",
+      "description": "The portfolio block (§2.9): the document's standing in the repository's portfolio of patterns. Optional on a pattern, a use case and a candidate.",
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/portfolioState"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "none"
+          ]
+        },
+        "target_quarter": {
+          "type": "string",
+          "pattern": "^\\d{4}-Q[1-4]$",
+          "description": "The quarter the document is meant to be ready, YYYY-Qn."
+        },
+        "committed": {
+          "type": "boolean",
+          "description": "Whether the document is committed work rather than a possibility."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why the state was set."
+        },
+        "since": {
+          "$ref": "#/$defs/isoDate",
+          "description": "When the state was set."
+        },
+        "backlog_ref": {
+          "type": "string",
+          "description": "The backlog row or ticket the document came from."
+        },
+        "archived_from": {
+          "type": "string",
+          "description": "Where an archived document lived before it was archived, relative to the repository root."
+        }
+      },
+      "additionalProperties": false
+    },
+    "banner": {
+      "type": "object",
+      "description": "A notice a site shows at the top of the page, such as the warning on an AI-generated draft.",
+      "properties": {
+        "tone": {
+          "type": "string",
+          "enum": [
+            "info",
+            "note",
+            "warning",
+            "danger"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
     }
   },
   "properties": {
@@ -462,6 +547,9 @@
     "provenance": {
       "$ref": "#/$defs/provenance"
     },
+    "portfolio": {
+      "$ref": "#/$defs/portfolio"
+    },
     "tags": {
       "type": "array",
       "items": {
@@ -478,6 +566,22 @@
     "unlisted": {
       "type": "boolean",
       "description": "Site presentation: when true, the page is built but kept out of the sidebar, the search index and the sitemap (Docusaurus unlisted). For pages kept for the record rather than for reading."
+    },
+    "moved_to": {
+      "type": "string",
+      "description": "Site presentation: on a stub left where an archived page was, the page's new place, relative to the stub. A stub carries no kind and is not an artefact."
+    },
+    "deck_publish": {
+      "type": "boolean",
+      "description": "Site presentation: markdown-deck publishes the page as a deck."
+    },
+    "deck_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Site presentation: the deck's identifier, the folder it publishes to."
+    },
+    "banner": {
+      "$ref": "#/$defs/banner"
     }
   },
   "required": [

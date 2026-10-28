@@ -129,6 +129,11 @@ type = "file"
 flows = ["runtime-agent"]
 description = """The repository's ontology validator, run over each record the runtime-agent flow writes. Unbound means the same: authored, not validated."""
 
+[inputs.options.criteriaUrl]
+type = "str"
+flows = ["triage", "report"]
+description = """The URL prefix where the assessment criteria are published, one page per criterion named by its id in lower case, as generated into docs/assessment-criteria/ by this bundle, such as https://architecture.example.com/docs/assessment-criteria/. The report and triage flows link each criterion identifier (CORE-QA-01) to <prefix>core-qa-01. Unset, criterion identifiers are written as plain text."""
+
 [inputs.options.catalogueUrl]
 type = "str"
 flows = ["triage", "report"]

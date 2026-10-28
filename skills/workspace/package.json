@@ -1,6 +1,6 @@
 {
   "name": "workspace",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Initialise or reinitialise a repository that uses the architecture skills: clear out what retired tooling left, install the declared skills, wire the build so it runs without them. An Agent Skill from AI-Assisted Architecture.",
   "author": "Dermot O'Brien",
   "homepage": "https://github.com/dermot-obrien/architecture-continuum",

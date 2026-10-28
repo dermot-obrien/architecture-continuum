@@ -3,7 +3,7 @@ lens:
   id: core
   prefix: CORE
   title: Core architecture lens
-  version: 0.5.0
+  version: 0.6.0
   applies_when: always
   description: >-
     The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, moves it toward its target state, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
@@ -237,7 +237,7 @@ criteria:
     why: Reliability, security, performance, operability and cost are judged on every workload by the Well-Architected frameworks; a design silent on one is incomplete.
     reads: [scenarios.quality_attribute]
     decided_by: both
-    rule: Report each of reliability, security, performance-efficiency, maintainability and cost that no scenario covers. A quality, failure or misuse scenario counts for the quality_attribute it names.
+    rule: Report each of reliability, security, performance-efficiency, maintainability, interaction-capability, safety and cost that no scenario covers, unless the design states the omission is deliberate. A quality, failure or misuse scenario counts for the quality_attribute it names.
     severity: major
     sources: [iso25010, wa-aws, wa-azure, wa-google]
   - id: CORE-QA-03
@@ -479,10 +479,10 @@ criteria:
   # Risk and obligations
   - id: CORE-RSK-01
     area: RSK
-    question: Does every known risk have a mitigation and an owner?
+    question: Does every known risk have a mitigation, an owner and its residual level?
     reads: [risks]
     decided_by: tool
-    rule: Every risk has mitigation and owner.
+    rule: Every risk has mitigation, owner and residual, the likelihood and impact left once the mitigation is in place.
     severity: major
     sources: [togaf-risk]
   - id: CORE-RSK-02

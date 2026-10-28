@@ -1,0 +1,273 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Assessment Lens Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: an atlas. A lens stack up top, then one map per lens where every criterion is a tile, then the anatomy of one criterion. Palette and type from the bundle's visual design standard. */
+:root {
+  --bg: #F0F2F5; --panel: #FFFFFF; --ink: #2C3038; --ink-2: #5E6B7F; --rule: #BFC5CC; --head: #1A1A2E;
+  --accent: #B83A5C; --accent-soft: #F6DBE2;
+  --tool: #4B5BAA; --both: #4A90D9; --reviewer: #C4724E;
+  --l-core: #1A1A2E; --l-ais: #9B72CF; --l-agt: #B86B9A; --l-prd: #B83A5C;
+  --soft-core: #DFE1E5; --soft-ais: #EBE3F5; --soft-agt: #F1E1EB; --soft-prd: #F6DBE2;
+  --block: #C2303A; --major: #5E6B7F; --minor: #AFB5BF; --advisory: #DFE1E5;
+  --f-body: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+    --accent: #E8738F; --accent-soft: #3A2030; --tool: #8C99D8; --both: #7DB3EA; --reviewer: #E09A79;
+    --l-core: #DFE1E5; --l-ais: #BBA0E2; --l-agt: #DCA0C4; --l-prd: #E8738F;
+    --soft-core: #2A2D40; --soft-ais: #2E2542; --soft-agt: #3A2536; --soft-prd: #3A2030;
+    --block: #F07A80; --major: #AFB5BF; --minor: #6B7280; --advisory: #3A3D52; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+  --accent: #E8738F; --accent-soft: #3A2030; --tool: #8C99D8; --both: #7DB3EA; --reviewer: #E09A79;
+  --l-core: #DFE1E5; --l-ais: #BBA0E2; --l-agt: #DCA0C4; --l-prd: #E8738F;
+  --soft-core: #2A2D40; --soft-ais: #2E2542; --soft-agt: #3A2536; --soft-prd: #3A2030;
+  --block: #F07A80; --major: #AFB5BF; --minor: #6B7280; --advisory: #3A3D52; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { color: var(--head); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.4rem, 2.6vw, 1.8rem); }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 68ch; }
+.mono { font-family: var(--f-mono); font-size: 0.82em; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--ink-2); }
+section.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 3vw, 32px); display: grid; gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.grid-2 > * { min-width: 0; }
+
+/* Stack */
+.stack { display: grid; gap: 6px; }
+.layer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 4px; border-left: 6px solid; }
+.layer .name { font-weight: 700; color: var(--head); font-size: 1.05rem; }
+.layer .name .mono { color: var(--ink-2); font-weight: 400; margin-left: 6px; }
+.layer .when { font-size: 0.92rem; color: var(--ink-2); }
+.layer .n { font-family: var(--f-mono); font-weight: 600; font-size: 1.4rem; color: var(--head); text-align: right; font-variant-numeric: tabular-nums; }
+.layer .n small { display: block; font-size: 0.68rem; color: var(--ink-2); font-weight: 400; letter-spacing: 0.04em; }
+.layer.prd { background: var(--soft-prd); border-color: var(--l-prd); margin-inline: 0 0; }
+.layer.agt { background: var(--soft-agt); border-color: var(--l-agt); margin-inline: 24px 0; }
+.layer.ais { background: var(--soft-ais); border-color: var(--l-ais); margin-inline: 24px 0; }
+.layer.core { background: var(--soft-core); border-color: var(--l-core); }
+.stack-note { font-size: 0.92rem; color: var(--ink-2); }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.88rem; color: var(--ink-2); align-items: center; }
+.legend .sw { display: inline-block; width: 14px; height: 14px; border-radius: 2px; margin-right: 6px; vertical-align: -2px; }
+.legend .sw.blk { background: var(--panel); box-shadow: inset 0 0 0 2px var(--block); }
+
+/* Lens maps */
+.lens { display: grid; gap: 14px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.lens:first-of-type { border-top: 0; padding-top: 0; }
+.lens-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; }
+.lens-head h3 { font-size: 1.25rem; }
+.lens-head .tag { font-family: var(--f-mono); font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; color: var(--panel); font-weight: 600; }
+.areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.area { border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.area .code { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); }
+.area .t { font-weight: 700; color: var(--head); line-height: 1.2; }
+.area .q { font-size: 0.86rem; color: var(--ink-2); line-height: 1.35; }
+.tiles { display: flex; flex-wrap: wrap; gap: 4px; }
+.cr { width: 22px; height: 22px; border-radius: 3px; display: grid; place-items: center; font-family: var(--f-mono); font-size: 0.62rem; color: var(--panel); font-weight: 600; cursor: help; }
+.cr.tool { background: var(--tool); } .cr.both { background: var(--both); } .cr.reviewer { background: var(--reviewer); }
+.cr.blocker { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--block); margin: 2px; }
+.cr:focus-visible { outline: 2px solid var(--head); outline-offset: 3px; }
+.detail { min-height: 4.6em; border-radius: 4px; background: var(--bg); padding: 10px 12px; font-size: 0.93rem; display: grid; gap: 2px; }
+.detail b { font-family: var(--f-mono); font-size: 0.85rem; color: var(--accent); }
+
+/* Bars */
+.bars svg { width: 100%; height: auto; display: block; }
+svg text { font-family: var(--f-body); fill: var(--ink); }
+.figure { overflow-x: auto; }
+
+/* Anatomy */
+.anatomy { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 760px) { .anatomy { grid-template-columns: 1fr; } }
+pre.yaml { margin: 0; background: var(--bg); border-radius: 4px; padding: 14px 16px; font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.6; overflow-x: auto; color: var(--ink); white-space: pre; }
+pre.yaml .k { color: var(--tool); font-weight: 600; }
+pre.yaml .n { display: inline-block; min-width: 1.4em; font-weight: 600; color: var(--panel); background: var(--accent); border-radius: 50%; text-align: center; font-size: 0.7rem; margin-right: 6px; }
+ol.notes { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: n; }
+ol.notes li { counter-increment: n; position: relative; padding-left: 32px; font-size: 0.95rem; }
+ol.notes li::before { content: counter(n); position: absolute; left: 0; top: 1px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--panel); font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; display: grid; place-items: center; }
+ol.notes b { color: var(--head); }
+
+/* Not lenses */
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.box { border-radius: 4px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.box.no { background: var(--soft-agt); }
+.box.next { background: var(--soft-ais); }
+.box ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.95rem; }
+footer { font-size: 0.88rem; color: var(--ink-2); display: grid; gap: 4px; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:12px">
+    <span class="eyebrow">Architecture continuum · draft assessment standard 0.7.0</span>
+    <h1>The assessment lenses</h1>
+    <p style="font-size:1.1rem">A lens is a set of criteria applied to a design specification. The core lens applies to every design. The others stack on top when the design contains a model or an agent, or when the solution is going into production. 121 criteria in four lenses, each one saying what it reads, who decides it and how much a failure matters.</p>
+  </header>
+
+  <section class="panel">
+    <div style="display:grid;gap:6px"><span class="eyebrow">How lenses stack</span><h2>What brings each lens in</h2></div>
+    <div class="grid-2">
+      <div class="stack" aria-label="Lens stack, top to bottom">
+        <div class="layer prd"><div><div class="name">Production entry <span class="mono">PRD</span></div><div class="when">When the assessment's trigger is production-entry, whatever the design contains</div></div><div class="n">19<small>9 BLOCKERS</small></div></div>
+        <div class="layer agt"><div><div class="name">AI agent <span class="mono">AGT</span></div><div class="when">When an element has an agent facet: a model that picks its own steps and calls tools</div></div><div class="n">23<small>9 BLOCKERS</small></div></div>
+        <div class="layer ais"><div><div class="name">AI solution <span class="mono">AIS</span></div><div class="when">When an element has an ai facet: anything that uses a model to produce its output</div></div><div class="n">27<small>3 BLOCKERS</small></div></div>
+        <div class="layer core"><div><div class="name">Core <span class="mono">CORE</span></div><div class="when">Always, for every design, including whether it moves toward the target state</div></div><div class="n">51<small>5 BLOCKERS</small></div></div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <p class="stack-note">An agent always carries an ai facet too, so the agent lens never comes alone: it brings the AI solution lens, which sits on the core. Remove the facets and the core lens still applies unchanged.</p>
+        <div class="figure bars">
+          <svg viewBox="0 0 520 210" role="img" aria-labelledby="sev-t">
+            <title id="sev-t">Criteria by default severity per lens. Core: 5 blocker, 30 major, 15 minor, 1 advisory. AI solution: 3, 20, 5, 0. AI agent: 9, 14, 0, 0. Production: 9, 10, 0, 0.</title>
+            <!-- scale: 1 criterion = 8 px, from x=110 -->
+            <g stroke="var(--rule)" stroke-width="1"><line x1="110" y1="8" x2="110" y2="170"/><line x1="190" y1="8" x2="190" y2="170" stroke-dasharray="2 4"/><line x1="270" y1="8" x2="270" y2="170" stroke-dasharray="2 4"/><line x1="350" y1="8" x2="350" y2="170" stroke-dasharray="2 4"/><line x1="430" y1="8" x2="430" y2="170" stroke-dasharray="2 4"/></g>
+            <g font-size="11" style="font-family:var(--f-mono)"><text x="110" y="186" text-anchor="middle" style="fill:var(--ink-2)">0</text><text x="190" y="186" text-anchor="middle" style="fill:var(--ink-2)">10</text><text x="270" y="186" text-anchor="middle" style="fill:var(--ink-2)">20</text><text x="350" y="186" text-anchor="middle" style="fill:var(--ink-2)">30</text><text x="430" y="186" text-anchor="middle" style="fill:var(--ink-2)">40</text></g>
+            <g font-size="13" font-weight="700">
+              <text x="100" y="31" text-anchor="end">core</text>
+              <rect x="110" y="14" width="40" height="26" style="fill:var(--block)"/><rect x="150" y="14" width="240" height="26" style="fill:var(--major)"/><rect x="390" y="14" width="120" height="26" style="fill:var(--minor)"/><rect x="510" y="14" width="8" height="26" style="fill:var(--advisory)"/>
+              <text x="100" y="71" text-anchor="end">ai-solution</text>
+              <rect x="110" y="54" width="24" height="26" style="fill:var(--block)"/><rect x="134" y="54" width="160" height="26" style="fill:var(--major)"/><rect x="294" y="54" width="40" height="26" style="fill:var(--minor)"/>
+              <text x="100" y="111" text-anchor="end">ai-agent</text>
+              <rect x="110" y="94" width="72" height="26" style="fill:var(--block)"/><rect x="182" y="94" width="112" height="26" style="fill:var(--major)"/>
+              <text x="100" y="151" text-anchor="end">production</text>
+              <rect x="110" y="134" width="72" height="26" style="fill:var(--block)"/><rect x="182" y="134" width="80" height="26" style="fill:var(--major)"/>
+            </g>
+            <text x="110" y="204" font-size="11" style="fill:var(--ink-2)">criteria, by default severity</text>
+          </svg>
+        </div>
+        <div class="legend"><span><i class="sw" style="background:var(--block)"></i>Blocker (26)</span><span><i class="sw" style="background:var(--major)"></i>Major (72)</span><span><i class="sw" style="background:var(--minor)"></i>Minor (21)</span><span><i class="sw" style="background:var(--advisory);box-shadow:inset 0 0 0 1px var(--rule)"></i>Advisory (1)</span></div>
+        <p class="stack-note">Severity rises up the stack. The agent and production lenses are almost half blockers, because they cover the failures that turn into incidents rather than defects.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="maps">
+    <div style="display:grid;gap:6px"><span class="eyebrow">Every criterion, by area</span><h2>Lens maps</h2><p class="muted">Each tile is one criterion. Select a tile to read its question.</p></div>
+    <div class="legend"><span><i class="sw" style="background:var(--tool)"></i>Tool decides from the specification</span><span><i class="sw" style="background:var(--both)"></i>Tool checks it's there, reviewer judges it</span><span><i class="sw" style="background:var(--reviewer)"></i>Reviewer decides</span><span><i class="sw blk"></i>Blocker by default</span></div>
+    <div id="lenses" style="display:grid;gap:22px"></div>
+  </section>
+
+  <section class="panel">
+    <div style="display:grid;gap:6px"><span class="eyebrow">Anatomy</span><h2>What one criterion says</h2></div>
+    <div class="anatomy">
+<pre class="yaml"><span class="n">1</span><span class="k">id:</span> CORE-SEC-02
+<span class="n">2</span><span class="k">area:</span> SEC
+  <span class="k">question:</span> Is every connector that crosses a
+    trust boundary authenticated and authorised?
+<span class="n">3</span><span class="k">reads:</span> [connectors.authentication,
+    connectors.authorisation, elements.trust_zone]
+<span class="n">4</span><span class="k">decided_by:</span> tool
+<span class="n">5</span><span class="k">rule:</span> Every connector whose ends lie in
+    different trust zones has authentication and
+    authorisation other than none.
+<span class="n">6</span><span class="k">severity:</span> blocker
+<span class="n">7</span><span class="k">sources:</span> [zt-800-207, wa-aws-sec]</pre>
+      <ol class="notes">
+        <li><b>A permanent id.</b> Prefix, area, number. An id is never reused, so a finding in one assessment can be compared with the next.</li>
+        <li><b>One question a design can answer.</b> Grouped into areas, each with a question of its own.</li>
+        <li><b>The fields it reads.</b> Dotted paths into the design specification, so the lens doubles as the author's list of what to write.</li>
+        <li><b>Who decides.</b> A tool, a reviewer, or both: the tool checks the answer is there, the reviewer judges whether it is good enough.</li>
+        <li><b>A rule a tool can apply without judgement.</b> Required for tool criteria. This is what makes the check depth run on every change.</li>
+        <li><b>A default severity.</b> An assessor may change it with a reason. One open blocker means the design is not endorsed.</li>
+        <li><b>Its sources</b>, by key, resolved in the lens's source list.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div style="display:grid;gap:6px"><span class="eyebrow">Boundaries</span><h2>What is not a lens, and what could be next</h2></div>
+    <div class="two">
+      <div class="box no">
+        <h3>Separate assessments, not lenses</h3>
+        <ul>
+          <li>Cybersecurity: are controls implemented and effective?</li>
+          <li>Privacy impact</li>
+          <li>AI impact</li>
+          <li>Regulatory conformity</li>
+        </ul>
+        <p style="font-size:0.92rem">Each one reads the running system, follows its own method, often needs an accredited assessor, and ends in an acceptance only its owner can give. They meet the lenses as a hand-over at design review and as evidence at production entry.</p>
+      </div>
+      <div class="box next">
+        <h3>Candidate lenses</h3>
+        <ul>
+          <li>Privacy by design, brought in by a personal-data profile</li>
+          <li>Data platforms</li>
+          <li>Regulated industries</li>
+          <li>Sovereign hosting</li>
+          <li>Readiness, after TOGAF's Business Transformation Readiness Assessment</li>
+        </ul>
+        <p style="font-size:0.92rem">A new lens needs a profile or a trigger and nothing else; the standard doesn't change. A changed criterion moves the lens's minor version. A change that would turn earlier results wrong moves the major version.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Generated from <span class="mono">standards/assessment/lenses/</span> (core 0.6.0, ai-solution 0.4.0, ai-agent 0.1.0, production 0.1.1) of the architecture continuum bundle, 28 October 2026.</span>
+    <span>The standard is a draft. Tool criteria are specified, not yet implemented.</span>
+  </footer>
+</div>
+
+<script>
+const DATA = [{"id":"core","prefix":"CORE","areas":[{"id":"DEM","title":"Demand and drivers","question":"Does the design answer a stated demand, for stated stakeholders, within stated constraints?","criteria":[{"id":"CORE-DEM-01","decided_by":"both","severity":"blocker","question":"Does the design state its goals, its non-goals and its stakeholders with their concerns?"},{"id":"CORE-DEM-02","decided_by":"both","severity":"major","question":"Is each goal traceable to an outcome, a use case or a capability, or explicitly recorded as an assumption?"},{"id":"CORE-DEM-03","decided_by":"reviewer","severity":"minor","question":"Are the constraints and assumptions stated, each with its source?"}]},{"id":"TRC","title":"Place on the continuum","question":"Can the design be traced up to the capabilities and outcomes it serves and down to what will run?","criteria":[{"id":"CORE-TRC-01","decided_by":"tool","severity":"major","question":"Does the design name the capabilities it realises, the platform it belongs to and the bounded contexts it touches?"},{"id":"CORE-TRC-02","decided_by":"tool","severity":"major","question":"Does the design's type agree with its abstraction?"},{"id":"CORE-TRC-03","decided_by":"tool","severity":"minor","question":"Does a reference architecture or solution design name what it implements?"},{"id":"CORE-TRC-04","decided_by":"tool","severity":"major","question":"Is every functional scenario tied to a use case, and does every use case the design serves have a scenario?"}]},{"id":"TGT","title":"Target state","question":"Does the design move the continuum toward its target state, with every departure from it decided and bounded?","criteria":[{"id":"CORE-TGT-01","decided_by":"tool","severity":"major","question":"Is every catalogued artefact the design uses at target or in flight, never retired, and does each one still at baseline have a decision naming what it moves to?"},{"id":"CORE-TGT-02","decided_by":"both","severity":"major","question":"Is every departure from the target state recorded as a decision, and is a time-bound one given an expiry and a path back?"},{"id":"CORE-TGT-03","decided_by":"reviewer","severity":"major","question":"Does the design move its capabilities toward the target state, rather than adding to what is being retired or creating a dependency that blocks a planned retirement?"},{"id":"CORE-TGT-04","decided_by":"reviewer","severity":"minor","question":"Where the design shows the target state to be wrong, has that been raised as a consideration to change the target, rather than worked around?"},{"id":"CORE-TGT-05","decided_by":"tool","severity":"blocker","question":"Is every building block the target state does not plan for, or holds where it is, brought in or extended only by an exception approved through escalation?"}]},{"id":"STR","title":"Structure","question":"Are the elements the right kind and grain, inside the right boundaries?","criteria":[{"id":"CORE-STR-01","decided_by":"reviewer","severity":"major","question":"Is every building block at container grain, never a component or a whole system?"},{"id":"CORE-STR-02","decided_by":"tool","severity":"major","question":"Does every ABB, SBB, service and store live in exactly one bounded context?"},{"id":"CORE-STR-03","decided_by":"tool","severity":"minor","question":"Does the realisation chain hold, with no orphans?"},{"id":"CORE-STR-04","decided_by":"tool","severity":"minor","question":"Is every service deployed to a node, and every store owned by one service?"},{"id":"CORE-STR-05","decided_by":"tool","severity":"blocker","question":"Does every element and connector reference resolve?"},{"id":"CORE-STR-06","decided_by":"tool","severity":"minor","question":"Is every element owned by a team?"},{"id":"CORE-STR-07","decided_by":"reviewer","severity":"major","question":"Do platform dependencies run down the landscape and through contracts only?"}]},{"id":"QA","title":"Quality attributes","question":"Does the design say, with measures, how it meets the qualities that matter, and what it trades?","criteria":[{"id":"CORE-QA-01","decided_by":"both","severity":"blocker","question":"Does the design state quality-attribute scenarios with a stimulus, a response and a measurable response measure?"},{"id":"CORE-QA-02","decided_by":"both","severity":"major","question":"Are the qualities that matter covered, and is each omission deliberate?"},{"id":"CORE-QA-03","decided_by":"both","severity":"minor","question":"Are the scenarios prioritised by importance and difficulty, and do the high, high scenarios have a design response?"},{"id":"CORE-QA-04","decided_by":"both","severity":"major","question":"Are failure scenarios stated for the dependencies the design cannot control?"},{"id":"CORE-QA-05","decided_by":"reviewer","severity":"major","question":"Are the trade-offs between qualities identified and recorded as decisions?"}]},{"id":"DEC","title":"Decisions and open questions","question":"Are the significant decisions recorded with their alternatives, and the open questions named?","criteria":[{"id":"CORE-DEC-01","decided_by":"both","severity":"major","question":"Is each significant decision recorded with its alternatives and rationale?"},{"id":"CORE-DEC-02","decided_by":"reviewer","severity":"major","question":"Is every open question named as a consideration, with who answers it and by when, or the design states it has none?"},{"id":"CORE-DEC-03","decided_by":"tool","severity":"major","question":"Is every consideration resolved by an accepted decision before the design is accepted?"},{"id":"CORE-DEC-04","decided_by":"both","severity":"minor","question":"Are one-way-door decisions identified and given proportionate scrutiny?"},{"id":"CORE-DEC-05","decided_by":"reviewer","severity":"minor","question":"Is debt taken on knowingly recorded against the decision that took it on?"}]},{"id":"INT","title":"Interfaces and contracts","question":"Is every interaction carried by a versioned contract, with coupling that is deliberate?","criteria":[{"id":"CORE-INT-01","decided_by":"tool","severity":"major","question":"Does every connector that crosses a bounded context or the design's boundary carry a versioned contract?"},{"id":"CORE-INT-02","decided_by":"both","severity":"minor","question":"Is the context-map relationship of every cross-context connector stated, and is it the right one?"},{"id":"CORE-INT-03","decided_by":"reviewer","severity":"minor","question":"Is coupling deliberate, with strong integration kept close and distant integration kept to contracts?"}]},{"id":"DAT","title":"Data","question":"Is every significant data set owned, classified and traced?","criteria":[{"id":"CORE-DAT-01","decided_by":"both","severity":"major","question":"Is every significant data set named with an owner and a classification?"},{"id":"CORE-DAT-02","decided_by":"tool","severity":"major","question":"Are residency, retention and lineage stated for personal and restricted data?"},{"id":"CORE-DAT-03","decided_by":"reviewer","severity":"minor","question":"Does each data set have one owner, and are other writers going through its owner's contract?"}]},{"id":"SEC","title":"Security architecture","question":"Are trust boundaries, identity and the placement of controls designed, and is the security assessment handed over?","criteria":[{"id":"CORE-SEC-01","decided_by":"tool","severity":"major","question":"Are trust zones declared and every element placed in one?"},{"id":"CORE-SEC-02","decided_by":"tool","severity":"blocker","question":"Is every connector that crosses a trust boundary authenticated and authorised?"},{"id":"CORE-SEC-03","decided_by":"both","severity":"major","question":"Is every path that carries untrusted content identified, and is that content validated before it is acted on?"},{"id":"CORE-SEC-04","decided_by":"tool","severity":"major","question":"Does a threat model exist for this version of the design, and has the cybersecurity assessment been handed over?"},{"id":"CORE-SEC-05","decided_by":"reviewer","severity":"major","question":"Do services and agents run as their own least-privileged identities rather than shared accounts?"}]},{"id":"OPS","title":"Operability","question":"Can the design be observed, deployed, rolled back and recovered, against stated objectives?","criteria":[{"id":"CORE-OPS-01","decided_by":"tool","severity":"major","question":"Are service level objectives stated for what users depend on?"},{"id":"CORE-OPS-02","decided_by":"tool","severity":"major","question":"Can the running design be observed through logs, metrics, traces and an audit trail, to stated conventions?"},{"id":"CORE-OPS-03","decided_by":"tool","severity":"minor","question":"Are deployment, rollback, recovery objectives and a degraded mode stated?"},{"id":"CORE-OPS-04","decided_by":"tool","severity":"minor","question":"Is there a runbook, or a commitment to one before the design is in service?"}]},{"id":"CST","title":"Cost and sustainability","question":"Is the running cost modelled and bounded, and the environmental cost considered?","criteria":[{"id":"CORE-CST-01","decided_by":"tool","severity":"major","question":"Is the running cost modelled, with a unit cost and a budget?"},{"id":"CORE-CST-02","decided_by":"reviewer","severity":"advisory","question":"Is the environmental cost of the design considered where it is material?"}]},{"id":"EVO","title":"Evolvability","question":"Will the design stay true after it is built, and can it change?","criteria":[{"id":"CORE-EVO-01","decided_by":"both","severity":"major","question":"Are the architecture's important characteristics protected by fitness functions, automated where they can be?"},{"id":"CORE-EVO-02","decided_by":"reviewer","severity":"minor","question":"Are the parts most likely to change isolated behind contracts, so they can change without the rest?"}]},{"id":"RSK","title":"Risk and obligations","question":"Are the known risks owned, and the obligations the design must meet named?","criteria":[{"id":"CORE-RSK-01","decided_by":"tool","severity":"major","question":"Does every known risk have a mitigation, an owner and its residual level?"},{"id":"CORE-RSK-02","decided_by":"reviewer","severity":"major","question":"Are the regulatory, contractual and policy obligations named, with how the design classes under each?"},{"id":"CORE-RSK-03","decided_by":"reviewer","severity":"major","question":"Does the evidence cited exist, cover what it claims and date from this version of the design?"}]}]},{"id":"ai-solution","prefix":"AIS","areas":[{"id":"FIT","title":"Fitness for AI","question":"Is a model the right tool, and is its role in the design bounded?","criteria":[{"id":"AIS-FIT-01","decided_by":"reviewer","severity":"major","question":"Does the design say why a model is needed, and what a deterministic alternative would cost?"},{"id":"AIS-FIT-02","decided_by":"both","severity":"minor","question":"Is the model's role in each element stated, and limited to that role?"}]},{"id":"MOD","title":"Model and value chain","question":"Is the model a pinned, documented, replaceable dependency?","criteria":[{"id":"AIS-MOD-01","decided_by":"tool","severity":"major","question":"Is every model version pinned, with a documented route to change it?"},{"id":"AIS-MOD-02","decided_by":"both","severity":"minor","question":"Is there a model card or system card for every model, and an AI bill of materials for the design?"},{"id":"AIS-MOD-03","decided_by":"both","severity":"major","question":"Can the model or its provider be replaced, and is there a fallback model or path?"}]},{"id":"EVAL","title":"Evaluation as evidence","question":"Do evals prove the design meets its quality scenarios, with each kind of error costed and measured on enough cases, and do they gate release?","criteria":[{"id":"AIS-EVAL-01","decided_by":"tool","severity":"blocker","question":"Does every model-backed element have evals with a metric and a threshold?"},{"id":"AIS-EVAL-02","decided_by":"tool","severity":"major","question":"Does at least one offline eval gate release?"},{"id":"AIS-EVAL-03","decided_by":"reviewer","severity":"major","question":"Do the evals cover the design's quality scenarios, its risk scenarios and the populations it serves?"},{"id":"AIS-EVAL-04","decided_by":"tool","severity":"major","question":"Is every LLM-as-judge eval calibrated against human labels?"},{"id":"AIS-EVAL-05","decided_by":"both","severity":"major","question":"Has the design been red-teamed against the OWASP LLM risks that apply to it?"},{"id":"AIS-EVAL-06","decided_by":"both","severity":"major","question":"Does each eval that classifies (retrieval, answer or abstain, routing, a guard) name its positive class and set a separate threshold on false positives and on false negatives, weighted by what each error costs, rather than relying on F1 or accuracy alone?"},{"id":"AIS-EVAL-07","decided_by":"both","severity":"major","question":"Is abstention evaluated, with questions the sources cannot answer in the test set, and the rate of answering them bounded?"},{"id":"AIS-EVAL-08","decided_by":"tool","severity":"major","question":"Is permission trimming tested as people with different access, with zero tolerance for content a user may not read?"},{"id":"AIS-EVAL-09","decided_by":"reviewer","severity":"major","question":"Is each threshold backed by enough test cases to tell a pass from chance, with the interval reported?"},{"id":"AIS-EVAL-10","decided_by":"tool","severity":"major","question":"Are the evals repeatable evidence, run more than once on a versioned, held-out set?"}]},{"id":"DATA","title":"Grounding and data","question":"Is the data the model sees owned, permissioned, current and traceable?","criteria":[{"id":"AIS-DATA-01","decided_by":"tool","severity":"major","question":"Is every grounding source a named, owned and classified data set?"},{"id":"AIS-DATA-02","decided_by":"tool","severity":"blocker","question":"Is retrieval trimmed to what the caller may see?"},{"id":"AIS-DATA-03","decided_by":"both","severity":"minor","question":"Are data provenance, freshness and drift monitored?"},{"id":"AIS-DATA-04","decided_by":"reviewer","severity":"major","question":"Is data used for training, fine-tuning or evaluation licensed and permitted for that use?"}]},{"id":"IO","title":"Inputs and outputs","question":"Is untrusted input contained and model output validated before it does anything?","criteria":[{"id":"AIS-IO-01","decided_by":"tool","severity":"major","question":"Is every model that receives untrusted input identified, with its untrusted inputs named?"},{"id":"AIS-IO-02","decided_by":"tool","severity":"blocker","question":"Is model output constrained and validated before it reaches a tool, a store, a query, code or a user?"},{"id":"AIS-IO-03","decided_by":"reviewer","severity":"major","question":"Does the design avoid relying on the system prompt for security, or on keeping it secret?"}]},{"id":"OPS","title":"Running AI","question":"Is the model observed, bounded in cost and latency, and able to fail safely?","criteria":[{"id":"AIS-OPS-01","decided_by":"tool","severity":"major","question":"Are token, rate, cost and time limits set on every model call?"},{"id":"AIS-OPS-02","decided_by":"both","severity":"minor","question":"Are model calls traced with prompts, outputs, tokens and cost, to the GenAI conventions?"},{"id":"AIS-OPS-03","decided_by":"reviewer","severity":"minor","question":"Is there a latency and quality budget per scenario, with a degraded mode when it is missed?"}]},{"id":"HUM","title":"People and obligations","question":"Is human oversight designed, users told, and the regulatory class known?","criteria":[{"id":"AIS-HUM-01","decided_by":"both","severity":"major","question":"Is the level of human oversight stated for each model-backed decision, and proportionate to its impact?"},{"id":"AIS-HUM-02","decided_by":"both","severity":"major","question":"Are users told when they deal with AI or receive generated content?"},{"id":"AIS-HUM-03","decided_by":"both","severity":"major","question":"Is the design's class under the AI regulations that apply to it recorded, with the impact assessment it requires?"}]}]},{"id":"ai-agent","prefix":"AGT","areas":[{"id":"JUS","title":"Justified agency","question":"Is an agent needed, at the autonomy it is given?","criteria":[{"id":"AGT-JUS-01","decided_by":"reviewer","severity":"major","question":"Does the design justify an agent over a workflow, and a multi-agent topology over a single agent?"},{"id":"AGT-JUS-02","decided_by":"both","severity":"blocker","question":"Is the autonomy level declared and proportionate to the impact and reversibility of what the agent does?"}]},{"id":"ACT","title":"Actions and blast radius","question":"Is every action inventoried, tiered, and bounded outside the agent's reach?","criteria":[{"id":"AGT-ACT-01","decided_by":"both","severity":"blocker","question":"Is every action the agent can take in the world listed, with its effect and whether it can be undone?"},{"id":"AGT-ACT-02","decided_by":"tool","severity":"blocker","question":"Do irreversible, financial, destructive and external-communication actions need human approval, or sit behind a T0 or T1 limit?"},{"id":"AGT-ACT-03","decided_by":"tool","severity":"blocker","question":"Are T0 and T1 limits enforced outside anything the agent can edit?"},{"id":"AGT-ACT-04","decided_by":"both","severity":"blocker","question":"Is code the agent generates or runs executed in a sandbox with no standing credentials?"}]},{"id":"INJ","title":"Injection and trust","question":"Can untrusted content steer the agent into a consequential action?","criteria":[{"id":"AGT-INJ-01","decided_by":"tool","severity":"blocker","question":"Does any single agent session combine untrusted input, access to sensitive data and the ability to change state or communicate externally?"},{"id":"AGT-INJ-02","decided_by":"both","severity":"major","question":"Does the design use a pattern that limits what injected instructions can do, rather than relying on the model to refuse them?"},{"id":"AGT-INJ-03","decided_by":"reviewer","severity":"major","question":"Is the agent's goal fixed by its principal and protected from being rewritten by content it reads?"}]},{"id":"ID","title":"Identity and privilege","question":"Does the agent act as itself, with only the privilege its task needs?","criteria":[{"id":"AGT-ID-01","decided_by":"tool","severity":"blocker","question":"Does the agent have its own workload identity, and is it clear whether it acts as itself or on behalf of a user?"},{"id":"AGT-ID-02","decided_by":"both","severity":"major","question":"Is every tool credential scoped to the task, and never broader than the user it acts for?"},{"id":"AGT-ID-03","decided_by":"reviewer","severity":"major","question":"Do MCP and other tool servers validate token audience and refuse to pass tokens through?"}]},{"id":"MEM","title":"Memory and context","question":"Can what the agent remembers be poisoned or leak across users?","criteria":[{"id":"AGT-MEM-01","decided_by":"both","severity":"major","question":"Can untrusted content be written to long-term memory, and if so, is it validated and attributed?"},{"id":"AGT-MEM-02","decided_by":"tool","severity":"major","question":"Is memory isolated per user or tenant, with stated retention?"}]},{"id":"MAS","title":"Multi-agent and supply chain","question":"Are peers, tools and protocols authenticated, pinned and contained?","criteria":[{"id":"AGT-MAS-01","decided_by":"tool","severity":"blocker","question":"Is every agent-to-agent interaction authenticated, with the peer's trust stated?"},{"id":"AGT-MAS-02","decided_by":"both","severity":"major","question":"Is a failure or compromise in one agent contained, so it cannot cascade through the others?"},{"id":"AGT-MAS-03","decided_by":"both","severity":"major","question":"Are tools, MCP servers, agent cards and protocol versions pinned and from trusted sources?"}]},{"id":"CTL","title":"Control and accountability","question":"Can the agent be watched, limited, stopped and held to account?","criteria":[{"id":"AGT-CTL-01","decided_by":"tool","severity":"blocker","question":"Are step, cost and time limits set, and is there a kill switch that works without the agent's cooperation?"},{"id":"AGT-CTL-02","decided_by":"tool","severity":"major","question":"Is every plan, tool call and output recorded with provenance, so an action can be traced to the input that caused it?"},{"id":"AGT-CTL-03","decided_by":"reviewer","severity":"major","question":"Is human approval protected from manipulation and from automation bias?"},{"id":"AGT-CTL-04","decided_by":"reviewer","severity":"major","question":"Is drift between what the agent did and what policy intended reconciled continuously, and is a rogue agent detectable?"}]},{"id":"EVAL","title":"Evaluating behaviour","question":"Is the agent evaluated on what it does, repeatedly, not only on what it ends with?","criteria":[{"id":"AGT-EVAL-01","decided_by":"tool","severity":"major","question":"Is the agent evaluated on its trajectory, not only its final output?"},{"id":"AGT-EVAL-02","decided_by":"both","severity":"major","question":"Is reliability measured over repeated runs, and is the agent tested against injection and hijacking?"}]}]},{"id":"production","prefix":"PRD","areas":[{"id":"BLD","title":"As built","question":"Is what was built the design that was assessed, at the version being released?","criteria":[{"id":"PRD-BLD-01","decided_by":"tool","severity":"blocker","question":"Is the design a solution design, accepted, with no open consideration, and has this version had an endorsed design review whose conditions are closed?"},{"id":"PRD-BLD-02","decided_by":"both","severity":"blocker","question":"Does an as-built record show the built solution matches this version of the design, with every departure either designed in a new version or recorded as a decision?"},{"id":"PRD-BLD-03","decided_by":"both","severity":"major","question":"Are the automated fitness functions running in the delivery pipeline or continuously, and passing on the release candidate?"}]},{"id":"EVD","title":"Evidence","question":"Was the evidence produced against this version, and does it cover what it must?","criteria":[{"id":"PRD-EVD-01","decided_by":"tool","severity":"blocker","question":"Was every piece of evidence the assessment relies on produced against the version being released?"},{"id":"PRD-EVD-02","decided_by":"both","severity":"major","question":"Do acceptance tests show the functional scenarios work end to end?"}]},{"id":"HND","title":"Hand-overs","question":"Have the assessments this one does not make returned, with acceptable outcomes?","criteria":[{"id":"PRD-HND-01","decided_by":"tool","severity":"blocker","question":"Has every assessment the design handed over returned an outcome for this version that is not a failure?"},{"id":"PRD-HND-02","decided_by":"reviewer","severity":"major","question":"Are the conditions and residual risks those assessments returned accepted by the person each one names?"}]},{"id":"OPS","title":"Run","question":"Is there a team, a runbook, alerting and an operational readiness review behind the solution?","criteria":[{"id":"PRD-OPS-01","decided_by":"tool","severity":"blocker","question":"Is a team named to run the solution, with its hours, on-call cover and escalation?"},{"id":"PRD-OPS-02","decided_by":"both","severity":"major","question":"Does every SLO alert the support team when it is at risk, and is the solution in the monitoring it will be run with?"},{"id":"PRD-OPS-03","decided_by":"tool","severity":"major","question":"Is there a runbook, and has an operational readiness review of this version passed?"}]},{"id":"REL","title":"Release and recovery","question":"Have rollback, recovery, load and cutover been exercised rather than written down?","criteria":[{"id":"PRD-REL-01","decided_by":"tool","severity":"blocker","question":"Has rollback of this release been tested, and is the point after which rollback becomes recovery known?"},{"id":"PRD-REL-02","decided_by":"tool","severity":"major","question":"Has recovery been tested against the stated recovery time and recovery point objectives?"},{"id":"PRD-REL-03","decided_by":"both","severity":"major","question":"Has a load test exercised the high-importance performance and reliability scenarios at the expected peak?"},{"id":"PRD-REL-04","decided_by":"reviewer","severity":"major","question":"Are the cutover, any data migration, and the retirement of what the solution replaces planned and owned?"}]},{"id":"RSK","title":"Residual risk","question":"Is everything carried into production owned and accepted by someone entitled to accept it?","criteria":[{"id":"PRD-RSK-01","decided_by":"both","severity":"blocker","question":"Does every risk, debt item and accepted finding carried into production have an owner entitled to accept it, and a date?"},{"id":"PRD-RSK-02","decided_by":"reviewer","severity":"major","question":"Are the conditions of this assessment each owned and dated, and is the first periodic assessment scheduled?"}]},{"id":"AI","title":"Model and agent readiness","question":"Do the release candidate's evals pass, and do an agent's limits and kill switch work in fact?","criteria":[{"id":"PRD-AI-01","decided_by":"tool","severity":"blocker","question":"Do the gating evals pass on the release candidate?"},{"id":"PRD-AI-02","decided_by":"tool","severity":"major","question":"Are drift monitoring and at least one online eval switched on for every model-backed element?"},{"id":"PRD-AI-03","decided_by":"tool","severity":"blocker","question":"Have the agent's limits, approval gates and kill switch been shown to work, without the agent's cooperation?"}]}]}];
+const META = {
+  core: { label: "Core", tag: "always", color: "var(--l-core)" },
+  "ai-solution": { label: "AI solution", tag: "ai facet", color: "var(--l-ais)" },
+  "ai-agent": { label: "AI agent", tag: "agent facet", color: "var(--l-agt)" },
+  production: { label: "Production entry", tag: "production-entry", color: "var(--l-prd)" }
+};
+const root = document.getElementById("lenses");
+for (const lens of DATA) {
+  const m = META[lens.id];
+  const wrap = document.createElement("div");
+  wrap.className = "lens";
+  const total = lens.areas.reduce((n, a) => n + a.criteria.length, 0);
+  const blockers = lens.areas.reduce((n, a) => n + a.criteria.filter(c => c.severity === "blocker").length, 0);
+  wrap.innerHTML = `<div class="lens-head"><h3>${m.label}</h3><span class="tag" style="background:${m.color}">${m.tag}</span><span class="muted mono">${lens.prefix} · ${total} criteria · ${blockers} blockers</span></div>`;
+  const areas = document.createElement("div");
+  areas.className = "areas";
+  const detail = document.createElement("div");
+  detail.className = "detail";
+  detail.setAttribute("aria-live", "polite");
+  const first = lens.areas.flatMap(a => a.criteria).find(c => c.severity === "blocker") || lens.areas[0].criteria[0];
+  const show = c => { detail.innerHTML = `<b>${c.id} · ${c.decided_by} · ${c.severity}</b><span>${c.question}</span>`; };
+  for (const a of lens.areas) {
+    const el = document.createElement("div");
+    el.className = "area";
+    el.innerHTML = `<span class="code">${a.id} · ${a.criteria.length}</span><span class="t">${a.title}</span><span class="q">${a.question}</span>`;
+    const tiles = document.createElement("div");
+    tiles.className = "tiles";
+    for (const c of a.criteria) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `cr ${c.decided_by}${c.severity === "blocker" ? " blocker" : ""}`;
+      b.textContent = c.id.split("-").pop();
+      b.title = `${c.id}: ${c.question}`;
+      b.setAttribute("aria-label", `${c.id}, ${c.decided_by}, ${c.severity}: ${c.question}`);
+      b.style.border = "0";
+      b.addEventListener("click", () => show(c));
+      b.addEventListener("mouseenter", () => show(c));
+      b.addEventListener("focus", () => show(c));
+      tiles.appendChild(b);
+    }
+    el.appendChild(tiles);
+    areas.appendChild(el);
+  }
+  wrap.appendChild(areas);
+  wrap.appendChild(detail);
+  show(first);
+  root.appendChild(wrap);
+}
+</script>
+
+</body></html>

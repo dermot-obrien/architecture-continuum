@@ -89,6 +89,8 @@
               "id": { "$ref": "#/$defs/localId" },
               "source": { "type": "string", "description": "The instrument, for example the EU AI Act Article 50, ISO/IEC 27001, a contract clause." },
               "classification": { "type": "string", "description": "How the instrument classes this design, for example 'high-risk, Annex III' or 'limited risk'." },
+              "role": { "enum": ["provider", "deployer", "importer", "distributor", "authorised-representative", "product-manufacturer"], "description": "The organisation's role under the instrument, where duties attach by role, as under the EU AI Act (Articles 3 and 16 to 27)." },
+              "substantial_modification": { "type": "boolean", "description": "The organisation modifies, rebrands or changes the intended purpose of an AI system in a way that makes it the provider (EU AI Act Article 25)." },
               "statement": { "type": "string" }
             }
           }
@@ -301,6 +303,7 @@
           "impact": { "enum": ["high", "medium", "low"] },
           "mitigation": { "type": "string" },
           "owner": { "type": "string" },
+          "residual": { "type": "object", "description": "The likelihood and impact left once the mitigation is in place: the risk an owner accepts.", "required": ["likelihood", "impact"], "additionalProperties": false, "properties": { "likelihood": { "enum": ["high", "medium", "low"] }, "impact": { "enum": ["high", "medium", "low"] } } },
           "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } }
         }
       }
@@ -514,7 +517,10 @@
               "metric": { "type": "string" },
               "threshold": { "type": "string" },
               "gating": { "type": "boolean", "description": "A release cannot ship when the eval fails." },
-              "judge_calibrated": { "type": "boolean", "description": "For an llm-judge eval: agreement with human labels has been measured." },
+              "judge_calibrated": { "type": "boolean", "description": "Deprecated: use judge_calibration, which records the measurement." },
+              "judge_calibration": { "type": "object", "description": "For an llm-judge eval: how far the judge agrees with human labels.", "required": ["labels", "agreement_metric", "agreement", "min_agreement"], "additionalProperties": false, "properties": { "labels": { "type": "integer", "minimum": 1, "description": "How many human-labelled cases the judge was compared with." }, "agreement_metric": { "type": "string", "description": "For example Cohen's kappa, or true positive and true negative rates against the labels." }, "agreement": { "type": "number" }, "min_agreement": { "type": "number", "description": "The agreement the judge must reach to be trusted." }, "judge_model_version": { "type": "string" }, "calibrated_on": { "type": "string", "format": "date" } } },
+              "repeats": { "type": "integer", "minimum": 1, "description": "How many times each case is run, so the variance of a non-deterministic model is known." },
+              "dataset_version": { "type": "string", "description": "The version of the eval set, held out from any tuning or prompt development." },
               "positive_class": { "type": "string", "description": "What counts as a positive in this eval, for example 'the agent answers' or 'the article is relevant'. Without it, precision, recall and F1 have no meaning." },
               "errors": {
                 "type": "object",

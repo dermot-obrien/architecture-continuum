@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.6.0
+version: 0.7.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -59,6 +59,8 @@ An assessment reads two kinds of file and writes a third.
 
 The specification is the data of a design document, not a second design. Where a design already has a Markdown document (an architecture pattern or a reference architecture written by the `pattern` skill), the specification names it in `design.source` and the two are kept in step; where the design is new, the specification can come first and the document be generated from it. In both cases the specification is what a tool reads, which is the agent-native rule that the catalogued artefact is the source of truth and machine-checkable beats human-readable.
 
+The specification, with the document `design.source` names, is the design's architecture description. It records stakeholders and their concerns as ISO/IEC/IEEE 42010 asks, but not viewpoints, views and correspondences, so conformance to 42010 is not claimed.
+
 ### 2.1 Elements are continuum kinds
 
 Every element has one `kind` from the continuum: `actor`, `external-system`, `local-role`, `abb`, `sbb`, `technology`, `service`, `store` or `deployment-node`. There is no kind for a model or an agent. A model is a technology or an SBB with an `ai` facet; a runtime agent is a service with an `ai` facet and an `agent` facet, which is what the [agent types](../agent-native/agent-types.md) standard already says. This keeps the continuum's levels intact and makes the AI lenses additive: remove the facets and the core lens still applies.
@@ -74,12 +76,14 @@ An assessment is made at one of three depths. Each includes the one before it. W
 | Depth | What happens | Who | When |
 |---|---|---|---|
 | Check | Every criterion a tool can decide (`decided_by: tool`, and the presence half of `both`) is run against the specification | A tool, in CI or on request | On every change to a design specification |
-| Review | Every applicable criterion is answered, the reviewer ones by a person or an agent reading the design and its evidence | A lead assessor, with a security architect where the design crosses trust zones | Before a design is accepted, at the R3 and R4 gates, and before a solution goes into production (section 8.1) |
+| Review | Every applicable criterion is answered, the reviewer ones by a person or an agent reading the design and its evidence | A lead assessor, joined by a security architect from triage tier AT3 (the tier table in the [triage standard](standard-assessment-triage.md#4-the-tiers) is the rule) | Before a design is accepted, at the R3 and R4 gates, and before a solution goes into production (section 8.1) |
 | Evaluation | A review, plus scenario-based analysis with the stakeholders: a utility tree, sensitivity and trade-off points, risk themes linked to the drivers | A lead assessor, the architect and the stakeholders, in a workshop | For a design that is costly to reverse, high-risk, or contested |
 
 The evaluation depth is the SEI's ATAM in the shape this bundle needs: the utility tree is built from the design's own quality scenarios, and the risks, sensitivity points and trade-off points are findings like any other. Lighter team-run methods (risk-storming over the design's diagrams, LASR, a decision-centric review of the design's decisions) are acceptable ways of doing a review, as long as their results are recorded as findings against criteria.
 
 An assessor is independent when they did not author the design and are not accountable for delivering it. A review needs at least one independent assessor, and from triage tier AT2 that assessor is a person: an agent may be an assessor, and may be independent, but its findings are reviewed by an independent person before the record is relied on. An agent's findings carry provenance like any other agent output, and it does not make the verdict alone.
+
+At triage tiers AT1 and AT2 a review may instead be governed as an advice process: the person deciding seeks advice from those the design affects and from those with the expertise, records that advice as findings against the criteria, and remains accountable for the decision. The record says so in `governance`. From AT3 an independent assessor and an approver remain required.
 
 ## 4. Process
 
@@ -129,6 +133,8 @@ An assessment does not keep its own backlog. Every finding that is not met goes 
 
 ## 7. Verdict
 
+Conformance to the target state is governance, not fitness: TOGAF handles a departure by dispensation. `CORE-TGT-05` is a blocker by policy, so that the organisation decides a departure from its target before a design relies on it; the exception authority's approval is that dispensation.
+
 The rules are applied in order, and the first that applies decides the outcome. An open finding is one that is `not-met` or `partly-met`.
 
 | Order | Outcome | Rule |
@@ -165,7 +171,7 @@ A solution goes into production only after a formal assessment of it as built: t
 | Trigger | `production-entry`: before a solution first goes into production, and before a change goes live that alters a one-way-door decision, a trust boundary, an agent's actions or the data a model sees. Other changes take the ordinary route in section 8 |
 | Depth | Review at least, evaluation for a solution that is costly to reverse or high-risk. A check alone is never enough |
 | Lenses | `core`, the lenses its profiles bring in, and `production` |
-| Assessors | A lead assessor independent of the design and of its delivery, always; a security architect. The service owner and operations take part as stakeholders, not as assessors. At triage tier AT1 only, the team runs the production lens's tool criteria itself and the owner approves; every rule below still applies |
+| Assessors | From triage tier AT2, a lead assessor independent of the design and of its delivery, joined by a security architect from AT3, as the tier table sets. At AT1 the team runs the production lens's tool criteria itself and the owner approves on that run; every other rule below still applies. The service owner and operations take part as stakeholders, not as assessors |
 | Approval | The accountable service owner approves or declines in the record, with the date. An agent may assess but never approves |
 
 Beyond section 7, these rules apply:

@@ -9,8 +9,8 @@
     {
       "name": "architecture",
       "path": "skills/architecture",
-      "version": "0.10.1",
-      "purl": "pkg:generic/dermot-obrien/architecture-continuum/architecture@0.10.1",
+      "version": "0.12.0",
+      "purl": "pkg:generic/dermot-obrien/architecture-continuum/architecture@0.12.0",
       "requires": [],
       "check": {
         "command": [
@@ -24,8 +24,8 @@
     {
       "name": "workspace",
       "path": "skills/workspace",
-      "version": "0.1.2",
-      "purl": "pkg:generic/dermot-obrien/architecture-continuum/workspace@0.1.2",
+      "version": "0.2.0",
+      "purl": "pkg:generic/dermot-obrien/architecture-continuum/workspace@0.2.0",
       "requires": [],
       "check": {
         "command": [

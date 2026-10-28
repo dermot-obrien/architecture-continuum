@@ -72,7 +72,7 @@ A copy does not track this repository: it stays at the version you copied until 
 ## Pull requests
 
 - One change per pull request, from a branch started at `origin/develop` and into `develop`, with the template filled in: what, why (with the issue, thread, improvement or decision it serves, or `No reference:` and the reason), how it was verified, and what changes for the skills and the workspaces that install them.
-- The title is a Conventional Commits subject (`feat(scope): what changed`), and so are the commit subjects. Pull requests are merged with merge commits, not squashed, so every commit subject reaches `main` and is a line in the release notes, and together they decide the next version (see Releases below). Write each commit subject for a reader of the notes. The PR check fails a title or a description that does not follow this; a commit subject in another form is a warning. A pull request into `main` must cite a change reference; into `develop` that check only warns.
+- The title is a Conventional Commits subject (`feat(scope): what changed`), and so are the commit subjects. A pull request into `develop` is squash merged with its title as the subject, so the title is its one line in the release notes and decides the next version (see Releases below). Write the title for a reader of the notes. The PR check fails a title or a description that does not follow this; a commit subject in another form is a warning. A pull request into `main` must cite a change reference; into `develop` that check only warns.
 - CI must pass: the checks below.
 - Contributions are licensed as the file they change is (see Licensing of Contributions below).
 
@@ -86,13 +86,14 @@ node scripts/validate-bundle.mjs --schemas standards/ontology .
 node scripts/test-architecture-ontology.mjs
 node scripts/sync-skill-standards.mjs --check
 node scripts/generate-schema-diagram.mjs --check
+node scripts/generate-criteria-pages.mjs --check
 python -m unittest discover -s skills/architecture/tests
 ```
 
 Each skill carries its own copy of the standards it reads in `references/standards/`. After
 changing a file under `standards/`, or the list in `skill-standards.json`, run
 `node scripts/sync-skill-standards.mjs` to rewrite the copies, and commit them with the change.
-After changing a schema or `docs/continuum.drawio`, run `node scripts/generate-schema-diagram.mjs`
+After changing a lens under `standards/assessment/lenses/`, run `node scripts/generate-criteria-pages.mjs` to regenerate `docs/assessment-criteria/`, the published page of each criterion, and commit them with the change. After changing a schema or `docs/continuum.drawio`, run `node scripts/generate-schema-diagram.mjs`
 to redraw `docs/schema.svg` and its page, and commit them with the change.
 
 With `npm install` done, also run `node scripts/validate-frontmatter.mjs --quiet` when you change a schema or the foundation. CI also runs the `skills-ref` reference validator, installs the bundle into a scratch workspace with AI-Assisted Work's `bin/skills.mjs` and runs each skill's check there, and checks REUSE compliance; [Commands](docs/commands.md) describes each tool.
@@ -101,21 +102,21 @@ If you change anything inside a skill folder, bump that skill's version in its `
 
 ## Releases
 
-The repository follows Git Flow. `develop` is the integration branch and the base of every pull request. `main` only takes releases: when a release is wanted, a pull request from `develop` to `main` is merged with a merge commit, never squashed, so the two branches keep one history. A fix to a released version branches from `main`, merges into `main`, then back into `develop`.
+The repository follows Git Flow. `develop` is the integration branch and the base of every pull request. Pull requests into `develop` are squash merged. `main` only takes releases: when a release is wanted, a pull request from `develop` to `main`, titled `chore(release): ...`, is merged with a merge commit, never squashed, so the two branches keep one history; the `chore` title keeps that merge commit out of the release notes, as does the back-merge's `chore: merge main into develop`. A fix to a released version branches from `main`, merges into `main`, then back into `develop`.
 
 Releases are made from what reaches `main`, by [Release Please](https://github.com/googleapis/release-please) in the `Release Please` workflow. Versions follow [semantic versioning](https://semver.org/) and tags are `vX.Y.Z`. The version is the bundle's, the one `package.json` names and the one a workspace pins; each skill also carries its own version, bumped by hand as above, which is what the installer records in a workspace's lock.
 
 | What | Rule |
 |---|---|
-| The next version | From the commit subjects that reached `main` since the last tag: `feat` bumps the minor version, `fix` the patch, and a `!` after the type or a `BREAKING CHANGE:` footer marks a breaking change, which bumps the minor version until 1.0.0 and the major after. `docs`, `build`, `ci`, `chore`, `refactor`, `test`, `style` and `perf` never bump on their own |
-| The changelog | One section per release in `CHANGELOG.md`, written by Release Please: `feat` lines under Added, `fix` under Fixed, `perf` under Changed, `docs` under Documentation, and breaking changes first. The other types are kept out. Each commit subject is its line, so write commit subjects for a reader of the notes |
+| The next version | From the squash subjects that reached `main` since the last tag: `feat` bumps the minor version, `fix` the patch, and a `!` after the type or a `BREAKING CHANGE:` footer marks a breaking change, which bumps the minor version until 1.0.0 and the major after. `docs`, `build`, `ci`, `chore`, `refactor`, `test`, `style` and `perf` never bump on their own |
+| The changelog | One section per release in `CHANGELOG.md`, written by Release Please: `feat` lines under Added, `fix` under Fixed, `perf` under Changed, `docs` under Documentation, and breaking changes first. The other types are kept out. A pull request's title is its line, so write the title for a reader of the notes |
 | The release pull request | Release Please keeps one open against `main`, `chore(main): release X.Y.Z`, and updates it on every merge into `main`. It bumps `version` in `package.json` and `package-lock.json`, `.release-please-manifest.json` and `CHANGELOG.md`. Merging it, with a merge commit, is the release: the workflow creates the tag and the GitHub Release with that section as its notes. Then `main` is merged back into `develop`. Nothing else tags, and nobody edits those four files by hand |
 | Pins | A workspace pins a tag, `"ref": "vX.Y.Z"` on the bundle's source in `.agents/skills.json`, never `main` and never a commit. To upgrade, move the tag, read the release's notes, run `skills.mjs sync` and commit the new lock |
 | 1.0.0 | A deliberate decision, made by adding `"release-as": "1.0.0"` to `release-please-config.json` for one release, not a consequence of a breaking change |
 
 Before Release Please, versions were tagged by skill and `CHANGELOG.md` was written by hand. 0.4.1 was the last of those. The workflow publishes a version the manifest names but no tag carries, from its `CHANGELOG.md` section, so a hand-cut version is possible but should not be needed again.
 
-Settings the maintainer keeps (nothing in the repository can set them): the repository secret `RELEASE_PLEASE_TOKEN`, a fine-grained token scoped to this repository with contents and pull requests write, which the workflow uses to open the release pull request so that it gets CI runs (a pull request opened with the workflow's own token starts no other workflow); and, under Pull Requests, merge commits allowed and `develop` as the default branch. Without the secret the workflow falls back to its own token, which needs "Allow GitHub Actions to create and approve pull requests" on under Actions, and the release pull request then has no CI run until it is closed and reopened.
+Settings the maintainer keeps (nothing in the repository can set them): the repository secret `RELEASE_PLEASE_TOKEN`, a fine-grained token scoped to this repository with contents and pull requests write, which the workflow uses to open the release pull request so that it gets CI runs (a pull request opened with the workflow's own token starts no other workflow); and, under Pull Requests, squash merging allowed with the pull request title as the squash subject, merge commits allowed for releases and back-merges, and `develop` as the default branch. Squashing into `develop` is what keeps each change to one line: when feature pull requests were merged with merge commits, Release Please read each merge commit's body as one more change and listed every change two or three times. Without the secret the workflow falls back to its own token, which needs "Allow GitHub Actions to create and approve pull requests" on under Actions, and the release pull request then has no CI run until it is closed and reopened.
 
 ## Content Guidelines
 

@@ -5,7 +5,7 @@ classification: internal
 version: 1.1.0
 status: draft
 created: 2026-05-08
-last_modified: 2026-05-08
+last_modified: 2026-10-18
 owner: "Architecture Team"
 triggers:
   - "Creating any catalog artefact (Outcome, Use Case, Platform, Capability, Bounded Context, ABB, SBB, API, Service, View, Decision Record, Event, Deployment Node, Consideration, Technical Debt)"
@@ -48,7 +48,7 @@ Every catalog artefact's `index.md` begins with a YAML frontmatter block carryin
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | * | Canonical ID. Format: `<TYPE>-NNN` (zero-padded 3 digits) for every kind except `service` (kebab-case slug). MUST match the folder name. Immutable. |
-| `kind` | enum | * | One of: `outcome`, `use-case`, `landscape`, `platform`, `product`, `feature`, `capability`, `bounded-context`, `abb`, `sbb`, `pattern`, `api`, `service`, `view`, `decision-record`, `event`, `deployment-node`, `store`, `consideration`, `technical-debt`. |
+| `kind` | enum | * | One of: `outcome`, `use-case`, `landscape`, `platform`, `product`, `feature`, `capability`, `bounded-context`, `abb`, `sbb`, `pattern`, `api`, `service`, `view`, `decision-record`, `event`, `deployment-node`, `store`, `consideration`, `technical-debt`, and `candidate`, a possible pattern that is not yet an artefact (§6.23). |
 | `title` | string | * | Human-readable title. Convention: `"<ID> <Name>"` for visual artefacts. |
 | `short_name` | string | recommended | Acronym used in diagrams (e.g. `"IAM"` for ABB-001). |
 | `description` | string | recommended | One- to two-sentence summary. Used by the agent retrieval index (`llms.txt`). |
@@ -117,11 +117,60 @@ references:
 | `sidebar_position` | integer | Docusaurus rendering hint. |
 | `unlisted` | boolean | Docusaurus rendering hint: when true the page is built but kept out of the sidebar, the search index and the sitemap. For a page kept for the record rather than for reading, such as a superseded or retired artefact a repository chooses to keep. |
 
+The fields a site reads to present a page:
+
+| Field | Type | Description |
+|---|---|---|
+| `deck_publish` | boolean | markdown-deck publishes the page as a deck when the site is built. |
+| `deck_id` | kebab-case string | The deck's identifier, the folder it publishes to. |
+| `banner` | object | A notice shown at the top of the page: `text` (required) and `tone` (`info`, `note`, `warning` or `danger`). The draft skill sets one on an AI-generated draft. |
+| `moved_to` | path | On a stub left where an archived page was: the page's new place, relative to the stub. A stub carries no `kind`, so it is not an artefact and is never validated as one. |
+
 ### 2.8 Schema declaration
 
 | Field | Type | Description |
 |---|---|---|
 | `$schema` | URI | Path or URI to the JSON Schema this artefact conforms to. Recommended: `"../../standards/schemas/v1.1.0/<kind>.schema.json"` (workspace-relative) or the framework's published schema URL. |
+
+### 2.9 Portfolio
+
+A pattern, a use case and a candidate may carry a `portfolio` block: the document's standing in the repository's portfolio, which the `portfolio` skill (architecture-pattern) reads and writes. It is optional, and absent it means the document is live and nothing is pending.
+
+```yaml
+portfolio:
+  state: proposed-deprecation        # see below
+  priority: high                     # high | medium | low | none
+  target_quarter: "2027-Q1"          # YYYY-Qn
+  committed: true
+  reason: "Superseded by AP-002"
+  since: 2026-10-18
+  backlog_ref: "BL-12"
+  archived_from: solution/patterns/AP-004-old-gateway   # set when archived
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `state` | enum | `placeholder`, `draft`, `needs-conversion`, `proposed-deprecation`, `archive` or `archived`. |
+| `priority` | enum | `high`, `medium`, `low` or `none`. |
+| `target_quarter` | string | The quarter the document is meant to be ready, `YYYY-Qn`. |
+| `committed` | boolean | Committed work rather than a possibility. |
+| `reason` | string | Why the state was set. |
+| `since` | ISO-8601 date | When the state was set. |
+| `backlog_ref` | string | The backlog row or ticket the document came from. |
+| `archived_from` | path | Where an archived document lived, relative to the repository root. |
+
+No other field is allowed in the block.
+
+| `state` | Means |
+|---|---|
+| `placeholder` | Committed, with no content yet. A placeholder need not carry the fields its kind requires once it has content (§6.2, §6.17). |
+| `draft` | An AI-generated draft written from research, citing its sources, awaiting review. It carries `provenance` with `origin: ai-generated`. |
+| `needs-conversion` | Not in the form its type expects: a diagram, its boxes, the links between them and its scenarios. |
+| `proposed-deprecation` | Its status, `superseded_by`, `valid_until` or age suggests retiring it; awaiting agreement. |
+| `archive` | Deprecation agreed: to be moved out of the main tree. |
+| `archived` | Moved to the repository's archive folder, keeping its place in the tree beneath it. An archived page is exempt from its scheme's home folder. |
+
+`portfolio.state` is independent of `status`: `status` is the document's own review lifecycle (§3), `portfolio.state` what the portfolio is doing about it.
 
 ---
 
@@ -298,6 +347,8 @@ requires_capabilities: [CAP-004]     # the capabilities that make it possible
 realised_by: [AP-001]                # the architecture patterns that realise it (and reference architectures that make them concrete)
 fulfilled_by_features: [FE-003]      # the product features that fulfil it
 ```
+
+A use case whose `portfolio.state` is `placeholder` (§2.9) need not yet carry `primary_actor`, `supports_outcome` or `success_criteria`.
 
 On the continuum a use case supports an outcome, requires capabilities, is fulfilled by the features of a product and is realised by an architecture pattern, whose scenarios walk the use case's scenarios across the building blocks. `realised_by` is the inverse of `serves` on the pattern, and `fulfilled_by_features` the inverse of `fulfils` on the feature. `realised_by_abbs` is removed: a use case reaches its building blocks through the pattern that realises it, and the capabilities it requires are named in `requires_capabilities`.
 
@@ -672,9 +723,9 @@ A `withdrawn` consideration affects nothing. The decision record that resolves a
 
 ---
 
-### 6.17 Architecture pattern (`AP-NNN`) and reference architecture (`RA-NNN`)
+### 6.17 Architecture pattern (`AP-NNN`), reference architecture (`RA-NNN`) and collaboration (`CL-NNN`)
 
-The two kinds of pattern document the continuum names, authored by the `pattern` skill in architecture-pattern. An architecture pattern is technology-agnostic (conceptual or logical, its boxes local roles or ABBs) and takes `AP-NNN`; a reference architecture is technology-specific (physical, its boxes SBBs and technologies), takes `RA-NNN`, and names the architecture patterns it applies in `implements`. The type is declared as `pattern_type` (`architecture-pattern` or `reference-architecture`) and must agree with the series; a repository binds both in `[suite.pattern.types.*]` of its binding file with those series. The kind is `pattern` for both, and the schema requires `pattern_type` and `pattern_scope`, an `AP-NNN` identifier on an architecture pattern, and an `RA-NNN` identifier and at least one entry in `implements` on a reference architecture. The skill's `model validate` checks a document's boxes against its type. The earlier series `PAT-NNN` and `REF-NNN` are retired: no document carries them, and the skill mints none.
+The three kinds of pattern document the continuum names, authored by the `pattern` skill in architecture-pattern. An architecture pattern is technology-agnostic (conceptual or logical, its boxes local roles or ABBs) and takes `AP-NNN`; a reference architecture is technology-specific (physical, its boxes SBBs and technologies), takes `RA-NNN`, and names the architecture patterns it applies in `implements`. The type is declared as `pattern_type` (`architecture-pattern` or `reference-architecture`) and must agree with the series; a repository binds both in `[suite.pattern.types.*]` of its binding file with those series. The kind is `pattern` for both, and the schema requires `pattern_type` and `pattern_scope`, an `AP-NNN` identifier on an architecture pattern, and an `RA-NNN` identifier and at least one entry in `implements` on a reference architecture. The skill's `model validate` checks a document's boxes against its type. The earlier series `PAT-NNN` and `REF-NNN` are retired: no document carries them, and the skill mints none.
 
 ```yaml
 kind: pattern
@@ -689,6 +740,10 @@ serves: [UC-001, UC-002]                  # optional; the use cases its scenario
 model:
   diagram: components.drawio              # the diagram the model skill keeps in step
 ```
+
+A collaboration is participants working together, where building-block rigour matters less: its boxes are participants, and need not be catalogued building blocks. It takes `CL-NNN` and `pattern_type: collaboration`, carries no `implements` and no `implemented_by`, and its `composes`, when it has one, may name ABBs or SBBs. A repository binds it as `[suite.pattern.types.collaboration]` with series `CL`. Like the other two, it has a diagram, its boxes (Participants), the links between them (Interactions) and its scenarios.
+
+`pattern_type`, with `kind: pattern`, is the signature by which a document is found to be a pattern: a tool decides from the front matter, never from a file or folder name. A placeholder (`portfolio.state: placeholder`, §2.9) need not yet carry `pattern_scope`, nor a reference architecture's `implements`; every other pattern must.
 
 `composes` mirrors the document's Building Blocks table for the boxes that are catalogued: ABBs in an architecture pattern, SBBs in a reference architecture, which the schema enforces. Local roles and technologies are not catalogued and are not listed. The inverse is `composed_by` on the ABB or SBB. An architecture pattern carries no `implements`, and a reference architecture no `implemented_by`.
 
@@ -786,6 +841,30 @@ affects: [SBB-001, DN-002]           # required, >=1: the artefacts that carry i
 The decision record lists the same items in `consequences.technical_debt`, and the repaying decision in `repays_debt`. A repository usually keeps debt as rows of a register (`decisions/technical-debt.csv` in the `/architecture check` layout), with a page for an item that needs more than a row.
 
 **Schema:** [`schemas/v1.1.0/technical-debt.schema.json`](./schemas/v1.1.0/technical-debt.schema.json).
+
+### 6.23 Candidate
+
+A possible pattern, noted but not formally one yet: a light page of its own, so that what a repository's portfolio holds is still said only in front matter. A candidate is not an artefact of its kind, so it does not carry the envelope's required fields, mints no identifier, and carries no `portfolio.state` but `needs-conversion`, which the convert skill sets on a source it cannot convert yet. When it is committed, the `portfolio` skill promotes it to a placeholder of its type, moving the page so its history follows it.
+
+```yaml
+kind: candidate
+title: Event-sourced ledger
+candidate_type: architecture-pattern   # optional: architecture-pattern | reference-architecture | collaboration | use-case
+description: "Keep a ledger as an append-only log of events, and derive balances from it."
+created: 2026-07-07
+portfolio: { priority: medium, target_quarter: "2027-Q2" }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `kind` | `candidate` | * | |
+| `title` | string | * | The possible pattern's name. |
+| `candidate_type` | enum | optional | What it would be, when that is known. |
+| `id` | kebab-case slug | optional | Never a series identifier. |
+| `description`, `owner`, `created`, `last_modified`, `tags` | | optional | As in the envelope. |
+| `portfolio` | object | optional | §2.9; its `state`, if any, is `needs-conversion`. |
+
+**Schema:** [`schemas/v1.1.0/candidate.schema.json`](./schemas/v1.1.0/candidate.schema.json).
 
 The kinds and their relationships are drawn, generated from these schemas, in [the schema picture](../docs/schema.md).
 

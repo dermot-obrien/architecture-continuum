@@ -1,0 +1,429 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ServiceNow Knowledge Agent in Teams</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: a reference architecture sheet. One solution diagram in four trust zones over a governance band, then the two data paths, the decisions with their reasons, the risks, and a triage under the bundle's own standard. Palette and type from the bundle's visual design standard. */
+:root {
+  --bg: #F0F2F5; --panel: #FFFFFF; --ink: #2C3038; --ink-2: #5E6B7F; --rule: #BFC5CC; --head: #1A1A2E;
+  --accent: #B83A5C; --accent-soft: #F6DBE2;
+  --query: #B83A5C; --ingest: #4B5BAA; --govern: #5E6B7F;
+  --z1: #F7F8FA; --z2: #F4F1F9; --z3: #EEF3FA; --z4: #F8F1EE; --zg: #F0F2F5;
+  --box: #FFFFFF; --box-line: #8D8D97;
+  --warn: #9A6B00; --block: #C2303A; --ok: #17803D;
+  --f-body: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+    --accent: #E8738F; --accent-soft: #3A2030; --query: #E8738F; --ingest: #8C99D8; --govern: #AFB5BF;
+    --z1: #1A1B29; --z2: #211C30; --z3: #1A2233; --z4: #2A1F1D; --zg: #171826;
+    --box: #23243A; --box-line: #6B7280; --warn: #E3B341; --block: #F07A80; --ok: #5CCB86; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+  --accent: #E8738F; --accent-soft: #3A2030; --query: #E8738F; --ingest: #8C99D8; --govern: #AFB5BF;
+  --z1: #1A1B29; --z2: #211C30; --z3: #1A2233; --z4: #2A1F1D; --zg: #171826;
+  --box: #23243A; --box-line: #6B7280; --warn: #E3B341; --block: #F07A80; --ok: #5CCB86; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 26px; }
+h1, h2, h3 { color: var(--head); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.35rem, 2.4vw, 1.7rem); }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--accent); }
+.mono { font-family: var(--f-mono); font-size: 0.82em; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--ink-2); }
+section.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 3vw, 30px); display: grid; gap: 18px; }
+.figure { overflow-x: auto; }
+.figure svg { display: block; width: 100%; min-width: 980px; height: auto; }
+svg text { font-family: var(--f-body); fill: var(--ink); font-size: 12.5px; }
+svg .t { font-weight: 700; fill: var(--head); font-size: 14px; }
+svg .z { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; fill: var(--ink-2); font-weight: 600; }
+svg .n { font-family: var(--f-mono); font-size: 11px; font-weight: 600; fill: var(--panel); }
+svg .zone { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 5 4; }
+svg .box { fill: var(--box); stroke: var(--box-line); stroke-width: 1; }
+svg .q { stroke: var(--query); stroke-width: 2.4; fill: none; }
+svg .i { stroke: var(--ingest); stroke-width: 2.4; fill: none; }
+svg .qd { stroke: var(--query); stroke-width: 1.6; fill: none; stroke-dasharray: 6 4; }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.9rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 22px; height: 3px; margin-right: 6px; vertical-align: 4px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+.cols > * { min-width: 0; }
+ol.path { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+ol.path li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; font-size: 0.97rem; }
+ol.path .k { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; color: var(--panel); margin-top: 1px; }
+.tablewrap { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 0.93rem; min-width: 760px; }
+table.t th, table.t td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.t th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+table.t td:first-child { font-weight: 700; color: var(--head); }
+.pill { display: inline-block; font-family: var(--f-mono); font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; color: var(--panel); }
+ul.risks { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+ul.risks li { border-left: 3px solid var(--warn); padding: 2px 0 2px 12px; font-size: 0.96rem; }
+ul.risks li.hi { border-color: var(--block); }
+.callout { background: var(--accent-soft); border-radius: 4px; padding: 14px 16px; display: grid; gap: 6px; }
+.callout strong { color: var(--head); }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.96rem; }
+footer { font-size: 0.86rem; color: var(--ink-2); display: grid; gap: 4px; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:12px">
+    <span class="eyebrow">Test case · solution design · 28 October 2026</span>
+    <h1>ServiceNow knowledge agent in Teams</h1>
+    <p style="font-size:1.08rem">A Copilot Studio agent that answers staff questions in Microsoft Teams from ServiceNow knowledge articles, set up the way Microsoft's current documentation recommends. The agent reuses the tenant's existing ServiceNow Knowledge Copilot connector connection, <span class="mono">servicenowkb3</span>, which indexes articles into Microsoft Graph with each article's ServiceNow read permissions carried across, so every answer is grounded only in articles the asking user could open in ServiceNow. The agent doesn't own that connection: it also feeds Microsoft Search and Microsoft 365 Copilot, and its configuration bounds what the agent can answer, so it is checked rather than set up here.</p>
+  </header>
+
+  <section class="panel">
+    <div class="figure">
+      <svg viewBox="0 0 1200 792" role="img" aria-labelledby="dia-t">
+        <title id="dia-t">Solution diagram: staff ask in Teams; the Copilot Studio agent retrieves permission-trimmed ServiceNow articles from the Microsoft Graph index, populated by the ServiceNow Knowledge Copilot connector; governance spans Power Platform, Microsoft 365, Purview and Agent 365.</title>
+        <defs>
+          <marker id="mq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--query)"/></marker>
+          <marker id="mi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ingest)"/></marker>
+        </defs>
+
+        <!-- Zones -->
+        <rect x="16" y="20" width="214" height="556" rx="6" class="zone" style="fill:var(--z1)"/>
+        <text x="30" y="44" class="z">PEOPLE AND CHANNEL</text>
+        <rect x="248" y="20" width="326" height="556" rx="6" class="zone" style="fill:var(--z2)"/>
+        <text x="262" y="44" class="z">POWER PLATFORM · MANAGED ENVIRONMENT</text>
+        <rect x="592" y="20" width="290" height="556" rx="6" class="zone" style="fill:var(--z3)"/>
+        <text x="606" y="44" class="z">MICROSOFT 365 TENANT</text>
+        <rect x="900" y="20" width="284" height="556" rx="6" class="zone" style="fill:var(--z4)"/>
+        <text x="914" y="44" class="z">SERVICENOW INSTANCE</text>
+
+        <!-- Zone 1 -->
+        <rect x="36" y="70" width="174" height="86" rx="4" class="box"/>
+        <text x="50" y="96" class="t">Staff</text>
+        <text x="50" y="118">Members of the agent's</text>
+        <text x="50" y="134">Entra security group</text>
+        <rect x="36" y="250" width="174" height="150" rx="4" class="box"/>
+        <text x="50" y="276" class="t">Microsoft Teams</text>
+        <text x="50" y="298">Teams + Microsoft 365</text>
+        <text x="50" y="314">channel</text>
+        <text x="50" y="338">Approved by an admin,</text>
+        <text x="50" y="354">shown to one group,</text>
+        <text x="50" y="370">not the whole organisation</text>
+
+        <!-- Zone 2 -->
+        <rect x="268" y="70" width="286" height="330" rx="4" class="box"/>
+        <text x="284" y="96" class="t">Copilot Studio agent</text>
+        <text x="284" y="120">Authenticate with Microsoft (Entra SSO)</text>
+        <text x="284" y="138">Shared with one security group</text>
+        <text x="284" y="156">Generative orchestration</text>
+        <text x="284" y="180">Off: web search, general knowledge,</text>
+        <text x="284" y="196">ungrounded responses</text>
+        <text x="284" y="220">Instructions: answer only from articles,</text>
+        <text x="284" y="236">cite them, else point to the portal</text>
+        <text x="284" y="260">Content moderation: high</text>
+        <rect x="284" y="278" width="254" height="56" rx="3" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:1"/>
+        <text x="298" y="300" class="t" style="font-size:13px">Knowledge</text>
+        <text x="298" y="320">Connection servicenowkb3 only</text>
+        <text x="284" y="360">Tenant graph grounding with</text>
+        <text x="284" y="376">semantic search: on</text>
+        <rect x="268" y="440" width="286" height="100" rx="4" class="box"/>
+        <text x="284" y="464" class="t">Lifecycle</text>
+        <text x="284" y="486">Dev, test and production environments</text>
+        <text x="284" y="504">Solutions, pipelines, Git source</text>
+        <text x="284" y="522">Application Insights telemetry</text>
+
+        <!-- Zone 3 -->
+        <rect x="612" y="70" width="250" height="120" rx="4" class="box"/>
+        <text x="626" y="94" class="t">Microsoft Graph semantic index</text>
+        <text x="626" y="116">ServiceNow articles as external</text>
+        <text x="626" y="132">items, each with its read ACL</text>
+        <text x="626" y="154">Results trimmed to the asking user</text>
+        <text x="626" y="172">Indexing quota applies</text>
+        <rect x="612" y="236" width="250" height="190" rx="4" class="box"/>
+        <text x="626" y="258" class="t">Connection servicenowkb3</text>
+        <text x="626" y="276" style="fill:var(--ink-2)">ServiceNow Knowledge Copilot connector</text>
+        <text x="626" y="298">Existing and tenant-wide: also feeds</text>
+        <text x="626" y="314">Microsoft Search and M365 Copilot</text>
+        <text x="626" y="336">Check: Federated Auth; Advanced flow</text>
+        <text x="626" y="352">if scripted user criteria; only people</text>
+        <text x="626" y="368">with access; query string limits the</text>
+        <text x="626" y="384">knowledge bases; rollout audience</text>
+        <text x="626" y="406">Owned by the Microsoft 365 admin</text>
+        <rect x="612" y="456" width="250" height="90" rx="4" class="box"/>
+        <text x="626" y="478" class="t">Microsoft Entra ID</text>
+        <text x="626" y="500">Users and groups; ServiceNow email</text>
+        <text x="626" y="516">mapped to UPN or mail</text>
+        <text x="626" y="534">Issues the connector's OIDC token</text>
+
+        <!-- Zone 4 -->
+        <rect x="920" y="70" width="244" height="82" rx="4" class="box"/>
+        <text x="934" y="92" class="t">Knowledge bases</text>
+        <text x="934" y="114">kb_knowledge: active, published</text>
+        <text x="934" y="132">Attachments and knowledge blocks</text>
+        <rect x="920" y="170" width="244" height="70" rx="4" class="box"/>
+        <text x="934" y="192" class="t">User criteria, roles, groups</text>
+        <text x="934" y="212">Can read and cannot read, at</text>
+        <text x="934" y="228">knowledge base and article level</text>
+        <rect x="920" y="258" width="244" height="110" rx="4" class="box"/>
+        <text x="934" y="280" class="t">Integration user</text>
+        <text x="934" y="300">Machine identity, OIDC provider</text>
+        <text x="934" y="318">Custom read role on the tables</text>
+        <text x="934" y="336">HR content reader if HR bases</text>
+        <text x="934" y="354">Microsoft 365 IPs allowlisted</text>
+        <rect x="920" y="386" width="244" height="84" rx="4" class="box"/>
+        <text x="934" y="408" class="t">Scripted REST API</text>
+        <text x="934" y="428">user_criteria_v2, user_changes</text>
+        <text x="934" y="446">Auditing on identity tables</text>
+        <rect x="920" y="488" width="244" height="58" rx="4" class="box"/>
+        <text x="934" y="510" class="t">Service Portal</text>
+        <text x="934" y="530">Where citations open the article</text>
+
+        <!-- Query path -->
+        <line x1="123" y1="156" x2="123" y2="246" class="q" marker-end="url(#mq)"/>
+        <circle cx="123" cy="201" r="10" style="fill:var(--query)"/><text x="123" y="205" text-anchor="middle" class="n">1</text>
+        <line x1="210" y1="300" x2="264" y2="300" class="q" marker-end="url(#mq)"/>
+        <circle cx="237" cy="300" r="10" style="fill:var(--query)"/><text x="237" y="304" text-anchor="middle" class="n">2</text>
+        <line x1="554" y1="120" x2="608" y2="120" class="q" marker-end="url(#mq)"/>
+        <circle cx="581" cy="120" r="10" style="fill:var(--query)"/><text x="581" y="124" text-anchor="middle" class="n">3</text>
+        <line x1="612" y1="160" x2="558" y2="160" class="q" marker-end="url(#mq)"/>
+        <circle cx="585" cy="160" r="10" style="fill:var(--query)"/><text x="585" y="164" text-anchor="middle" class="n">4</text>
+        <line x1="268" y1="370" x2="214" y2="370" class="q" marker-end="url(#mq)"/>
+        <circle cx="241" cy="370" r="10" style="fill:var(--query)"/><text x="241" y="374" text-anchor="middle" class="n">5</text>
+        <path d="M123 400 V562 H1042 V550" class="qd" marker-end="url(#mq)"/>
+        <circle cx="430" cy="562" r="10" style="fill:var(--query)"/><text x="430" y="566" text-anchor="middle" class="n">6</text>
+
+        <!-- Ingestion path -->
+        <line x1="862" y1="300" x2="916" y2="300" class="i" marker-end="url(#mi)"/>
+        <circle cx="889" cy="300" r="10" style="fill:var(--ingest)"/><text x="889" y="304" text-anchor="middle" class="n">A</text>
+        <line x1="920" y1="118" x2="866" y2="252" class="i" marker-end="url(#mi)"/>
+        <circle cx="893" cy="185" r="10" style="fill:var(--ingest)"/><text x="893" y="189" text-anchor="middle" class="n">B</text>
+        <line x1="920" y1="428" x2="866" y2="384" class="i" marker-end="url(#mi)"/>
+        <circle cx="893" cy="406" r="10" style="fill:var(--ingest)"/><text x="893" y="410" text-anchor="middle" class="n">C</text>
+        <line x1="737" y1="236" x2="737" y2="194" class="i" marker-end="url(#mi)"/>
+        <circle cx="737" cy="214" r="10" style="fill:var(--ingest)"/><text x="737" y="218" text-anchor="middle" class="n">D</text>
+        <line x1="737" y1="456" x2="737" y2="430" class="i" marker-end="url(#mi)"/>
+        <circle cx="757" cy="443" r="10" style="fill:var(--ingest)"/><text x="757" y="447" text-anchor="middle" class="n">E</text>
+
+        <!-- Governance band -->
+        <rect x="16" y="596" width="1168" height="182" rx="6" class="zone" style="fill:var(--zg)"/>
+        <text x="30" y="620" class="z">GOVERNANCE AND OPERATIONS</text>
+        <g>
+          <rect x="32" y="634" width="220" height="130" rx="4" class="box"/>
+          <text x="46" y="656" class="t" style="font-size:13px">Power Platform admin center</text>
+          <text x="46" y="678">Data policy: sign-in required,</text>
+          <text x="46" y="694">knowledge only from Copilot</text>
+          <text x="46" y="710">connectors, no HTTP requests,</text>
+          <text x="46" y="726">no public websites</text>
+          <text x="46" y="748">Copilot credit cap</text>
+
+          <rect x="264" y="634" width="220" height="130" rx="4" class="box"/>
+          <text x="278" y="656" class="t" style="font-size:13px">Microsoft 365 and Teams admin</text>
+          <text x="278" y="678">Agent approval and availability</text>
+          <text x="278" y="700">Connector setup, staged rollout,</text>
+          <text x="278" y="716">indexed item and user counts</text>
+          <text x="278" y="738">Validate an article's permissions</text>
+          <text x="278" y="754">by its sys_id</text>
+
+          <rect x="496" y="634" width="220" height="130" rx="4" class="box"/>
+          <text x="510" y="656" class="t" style="font-size:13px">Microsoft Purview, Sentinel</text>
+          <text x="510" y="678">Maker and agent audit logs</text>
+          <text x="510" y="694">in Purview</text>
+          <text x="510" y="716">Alerts on agent activity</text>
+          <text x="510" y="732">in Sentinel</text>
+
+          <rect x="728" y="634" width="220" height="130" rx="4" class="box"/>
+          <text x="742" y="656" class="t" style="font-size:13px">Microsoft Agent 365</text>
+          <text x="742" y="678">Agent as an Entra identity</text>
+          <text x="742" y="694">Conditional Access, inventory</text>
+          <text x="742" y="710">Network egress controls</text>
+          <text x="742" y="732" style="fill:var(--ink-2)">Optional, where onboarded</text>
+
+          <rect x="960" y="634" width="208" height="130" rx="4" class="box"/>
+          <text x="974" y="656" class="t" style="font-size:13px">Licensing and cost</text>
+          <text x="974" y="678">Users with a Microsoft 365</text>
+          <text x="974" y="694">Copilot licence: grounded</text>
+          <text x="974" y="710">answers not billed</text>
+          <text x="974" y="732">Others: Copilot Credits,</text>
+          <text x="974" y="748">capped pay-as-you-go</text>
+        </g>
+      </svg>
+    </div>
+    <div class="legend"><span><i style="background:var(--query)"></i>Answering a question (1 to 6)</span><span><i style="background:var(--ingest)"></i>Indexing articles and permissions (A to E)</span><span><i style="background:var(--rule)"></i>Trust zone boundary</span></div>
+  </section>
+
+  <section class="panel">
+    <div class="cols">
+      <div style="display:grid;gap:10px">
+        <h2>How a question is answered</h2>
+        <ol class="path">
+          <li><span class="k" style="background:var(--query)">1</span><span>A member of the agent's security group asks a question in Teams.</span></li>
+          <li><span class="k" style="background:var(--query)">2</span><span>Teams passes the question with the user's Entra identity. With Authenticate with Microsoft the user isn't prompted to sign in.</span></li>
+          <li><span class="k" style="background:var(--query)">3</span><span>The agent queries the Graph index as that user, through the <span class="mono">servicenowkb3</span> connection, which is its only knowledge source.</span></li>
+          <li><span class="k" style="background:var(--query)">4</span><span>The index returns only the articles whose ACL admits that user, as mapped from ServiceNow user criteria.</span></li>
+          <li><span class="k" style="background:var(--query)">5</span><span>The agent answers from those articles alone, with citations, or says it has no article and points to the portal.</span></li>
+          <li><span class="k" style="background:var(--query)">6</span><span>A citation opens the article in the ServiceNow Service Portal, where ServiceNow applies its own access check again.</span></li>
+        </ol>
+      </div>
+      <div style="display:grid;gap:10px">
+        <h2>How articles get there</h2>
+        <p class="muted" style="font-size:0.95rem">This is what <span class="mono">servicenowkb3</span> does if it is configured as recommended. Each step is something to confirm on the existing connection, not something this agent sets up.</p>
+        <ol class="path">
+          <li><span class="k" style="background:var(--ingest)">A</span><span>The connector signs in to ServiceNow with Federated Auth: an Entra-issued OIDC token for a machine integration user, so there's no secret to store or rotate.</span></li>
+          <li><span class="k" style="background:var(--ingest)">B</span><span>It crawls published, active articles in the chosen knowledge bases: changes every 15 minutes, a full crawl daily.</span></li>
+          <li><span class="k" style="background:var(--ingest)">C</span><span>In the Advanced flow it evaluates script-based user criteria through the scripted REST API, and picks up identity changes every 30 minutes.</span></li>
+          <li><span class="k" style="background:var(--ingest)">D</span><span>It writes each article into the Graph index with a read ACL built from its knowledge base and article user criteria.</span></li>
+          <li><span class="k" style="background:var(--ingest)">E</span><span>ServiceNow users are matched to Entra users by email against UPN or mail, so the ACL names real tenant identities.</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Design decisions</h2>
+    <div class="tablewrap"><table class="t">
+      <thead><tr><th>Decision</th><th>Chosen</th><th>Set aside</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>How knowledge reaches the agent</td><td>The ServiceNow Knowledge Copilot connector, through the existing connection <span class="mono">servicenowkb3</span></td><td>The Power Platform ServiceNow connector as real-time knowledge</td><td>Microsoft's guidance is to start with Copilot connectors for knowledge Q&amp;A at scale, with citations and index-speed retrieval. Real-time knowledge is still preview, and needs every user to have a ServiceNow connection of their own. Keep the Power Platform connector for a later phase of actions, such as raising an incident.</td></tr>
+        <tr><td>Reuse or a dedicated connection</td><td>Reuse <span class="mono">servicenowkb3</span>, if its checks pass</td><td>A new connection for this agent alone</td><td>Reuse avoids indexing the same articles twice and keeps one permission model across Search, Microsoft 365 Copilot and the agent. Create a dedicated connection only if the agent needs a narrower set of knowledge bases than the shared connection's query string, or if <span class="mono">servicenowkb3</span> can't be brought up to the settings below without affecting its other users.</td></tr>
+        <tr><td>Connector sign-in to ServiceNow</td><td>Federated Auth</td><td>Basic authentication; OAuth with a client secret</td><td>Microsoft's recommended option: Entra issues the token, so no password or secret is stored or rotated.</td></tr>
+        <tr><td>Permission flow</td><td>Advanced, if any user criterion uses a script; Simple otherwise</td><td>Simple everywhere</td><td>The Simple flow can't evaluate scripts. It skips a scripted allow criterion, which can overshare, and treats a scripted deny as deny-all.</td></tr>
+        <tr><td>Who sees indexed articles</td><td>Only people with access in ServiceNow</td><td>Everyone</td><td>Keeps ServiceNow's read rules intact in every answer.</td></tr>
+        <tr><td>What is indexed</td><td>Published, active articles in the knowledge bases chosen for this agent, by query string</td><td>The whole instance</td><td>A smaller blast radius, a cleaner index, less indexing quota. Leave HR and other sensitive bases out until their permissions are proven.</td></tr>
+        <tr><td>User sign-in</td><td>Authenticate with Microsoft</td><td>Manual authentication</td><td>Microsoft's choice for the built-in Teams and Microsoft 365 channel: single sign-on with no prompt, and sharing controls who can chat. Confirm in your tenant that Graph connector knowledge returns results under this option; see the checks below.</td></tr>
+        <tr><td>Grounding</td><td>Web search, general knowledge and ungrounded responses off; one knowledge source</td><td>Defaults</td><td>The agent answers from ServiceNow articles or not at all. Instructions alone don't enforce that; the settings do.</td></tr>
+        <tr><td>Distribution</td><td>Admin-approved, shown to one security group, rolled out to a pilot first</td><td>Shown to everyone in the organisation</td><td>Publishing doesn't deploy anything by itself; approval and availability are the gate. Widen the audience once the permission checks pass.</td></tr>
+        <tr><td>Where it is built</td><td>A dedicated production Managed Environment, fed from dev and test by pipelines</td><td>The default environment</td><td>Data policies, ALM and auditing apply cleanly, and makers can't change production directly.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="panel">
+    <div class="cols">
+      <div style="display:grid;gap:12px">
+        <h2>Risks to watch</h2>
+        <p class="muted">The architectural risk here is oversharing through permissions that don't survive the trip from ServiceNow into the index. Most of these failures are silent.</p>
+        <ul class="risks">
+          <li class="hi"><b>HR-scoped user criteria.</b> Without an HR Core reader or admin role, the service account gets empty results instead of an error, and HR articles can be indexed as open to all.</li>
+          <li class="hi"><b>Articles with no user criteria.</b> They appear to everyone when <span class="mono">glide.knowman.block_access_with_no_user_criteria</span> is false.</li>
+          <li><b>Unreadable system properties.</b> Without read access to <span class="mono">sys_properties</span>, the connector silently falls back to the most restrictive defaults, and articles go missing with no error.</li>
+          <li><b>Permission lag.</b> The 15-minute crawl doesn't pick up knowledge-base-level permission changes. Those wait for the daily full crawl, unless identity sync is set up in the Advanced flow.</li>
+          <li><b>Identity mismatches.</b> A ServiceNow user whose email matches no Entra UPN or mail gets no access, and a wrong match gets the wrong access.</li>
+          <li><b>Article content as untrusted input.</b> Many people can contribute to a knowledge base. An article's text goes into the model's context, so contribution rights matter, even though the agent has no tools to misuse.</li>
+          <li><b>Confabulation and staleness.</b> Answers can paraphrase wrongly or cite a since-retired article. The controls are evals on real questions with costed false positives, and citations shown to the user. See the evaluation plan.</li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h2>Triage under the bundle's standard</h2>
+        <div class="tablewrap"><table class="t" style="min-width:0">
+          <thead><tr><th>Driver</th><th>Answer</th><th>Tier</th></tr></thead>
+          <tbody>
+            <tr><td>Reach and agency</td><td><span class="mono">read</span>, <span class="mono">none</span>: retrieval from a live index, trimmed to the caller; no tools</td><td>AT2</td></tr>
+            <tr><td>Data</td><td>Internal; confidential if any chosen base is restricted</td><td>AT1 to AT2</td></tr>
+            <tr><td>Exposure</td><td>Staff</td><td>AT1</td></tr>
+            <tr><td>Untrusted content</td><td>Articles by internal contributors, read-only session</td><td>AT1 to AT2</td></tr>
+            <tr><td>Effect on people</td><td>Must say it is AI</td><td>AT1</td></tr>
+            <tr><td>Novelty</td><td>The connection exists; Copilot Studio may not be onboarded yet</td><td>AT1, or AT3 until onboarded</td></tr>
+            <tr><td>Reversibility</td><td>Two-way door</td><td>AT1</td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout">
+          <strong>Result: AT2 Standard, once the platform is onboarded</strong>
+          <span>If this is the organisation's first Copilot Studio agent, onboard Copilot Studio as a platform first. That assessment sets the envelope this agent and later ones inherit: identity, logging, data policy and channel approval. Until then the novelty driver holds the agent at AT3. <span class="mono">servicenowkb3</span> is already in the landscape, but its permission fidelity is what this agent's answers inherit. If it was never assessed, its checks below are part of this assessment, and their results are worth recording against the connection itself, so later agents reuse them.</span>
+        </div>
+        <div class="callout" style="background:var(--bg)">
+          <strong>What the test case shows about the standard</strong>
+          <span>The reach definitions need one clarification. An indexed enterprise source the agent retrieves from, trimmed to the user, is <span class="mono">read</span>, not <span class="mono">knowledge</span>, even though there are no tools. <span class="mono">knowledge</span> is for content loaded into the agent's own configuration. Separately, "untrusted content" should cover content many people can edit, not only content from outside.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="evals">
+    <div style="display:grid;gap:6px">
+      <span class="eyebrow">Evaluation plan</span>
+      <h2>Evals, and why F1 alone would mislead here</h2>
+      <p class="muted">Each eval names its positive class and sets a separate ceiling on each kind of error, because here the two kinds cost very differently. Thresholds are a starting proposal for the owner to confirm. All but the online signals run in Copilot Studio's agent evaluation, and the gating ones run through its REST API in the pipeline before test is promoted to production.</p>
+    </div>
+    <div class="tablewrap"><table class="t">
+      <thead><tr><th>Eval</th><th>Positive class</th><th>False positive, and its cost</th><th>False negative, and its cost</th><th>Threshold</th><th>Copilot Studio method</th></tr></thead>
+      <tbody>
+        <tr><td>Answer or abstain</td><td>The agent answers</td><td>Answers a question no article supports, or from the wrong article. Staff act on wrong guidance with a citation that looks authoritative.</td><td>Declines a question an article answers. A ticket the agent could have saved.</td><td>False positives at most 2%; false negatives at most 20%; F0.5 reported, never F1 alone</td><td>Custom, with four labels: answered correctly, declined correctly, answered wrongly, declined wrongly. General quality treats a correct refusal as a failure, so it can't be used here</td></tr>
+        <tr><td>Answer correctness</td><td>The answer says what the article says</td><td>Paraphrase changes the meaning: a step dropped, a condition reversed</td><td>Not applicable: scored on answered cases only</td><td>At least 90% of answered cases pass, with the pass score calibrated against human labels</td><td>Compare meaning, against answers written by knowledge base owners; general quality for groundedness</td></tr>
+        <tr><td>Retrieval and citation</td><td>A cited article is relevant</td><td>Cites an irrelevant, outdated or retired article</td><td>Misses the article that holds the answer</td><td>Citation precision at least 95%; the expected article among those cited in at least 85% of cases</td><td>Keyword match on the expected article number</td></tr>
+        <tr><td>Permission leakage</td><td>Content from an article the test user may not read appears</td><td>Any occurrence. This is a security failure, not a quality trade-off</td><td>Not applicable</td><td><b>Zero</b> in at least 300 probes across test users, which bounds the true rate below 1% at 95% confidence</td><td>Test set user profiles for test users with different access; keyword match on canary phrases planted in restricted test articles</td></tr>
+        <tr><td>Content safety</td><td>Harmful content in a response</td><td>Any response above the permitted level</td><td>Not applicable</td><td>Strictest level for each of the four types</td><td>Content safety</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cols">
+      <div style="display:grid;gap:10px">
+        <h3>F1 and its limits</h3>
+        <ul class="plain">
+          <li><b>F1 weighs both errors equally.</b> It is the harmonic mean of precision and recall, 2PR / (P + R). Here a confident wrong answer costs far more than a polite "I can't find that", so F1 would reward trading one for the other.</li>
+          <li><b>Report F0.5 instead.</b> F-beta is (1 + β²)PR / (β²P + R); β = 0.5 counts precision as more important than recall. Gate on the two floors, not on any single score: a better F-score bought by losing precision is a worse agent.</li>
+          <li><b>Name the positive class.</b> "Precision" means nothing until the eval says whether a positive is an answer, a relevant article or a leak.</li>
+          <li><b>Balance the test set on purpose.</b> If it holds only answerable questions, precision can't be measured honestly. Plan about 60% answerable questions across the chosen knowledge bases, 25% in-domain questions no article answers, and 15% out of scope.</li>
+          <li><b>Leakage is not on the curve.</b> It is never traded for recall, so it has its own zero-tolerance eval.</li>
+          <li><b>Report intervals.</b> 90% on 100 cases is roughly 83% to 95% at 95% confidence (Wilson). Zero failures in n probes bounds the rate only at about 3 in n, which is why the leakage eval needs about 300 probes.</li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:10px;align-content:start">
+        <h3>Building and running the test set</h3>
+        <ul class="plain">
+          <li>Draw questions from real demand: ServiceNow portal searches with no click, and incident short descriptions. Knowledge base owners write the expected answers and article numbers.</li>
+          <li>Set up test users whose ServiceNow access differs (for example, one with HR access and one without). Plant canary phrases in restricted test articles indexed by <span class="mono">servicenowkb3</span>, and probe for them as the users who shouldn't see them.</li>
+          <li>Calibrate the LLM graders on at least 50 human-labelled cases before trusting their pass scores.</li>
+          <li>Run the gating evals before every promotion to production, after a model change, and weekly, because the knowledge bases change under the agent with every crawl.</li>
+          <li>Online, in production: watch the thumbs-down rate, the decline rate and the unanswered-question log. Feed unanswered questions to knowledge base owners as gaps; that is the agent's recall improving at the source.</li>
+          <li>Copilot Studio evaluations support only agents on No authentication or Authenticate with Microsoft, which is one more reason for the sign-in choice above.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="background:var(--bg)">
+      <strong>Added to the AI solution lens (0.2.0) by this test case</strong>
+      <span><span class="mono">AIS-EVAL-06</span>: a positive class, with separate false-positive and false-negative thresholds weighted by cost, not F1 or accuracy alone. <span class="mono">AIS-EVAL-07</span>: abstention evaluated with unanswerable questions. <span class="mono">AIS-EVAL-08</span>: permission trimming tested as different users, zero tolerance, gating. <span class="mono">AIS-EVAL-09</span>: enough cases behind each threshold, with intervals.</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Checks on servicenowkb3</h2>
+    <p class="muted">In the Microsoft 365 admin center, under Copilot, then Connectors, open the connection whose ID is <span class="mono">servicenowkb3</span>. Each row is a condition for reusing it as this agent's knowledge source.</p>
+    <div class="tablewrap"><table class="t">
+      <thead><tr><th>Setting</th><th>Needed for this agent</th><th>If it isn't</th></tr></thead>
+      <tbody>
+        <tr><td>Access permissions</td><td>Only people with access to this data source</td><td><span class="pill" style="background:var(--block)">Blocker</span> With Everyone, every indexed article is open to every user of Search, Microsoft 365 Copilot and the agent. Change it, or use a dedicated connection.</td></tr>
+        <tr><td>Authentication type</td><td>Federated Auth</td><td><span class="pill" style="background:var(--warn)">Major</span> Basic or OAuth with a stored secret works, but means a credential to protect and rotate. Plan the move to Federated Auth.</td></tr>
+        <tr><td>User criteria flow</td><td>Advanced, if any user criterion uses a script</td><td><span class="pill" style="background:var(--block)">Blocker</span> On the Simple flow, scripted allow criteria are skipped, which overshares. Check with the <span class="mono">user_criteria?advanced=true</span> query.</td></tr>
+        <tr><td>Query string</td><td>Only the knowledge bases this agent should answer from, published and active</td><td>Wider is a data-scope decision for the owner: the agent answers from whatever the connection indexes and the user can read. Narrower than the agent needs means a dedicated connection.</td></tr>
+        <tr><td>Knowledge bases in scope</td><td>Any HR Service Delivery base covered by the service account's HR content reader role</td><td><span class="pill" style="background:var(--block)">Blocker</span> Without the role, HR articles can be indexed as open to everyone, with no error.</td></tr>
+        <tr><td>Service account</td><td>Read on the documented tables, including <span class="mono">sys_properties</span>; write on <span class="mono">oauth_credential</span>; no <span class="mono">snc_read_only</span></td><td><span class="pill" style="background:var(--warn)">Major</span> Missing reads silently drop articles or fall back to restrictive defaults. Run the Copilot Connector Checker.</td></tr>
+        <tr><td>Rollout audience</td><td>Includes everyone in the agent's security group</td><td>A limited-audience connection returns nothing to users outside that audience, so the agent gives them no answers.</td></tr>
+        <tr><td>Identity mapping</td><td>ServiceNow email matches Entra UPN or mail, or a custom formula is in place</td><td><span class="pill" style="background:var(--warn)">Major</span> Unmatched users see nothing; wrongly matched users see the wrong articles.</td></tr>
+        <tr><td>Sync health</td><td>Ready, with a recent full crawl, and the indexed count matching ServiceNow's published count</td><td>Investigate before relying on answers. Identity sync every 30 minutes needs the Advanced flow with <span class="mono">user_changes</span>.</td></tr>
+        <tr><td>Ownership and siblings</td><td>A named owner; known purpose of any other ServiceNow connections</td><td>The 3 in the name suggests other ServiceNow connections exist. Attaching two that index the same articles duplicates results, and a change to <span class="mono">servicenowkb3</span> by its owner changes this agent's answers. Agree change notice with that owner.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="panel">
+    <h2>Check in your tenant before building</h2>
+    <ul class="plain">
+      <li>That the agent returns Graph connector results in Teams under Authenticate with Microsoft. Microsoft's knowledge page says the <span class="mono">ExternalItem.Read.All</span> scope must be in the manual authentication setting, while its authentication page says to use Authenticate with Microsoft for the Teams and Microsoft 365 channel. If the scope isn't granted, use manual Entra ID authentication with Teams single sign-on.</li>
+      <li>Whether any user criteria use scripts: <span class="mono">/api/now/table/user_criteria?advanced=true&amp;sysparm_limit=1</span> on the instance. If any do, use the Advanced flow.</li>
+      <li>The service account's table access, with Microsoft's Copilot Connector Checker.</li>
+      <li>After the first full crawl, the indexed article count against the expected count, and the permissions of a few known restricted articles by <span class="mono">sys_id</span>.</li>
+      <li>Licensing: who has a Microsoft 365 Copilot licence, and the credit cap for everyone else.</li>
+      <li>Whether Microsoft Agent 365 is onboarded, so the agent can be governed as an Entra identity.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Sources, Microsoft Learn: <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-graph-vs-power-platform-connectors">Copilot connectors versus Power Platform connectors</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-connectors">Copilot connectors as knowledge</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-real-time-connectors">Power Platform connectors as knowledge (preview)</a>; <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/connectors/servicenow-knowledge-deployment">Deploy the ServiceNow Knowledge connector</a>; <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/connectors/servicenow-knowledge-admin-setup">ServiceNow-side setup</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication">User authentication</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/security-and-governance">Security and governance</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/faq-billing-licensing">Billing and licensing FAQ</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/analytics-agent-evaluation-intro">Agent evaluation</a>; <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/analytics-agent-evaluation-overview">Evaluation test methods</a>.</span>
+    <span>Researched on 28 October 2026. The page describes the documented configuration; it has not been built or tested in a tenant.</span>
+  </footer>
+</div>
+
+</body></html>

@@ -176,6 +176,23 @@ test("without the skill installed, the door script says so in one line and exits
   }
 });
 
+test("regenerate writes the portfolio's inventory page when it is bound and the portfolio skill is installed", () => {
+  write(".agents/skill-bindings.toml", '[suite.portfolio]\ninventory = "../docs/portfolio.md"\n');
+  // A stand-in for the portfolio skill: it records how it was run, where the real one writes the page.
+  write(".agents/skills/portfolio/scripts/portfolio.py",
+    "import os, sys\nos.makedirs('docs', exist_ok=True)\nopen('docs/portfolio.md', 'w').write(' '.join(sys.argv[1:]) + '\\n')\n");
+  const lines = [];
+  const err = console.error;
+  console.error = (m) => lines.push(m);
+  try {
+    assert.equal(regenerate(repo, { env: {} }), 0);
+  } finally {
+    console.error = err;
+  }
+  assert.equal(fs.readFileSync(path.join(repo, "docs", "portfolio.md"), "utf8"), "inventory\n");
+  assert.ok(!lines.some((l) => l.startsWith("inventory skipped")), lines.join("\n"));
+});
+
 test("with the skill but none of the others, regenerate and check skip each step in one line and exit 0", () => {
   write(".agents/skill-bindings.toml", '[suite.architecture]\nroot = "../docs"\n[suite.use-case]\noutputDir = "../docs/uc"\n[suite.workspace]\ndecks = "../static/decks"\n');
   fs.mkdirSync(path.join(repo, "docs", "uc"), { recursive: true });
@@ -191,6 +208,7 @@ test("with the skill but none of the others, regenerate and check skip each step
   }
   assert.deepEqual(lines, [
     "diagram regeneration skipped: the pattern and model skills are not installed",
+    "inventory skipped: no inventory page is bound ([suite.portfolio] inventory)",
     "deck publishing skipped: the markdown-deck skill is not installed",
     "continuum check skipped: the architecture skill is not installed",
     "cross-reference check skipped: the cross-reference skill is not installed",

@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assessment Viewpoints Deck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root { color-scheme: light; --bg: #E9EBEF; --ink: #2C3038; --muted: #5E6B7F; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: Carlito, Calibri, Arial, sans-serif; }
+header { max-width: 1200px; margin: 0 auto; padding: 24px 16px 8px; }
+header h1 { margin: 0; font-size: 28px; }
+header p { margin: 4px 0 0; color: var(--muted); }
+main { max-width: 1200px; margin: 0 auto; padding: 8px 16px 48px; display: grid; gap: 28px; }
+.slide { margin: 0; }
+.frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.18); background: #fff; }
+.canvas { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.canvas > section { position: relative; width: 1920px; height: 1080px; box-sizing: border-box; overflow: hidden; }
+.canvas * { box-sizing: border-box; margin: 0; }
+.canvas ul, .canvas ol { padding-left: 1.2em; }
+.canvas table { border-collapse: collapse; width: 100%; }
+.canvas th, .canvas td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #D5D7DF; vertical-align: top; }
+x-shape { display: block; }
+x-shape[kind="ellipse"] { border-radius: 50%; }
+x-shape[kind="rounded"] { border-radius: 16px; }
+x-shape[kind="arrow-right"] { clip-path: polygon(0 30%, 70% 30%, 70% 0, 100% 50%, 70% 100%, 70% 70%, 0 70%); }
+figcaption { display: flex; gap: 16px; padding: 8px 2px 0; font-size: 14px; color: var(--muted); line-height: 1.45; }
+figcaption .num { flex: none; font-weight: 700; }
+</style>
+</head>
+<body>
+<header><h1>Assessment Viewpoints Deck</h1><p>One assessment method, read from six seats · Where assessment sits, and how each role takes part</p></header>
+<main>
+<figure class="slide" id="cover">
+<div class="frame"><div class="canvas">
+<section id="cover" data-transition="fade" style="background:#1A1A2E;color:#F4F5F8;font-family:'Carlito', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:4px;text-transform:uppercase;color:#E8738F">Architecture continuum · draft standard 0.7.0</p>
+<h1 style="font-size:120px;font-weight:700;line-height:1.05;color:#F4F5F8">Assessment viewpoints</h1>
+<p style="font-size:44px;line-height:1.3;color:#C9CCD6;width:1400px">One assessment method, read from six seats: leadership, the design author, the assessor, the service owner, the specialist assessors, and AI teams.</p>
+<div style="display:flex;gap:24px">
+<p style="font-size:28px;background:#2A2B44;color:#F4F5F8;padding:16px 28px;border-radius:999px">121 criteria in four lenses</p>
+<p style="font-size:28px;background:#2A2B44;color:#F4F5F8;padding:16px 28px;border-radius:999px">26 blockers</p>
+<p style="font-size:28px;background:#2A2B44;color:#F4F5F8;padding:16px 28px;border-radius:999px">Triage tiers AT1 to AT4</p>
+</div>
+
+</section>
+</div></div>
+<figcaption><span class="num">1 / 7</span><span class="notes">The deck condenses the six viewpoint panels of the Assessment Viewpoints page, one slide each. Figures are from the draft Architecture Assessment Standard 0.7.0, the triage standard 0.3.0, and the lenses: core 0.6.0, AI solution 0.4.0, AI agent 0.1.0, production 0.1.1.</span></figcaption>
+</figure>
+<figure class="slide" id="leadership">
+<div class="frame"><div class="canvas">
+<section id="leadership" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 1 · Architecture leadership</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">Where assessment sits on the continuum</h2>
+<div style="display:flex;align-items:center;gap:28px;background:#1A1A2E;padding:24px 32px;border-radius:8px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#E8738F;white-space:nowrap">TRIAGE FIRST</p>
+<p style="font-size:28px;line-height:1.3;color:#F4F5F8">The tier, AT1 Light to AT4 Critical, sets the depth, the assessors, the evidence and the approver before any assessment starts.</p>
+</div>
+<div style="display:flex;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#5E6B7F">R0</p>
+<p style="font-size:24px">Unrecognised</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#5E6B7F">R1</p>
+<p style="font-size:24px">Named</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#5E6B7F">R2</p>
+<p style="font-size:24px">Bounded</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #1A1A2E;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#1A1A2E">R3</p>
+<p style="font-size:24px">Decided</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #1A1A2E;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#1A1A2E">R4</p>
+<p style="font-size:24px">Buildable</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #1A1A2E;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#1A1A2E">R5</p>
+<p style="font-size:24px">Proven</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#B83A5C;border:2px solid #B83A5C;border-radius:8px;padding:18px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;font-weight:600;color:#FBFBF8">R6</p>
+<p style="font-size:24px;color:#FBFBF8">In service</p>
+</div>
+</div>
+<div style="display:flex;gap:16px">
+<div style="width:704px;flex:none;display:flex;flex-direction:column;justify-content:center;padding:18px;border-left:4px solid #BFC5CC">
+<p style="font-size:24px;line-height:1.35;color:#5E6B7F">Up to R2 the ladder's own checks hold. Assessment gates the moves from R2 upwards.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#DBDEEE;border-radius:8px;padding:18px">
+<p style="font-size:24px;font-weight:700;color:#1A1A2E">Into R3: review</p>
+<p style="font-size:24px;line-height:1.3">The logical pattern and its decisions</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#DBDEEE;border-radius:8px;padding:18px">
+<p style="font-size:24px;font-weight:700;color:#1A1A2E">Into R4: review or evaluation</p>
+<p style="font-size:24px;line-height:1.3">Reference architecture and cost model</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#F3E3DC;border-radius:8px;padding:18px">
+<p style="font-size:24px;font-weight:700;color:#1A1A2E">Into R5: evidence review</p>
+<p style="font-size:24px;line-height:1.3">Does the build exercise the design?</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#F6DBE2;border-radius:8px;padding:18px">
+<p style="font-size:24px;font-weight:700;color:#1A1A2E">Into R6: production entry</p>
+<p style="font-size:24px;line-height:1.3">Formal, with the owner's approval</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.35;color:#2C3038">Throughout: a tool check on every change, re-assessment on the tier's cadence, and an incident assessment when a criterion should have caught a failure.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">2 / 7</span><span class="notes">Triage is the front door: a few questions about reach, agency, data, exposure, untrusted content, effect on people, novelty and reversibility give a tier, the highest any one driver gives. The tier then fixes how the gates below are run. Architecture authors the artefacts up to R4; R5 and R6 rest on implementation evidence that architecture receives.</span></figcaption>
+</figure>
+<figure class="slide" id="author">
+<div class="frame"><div class="canvas">
+<section id="author" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 2 · Design author</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">Getting a design ready to be assessed</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="width:560px;flex:none;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:44px;font-weight:700;line-height:1.2;color:#1A1A2E">The assessment reads what you wrote, and only that.</p>
+<p style="font-size:28px;line-height:1.35">A quality the design meets but does not state counts as a quality it does not meet.</p>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFFFF;border-left:6px solid #C2303A;padding:20px 24px;border-radius:4px">
+<h3 style="font-size:28px;font-weight:700;color:#1A1A2E">Core blockers to clear first</h3>
+<ul style="font-size:24px;line-height:1.4">
+<li>Goals, non-goals and stakeholders with concerns</li>
+<li>Every reference resolves</li>
+<li>Quality scenarios with a measure</li>
+<li>Every trust-boundary crossing authenticated</li>
+<li>Nothing outside the target state without an approved exception</li>
+</ul>
+</div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">1</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Ask for triage</h3>
+<p style="font-size:24px;line-height:1.35">The tier sets the depth, evidence and approver.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">2</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Read the lenses</h3>
+<p style="font-size:24px;line-height:1.35">Each criterion names the fields it reads.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">3</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Write the specification</h3>
+<p style="font-size:24px;line-height:1.35">From the solution design template, or YAML against the schema.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">4</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Run the check yourself</h3>
+<p style="font-size:24px;line-height:1.35">Validate, then walk the 53 tool criteria.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">5</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Clear the blockers</h3>
+<p style="font-size:24px;line-height:1.35">One open blocker means not endorsed.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:24px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#4B5BAA">6</p>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Act on the findings</h3>
+<p style="font-size:24px;line-height:1.35">Fix, decide, record debt, or the owner accepts the risk.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">3 / 7</span><span class="notes">Common gaps reviewers find: "fast" with no number; no failure scenario for a dependency the team does not control; a trust-boundary connector with no authentication; decisions without alternatives; open questions left in prose; evidence from an earlier version. The core lens also asks about target state (CORE-TGT-01 to 05): nothing retired used, every departure recorded as a decision, and anything not-target, or a new use of something contained, only under an exception approved through escalation. A design written from the pattern skill's solution design template is translated into a specification table by table.</span></figcaption>
+</figure>
+<figure class="slide" id="assessor">
+<div class="frame"><div class="canvas">
+<section id="assessor" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 3 · Assessor</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">Running an assessment</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:520px;flex:none;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Eight steps, after ISO/IEC/IEEE 42020</h3>
+<ol style="font-size:26px;line-height:1.5">
+<li>Prepare: version and digest</li>
+<li>Select the lenses</li>
+<li>Check: validate, run tool rules</li>
+<li>Review the remaining criteria</li>
+<li>Evaluate, at evaluation depth</li>
+<li>Dispose of every shortfall</li>
+<li>Decide the outcome</li>
+<li>Record and hand over</li>
+</ol>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Who decides each of the 121 criteria</h3>
+<div style="display:flex;align-items:center;gap:16px">
+<p style="width:190px;flex:none;font-size:26px;font-weight:700">core</p>
+<div style="display:flex;height:40px">
+<div style="width:322px;background:#4B5BAA"></div><div style="width:182px;background:#4A90D9"></div><div style="width:210px;background:#C4724E"></div>
+</div>
+<p style="font-size:26px;font-weight:700">51</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<p style="width:190px;flex:none;font-size:26px;font-weight:700">ai-solution</p>
+<div style="display:flex;height:40px">
+<div style="width:154px;background:#4B5BAA"></div><div style="width:154px;background:#4A90D9"></div><div style="width:84px;background:#C4724E"></div>
+</div>
+<p style="font-size:26px;font-weight:700">28</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<p style="width:190px;flex:none;font-size:26px;font-weight:700">ai-agent</p>
+<div style="display:flex;height:40px">
+<div style="width:126px;background:#4B5BAA"></div><div style="width:126px;background:#4A90D9"></div><div style="width:70px;background:#C4724E"></div>
+</div>
+<p style="font-size:26px;font-weight:700">23</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<p style="width:190px;flex:none;font-size:26px;font-weight:700">production</p>
+<div style="display:flex;height:40px">
+<div style="width:140px;background:#4B5BAA"></div><div style="width:84px;background:#4A90D9"></div><div style="width:42px;background:#C4724E"></div>
+</div>
+<p style="font-size:26px;font-weight:700">19</p>
+</div>
+<div style="display:flex;gap:28px;flex-wrap:wrap">
+<p style="font-size:24px"><span style="color:#4B5BAA"><b>Tool</b></span> 53</p>
+<p style="font-size:24px"><span style="color:#2F6FB0"><b>Tool checks, reviewer judges</b></span> 39</p>
+<p style="font-size:24px"><span style="color:#A2552F"><b>Reviewer</b></span> 29</p>
+</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<p style="font-size:24px;background:#17803D;color:#FBFBF8;padding:8px 18px;border-radius:999px">Endorsed: no open blocker or major</p>
+<p style="font-size:24px;background:#9A6B00;color:#FBFBF8;padding:8px 18px;border-radius:999px">With conditions: majors dated</p>
+<p style="font-size:24px;background:#C2303A;color:#FBFBF8;padding:8px 18px;border-radius:999px">Not endorsed: a blocker is open</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">4 / 7</span><span class="notes">Bars are to scale, 14 pixels per criterion. Finding types come from ATAM: gap, risk, non-risk, sensitivity point, trade-off point, observation. From AT2 at least one assessor must not have written or delivered the design; at AT1 the team assesses itself. An agent may assess, with provenance; a person confirms the outcome. A fourth outcome, deferred, applies when the specification does not validate or its evidence is missing.</span></figcaption>
+</figure>
+<figure class="slide" id="owner">
+<div class="frame"><div class="canvas">
+<section id="owner" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 4 · Service owner</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">Approving a solution for production</h2>
+<div style="display:flex;gap:48px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">The evidence on your desk, for the version being released</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Design review</p>
+<p style="font-size:24px;line-height:1.3">Endorsed, conditions closed</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">As-built record</p>
+<p style="font-size:24px;line-height:1.3">What was built, every departure</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Hand-overs</p>
+<p style="font-size:24px;line-height:1.3">Security, privacy, AI impact: none failed</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Rollback test</p>
+<p style="font-size:24px;line-height:1.3">Done, point of no return known</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Recovery and load</p>
+<p style="font-size:24px;line-height:1.3">Tested against RTO, RPO and peak</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Support team</p>
+<p style="font-size:24px;line-height:1.3">Hours, on-call, escalation</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:1px solid #BFC5CC;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Readiness review</p>
+<p style="font-size:24px;line-height:1.3">Runbook, alerting on every SLO</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">Residual risk</p>
+<p style="font-size:24px;line-height:1.3">Owned by someone entitled to accept it</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FFFFFF;border:2px solid #C2303A;border-radius:8px;padding:18px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">AI release gates</p>
+<p style="font-size:24px;line-height:1.3">Evals pass; agent controls tested</p>
+</div>
+</div>
+<p style="font-size:24px;color:#5E6B7F"><span style="color:#C2303A"><b>Red border:</b></span> a blocker in the production lens.</p>
+</div>
+<div style="width:560px;flex:none;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">As built against as designed</h3>
+<div style="display:flex;justify-content:space-between;background:#F3E3DC;border-radius:6px;padding:12px 18px"><p style="font-size:24px">Irrelevant, consistent, compliant</p><p style="font-size:24px;font-weight:700;color:#C2303A">Not endorsable</p></div>
+<div style="display:flex;justify-content:space-between;background:#DAE9F7;border-radius:6px;padding:12px 18px"><p style="font-size:24px">Conformant</p><p style="font-size:24px;font-weight:700;color:#7A5500">If extras are decisions</p></div>
+<div style="display:flex;justify-content:space-between;background:#DAE9F7;border-radius:6px;padding:12px 18px"><p style="font-size:24px;font-weight:700">Fully conformant</p><p style="font-size:24px;font-weight:700;color:#17803D">Endorsable</p></div>
+<div style="display:flex;justify-content:space-between;background:#F3E3DC;border-radius:6px;padding:12px 18px"><p style="font-size:24px">Non-conformant</p><p style="font-size:24px;font-weight:700;color:#C2303A">Not endorsable</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#F6DBE2;border-radius:8px;padding:20px;flex:1;justify-content:center">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">You approve or decline, by name and date.</p>
+<p style="font-size:24px;line-height:1.35">Conditions need an owner and a due date and never sit on a blocker.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">5 / 7</span><span class="notes">The production entry assessment is the gate from R5 to R6. It checks that what was built is the design that was assessed, and that it can be run. At AT1 the team runs the production lens's tool criteria and the owner approves; from AT2 it is a review with an independent lead. A solution that departs from its design needs a new, assessed version of the design; a condition does not cover it.</span></figcaption>
+</figure>
+<figure class="slide" id="specialists">
+<div class="frame"><div class="canvas">
+<section id="specialists" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 5 · Security, privacy and compliance</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">Where architecture ends and your assessment begins</h2>
+<div style="display:flex;gap:12px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#DBDEEE;border-radius:8px 0 0 8px;padding:28px">
+<h3 style="font-size:32px;font-weight:700;color:#1A1A2E">Architecture reads the design</h3>
+<ul style="font-size:24px;line-height:1.45">
+<li>Trust zones and what crosses them</li>
+<li>Authentication on every crossing</li>
+<li>The identity each service and agent runs as</li>
+<li>Where untrusted content enters</li>
+</ul>
+</div>
+<div style="width:220px;flex:none;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#EBE3F5;padding:20px">
+<p style="font-size:30px;font-weight:700;color:#1A1A2E;text-align:center">Threat model</p>
+<p style="font-size:24px;text-align:center;color:#5E6B7F">the only overlap</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F3E3DC;border-radius:0 8px 8px 0;padding:28px">
+<h3 style="font-size:32px;font-weight:700;color:#1A1A2E">You read the running system</h3>
+<ul style="font-size:24px;line-height:1.45">
+<li>Are controls implemented and effective?</li>
+<li>Is the privacy or AI impact acceptable?</li>
+<li>Does it conform to the regulation?</li>
+<li>Is residual risk accepted by its owner?</li>
+</ul>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border-left:6px solid #4B5BAA;border-radius:4px;padding:20px 24px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">At design review</p>
+<p style="font-size:24px;line-height:1.35">Your assessment is named and handed over, with the threat model and the findings behind it.</p>
+</div>
+<x-shape kind="arrow-right" style="width:80px;height:40px;background:#5E6B7F"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border-left:6px solid #B83A5C;border-radius:4px;padding:20px 24px">
+<p style="font-size:26px;font-weight:700;color:#1A1A2E">At production entry</p>
+<p style="font-size:24px;line-height:1.35">Your outcome returns as evidence for the version released. A failed outcome is a blocker.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.35"><b>Not a lens.</b> Your assessment reads a different object, follows its own method, often needs an accredited assessor, and ends in an acceptance only its owner can give.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">6 / 7</span><span class="notes">Methods on the specialist side include NIST SP 800-53A, an ISO/IEC 27001 audit and ISO/IEC 42005. The design-facing part of privacy can be a lens: a privacy-by-design lens, brought in by a personal-data profile, is a candidate.</span></figcaption>
+</figure>
+<figure class="slide" id="ai">
+<div class="frame"><div class="canvas">
+<section id="ai" data-transition="fade" style="background:#F4F5F8;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Viewpoint 6 · AI and agent teams</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;color:#1A1A2E">What changes with models and agents</h2>
+<div style="display:flex;gap:48px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">AI solution lens · 28 criteria, 3 blockers</h3>
+<ul style="font-size:24px;line-height:1.4">
+<li>Evals with a metric and threshold, gating release</li>
+<li>Retrieval trimmed to what the caller may see</li>
+<li>Output constrained and validated before it acts</li>
+<li>False positives and false negatives capped separately by cost, not F1 alone</li>
+<li>Abstention tested with questions no source answers</li>
+<li>Permission leakage tested with zero tolerance</li>
+<li>Enough cases behind every threshold</li>
+</ul>
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Agent lens · 23 criteria, 9 blockers</h3>
+<p style="font-size:24px;line-height:1.4">Every action listed; dangerous ones approved or limited outside the agent; its own identity; a kill switch that works without it.</p>
+</div>
+<div style="width:660px;flex:none;display:flex;flex-direction:column;gap:16px">
+<div style="position:relative;width:640px;height:520px">
+<x-shape kind="ellipse" style="position:absolute;left:40px;top:0px;width:320px;height:320px;background:#9B72CF;opacity:0.45"></x-shape>
+<x-shape kind="ellipse" style="position:absolute;left:280px;top:0px;width:320px;height:320px;background:#4A90D9;opacity:0.45"></x-shape>
+<x-shape kind="ellipse" style="position:absolute;left:160px;top:200px;width:320px;height:320px;background:#C4724E;opacity:0.45"></x-shape>
+<p style="position:absolute;left:70px;top:110px;width:150px;font-size:26px;font-weight:700;color:#1A1A2E">Untrusted input</p>
+<p style="position:absolute;left:430px;top:110px;width:150px;font-size:26px;font-weight:700;color:#1A1A2E">Sensitive data</p>
+<p style="position:absolute;left:220px;top:420px;width:200px;font-size:26px;font-weight:700;color:#1A1A2E;text-align:center">Acts or sends outside</p>
+<x-shape kind="ellipse" style="position:absolute;left:290px;top:198px;width:60px;height:60px;background:#C2303A"></x-shape>
+<p style="position:absolute;left:290px;top:208px;width:60px;font-size:28px;font-weight:700;color:#FBFBF8;text-align:center">No</p>
+</div>
+<p style="font-size:24px;line-height:1.35"><b>AGT-INJ-01.</b> No session holds all three. If one must, it does not run unattended.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B7F">Assessment viewpoints · draft Architecture Assessment Standard 0.7.0</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">7 / 7</span><span class="notes">A model is a technology or SBB with an ai facet; an agent is a service that also has an agent facet. The facets bring in the extra lenses, and the core lens still applies. The four new evaluation criteria are AIS-EVAL-06 to 09. At production entry the gating evals must pass on the release candidate, and for an agent a control test must show its limits and kill switch work without its cooperation. The lethal trifecta in a session that runs unattended makes the subject AT4 in triage.</span></figcaption>
+</figure>
+</main>
+<script>
+function fit() { document.querySelectorAll(".frame").forEach(f => { f.firstElementChild.style.transform = "scale(" + (f.clientWidth / 1920) + ")"; }); }
+window.addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>

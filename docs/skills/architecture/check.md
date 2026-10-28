@@ -60,7 +60,7 @@ warn  REL-002  runtime/services/SV-001-pipeline/index.md: SBB-003 realised_by_se
 Each line is the level, the code, the file relative to the root and the disagreement. The codes
 are listed in the skill's `SKILL.md`; in short, `CONT` is the layout, `FM` the front matter
 against its schema, `ID` identifiers against the schemes, `REG` registers against pages, `REL`
-relations that resolve and agree with their inverses, `PAT` the two kinds of pattern document,
+relations that resolve and agree with their inverses, `PAT` the kinds of pattern document,
 `MOD` diagrams and their exported views, `DEC` considerations against decisions and `CAL` the
 calibration. Errors fail the check; warnings fail it only with `--strict`.
 
