@@ -2,7 +2,7 @@
 document_type: standards
 title: "Assessment Triage Standard"
 classification: internal
-version: 0.3.0
+version: 0.4.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -116,11 +116,13 @@ Triage is declared before the specification is complete, and it is checked once 
 |---|---|---|---|---|
 | Typical subject | A staff knowledge assistant on internal documents; a conventional internal solution on target components | A read-only agent over internal systems; a customer-facing solution on catalogued components | An agent that writes to internal systems without per-action approval; anything reaching outside the organisation; restricted data | A trifecta session; an agent that acts unattended on external systems or with money; a high-risk AI system |
 | Depth | Check, and the team answers the blocker criteria itself | Review | Review, or evaluation for a one-way door | Evaluation |
-| Assessors | The team, with the tool | One independent assessor | Independent lead and a security architect | Independent lead, security architect, an AI or agent specialist, and the stakeholders |
-| Reviewer criteria | Blockers only | All that apply | All that apply | All that apply, with the utility tree |
+| Assessors | The team, with the tool | An advice process by default: the decider seeks and records advice; one independent assessor where the owner asks for a gate | Independent lead and a security architect | Independent lead, security architect, an AI or agent specialist, and the stakeholders |
+| Reviewer criteria | Blockers only | Blockers, and the majors in the areas the drivers point at | All that apply | All that apply, with the utility tree |
 | Evidence, beyond the specification | A threat-model checklist; evals for every model-backed element | A threat model; a cost model where one is required | Injection tests where untrusted content is read; a load test | A red-team report; control tests for every agent; the AI impact assessment |
 | Hand-overs | Only those an obligation requires | A baseline security assessment | A full security assessment; a privacy impact assessment when personal data is held | As AT3, with the AI impact assessment, and conformity assessment when high-risk |
-| Approval | The subject's owner | The architecture lead | The architecture board or its delegate, with the service owner | The architecture board and the accountable executive who owns the risk |
+| Output | The record | The record and a one-page summary | The record, the report and a readout | As AT3 |
+| Target time to a proposed outcome | The same day | One session; five working days | Ten working days | As planned for the evaluation |
+| Approval | The subject's owner | The decider, accountable under the advice process, or the architecture lead where a gate is used | The architecture board or its delegate, with the service owner | The architecture board and the accountable executive who owns the risk |
 | Into production | The team runs the production lens's tool criteria and the owner approves | Production entry assessment | Production entry assessment | Production entry assessment, and a staged rollout: a run in shadow or with every action approved, before autonomy is raised |
 | Assessed again | On a material change | Yearly and on a change | Every six months and on a change | Every quarter, and on any change to its tools, model, data or autonomy |
 
