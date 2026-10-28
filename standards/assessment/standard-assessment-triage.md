@@ -2,7 +2,7 @@
 document_type: standards
 title: "Assessment Triage Standard"
 classification: internal
-version: 0.1.0
+version: 0.2.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -98,11 +98,17 @@ An agent is placed on two axes. Reach is what it can touch, which is the tiering
 
 A prohibited practice under the EU AI Act is not tiered. Triage stops, and the subject is not assessed for approval.
 
-### 3.3 Overrides and derivation
+### 3.3 Target-state positions are attested
+
+Whether a building block belongs to the target state is a judgement about where the organisation is going, not a property of the design. It is made by the architect responsible for the target architecture the block belongs to (an enterprise architect, or the domain architect for a platform), never by the design's author and never by an assessing agent. Triage asks that architect for the position of every building block the subject uses, and records it in the triage record's `target_state`: the element, its catalogue identifier if it has one, its position (`target`, `in-flight`, `baseline`, `retiring` or `retired`), its successor when the architect has named one, who attested it and when. Where an architect maintains `lifecycle_state` in the catalogue, that is the same attestation, kept once for every design that uses the block.
+
+The positions feed two things. The novelty driver: a block at `baseline` or `retiring` is a departure, AT2. And the core lens's target-state criteria (`CORE-TGT-01` to `04`), which read the attestation rather than guess at it. A block with no attested position is a question for that architect; the assessment can proceed, but reports the gap as a condition.
+
+### 3.4 Overrides and derivation
 
 An owner or the architecture function may raise a tier, with a reason recorded in the triage record. Nobody may lower one; a driver that seems to overstate the risk is answered by changing the design (removing a leg of the trifecta, adding human approval, narrowing the data), and triaging again.
 
-Triage is declared before the specification is complete, and it is checked once it is. The check depth derives reach, agency, data, exposure and untrusted content from the specification (the columns headed "Read from the specification" above, `data.classification`, `data.personal` and `design.exposure`) and reports any driver that derives higher than declared. The derived tier wins, as derived stages win on the definition ladder: an assessment under way at too low a tier stops and resumes at the right one.
+Triage is declared before the specification is complete, and it is checked once it is. The check depth derives reach, agency, data, exposure and untrusted content from the specification (the columns headed "Read from the specification" above, `data.classification`, `data.personal` and `design.exposure`) and reports any driver that derives higher than declared. The derived tier wins, as derived stages win on the definition ladder: an assessment under way at too low a tier stops and resumes at the right one. Novelty is derived from the elements and the attested positions: an `sbb` or `technology` with no `ref` is new to the landscape, one attested at `baseline` or `retiring` is a departure, and a subject inherits from a platform, and avoids the novelty driver for it, only when the platform's element names the assessment that admitted it in `assessed_by`. A novelty answer with nothing to cite is a question for the requester, not an assumption.
 
 ## 4. The tiers
 
@@ -118,6 +124,8 @@ Triage is declared before the specification is complete, and it is checked once 
 | Into production | The team runs the production lens's tool criteria and the owner approves | Production entry assessment | Production entry assessment | Production entry assessment, and a staged rollout: a run in shadow or with every action approved, before autonomy is raised |
 | Assessed again | On a material change | Yearly and on a change | Every six months and on a change | Every quarter, and on any change to its tools, model, data or autonomy |
 
+The evidence row is what the tier requires by the time the subject enters production. At a design review, evidence that can exist only once the solution is built (eval reports, test results, hand-over outcomes) is not yet due: the assessment judges its plan instead, and the production entry assessment requires the evidence (assessment standard, section 5). The lenses in a plan are those of the assessment about to run; the `production` lens joins only the production entry assessment.
+
 The lenses do not change with the tier; the profile brings them in, as the assessment standard says. What the tier changes is how much of each lens a person must answer, who that person is, and what evidence they need. AT1 is the only tier with no independent assessor, which is what the assessment standard's design review requires; at AT1 there is no design review, only a check that the team owns.
 
 ## 5. Changes and re-triage
@@ -128,7 +136,7 @@ A change is triaged again before it is assessed. A change that leaves every driv
 
 A platform assessment is made once, at the highest tier the platform will host, and it produces two things its tenants use. The first is an envelope: the highest reach, agency, data classification, exposure and tier a tenant may have and still run on the platform. The second is a list of inherited controls: criteria the platform answers for every tenant, such as the agent's identity (`AGT-ID-01`), limits held outside the agent (`AGT-ACT-03`), the kill switch (`AGT-CTL-01`), trajectory logging and the tracing of model calls.
 
-A subject inside the envelope of an assessed platform records those criteria as `met` by inheritance, citing the platform's assessment record, and its assessors answer only the rest. Inheritance lowers the effort of an assessment, never its tier: an agent at AT3 on an assessed platform is still assessed and approved as AT3. A subject outside the envelope inherits nothing, and its triage says so. When the platform's assessment lapses or its envelope shrinks, its tenants are triaged again.
+A subject inside the envelope of an assessed platform records those criteria as `met` by inheritance, citing the platform's assessment record, and its assessors answer only the rest. The subject's specification shows the inheritance through the platform's element, whose `assessed_by` names that record. Inheritance lowers the effort of an assessment, never its tier: an agent at AT3 on an assessed platform is still assessed and approved as AT3. A subject outside the envelope inherits nothing, and its triage says so. When the platform's assessment lapses or its envelope shrinks, its tenants are triaged again.
 
 This is how a configured agent on an approved agent platform gets a light assessment and a custom-built agent does not: the controls that matter most for agents are assessed once, where they are implemented.
 

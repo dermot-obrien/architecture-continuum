@@ -444,6 +444,7 @@
         "realises": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The elements of the abstraction above that this one realises: an sbb realises abbs, a service realises sbbs." },
         "deployed_to": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
         "trust_zone": { "$ref": "#/$defs/localId" },
+        "assessed_by": { "type": "string", "pattern": "^AS-\\d{3}$", "description": "The component onboarding or platform assessment that admitted this element to the landscape. Triage derives novelty and platform inheritance from it." },
         "owner": { "type": "string", "description": "The team that owns and runs it." },
         "responsibilities": { "type": "array", "items": { "type": "string" } },
         "technology": { "type": "string", "description": "The named technology, on an sbb, technology, service, store or node." },
@@ -509,7 +510,19 @@
               "metric": { "type": "string" },
               "threshold": { "type": "string" },
               "gating": { "type": "boolean", "description": "A release cannot ship when the eval fails." },
-              "judge_calibrated": { "type": "boolean", "description": "For an llm-judge eval: agreement with human labels has been measured." }
+              "judge_calibrated": { "type": "boolean", "description": "For an llm-judge eval: agreement with human labels has been measured." },
+              "positive_class": { "type": "string", "description": "What counts as a positive in this eval, for example 'the agent answers' or 'the article is relevant'. Without it, precision, recall and F1 have no meaning." },
+              "errors": {
+                "type": "object",
+                "description": "The two kinds of error, each with what it means here and the highest rate the design accepts. Set separately because they rarely cost the same.",
+                "additionalProperties": false,
+                "properties": {
+                  "false_positive": { "$ref": "#/$defs/evalError" },
+                  "false_negative": { "$ref": "#/$defs/evalError" }
+                }
+              },
+              "zero_tolerance": { "type": "boolean", "description": "A single failure fails the eval, as for leaking content a user may not read." },
+              "sample_size": { "type": "integer", "minimum": 1, "description": "The number of test cases behind the threshold." }
             }
           }
         },
@@ -522,6 +535,17 @@
           "additionalProperties": false,
           "properties": { "max_tokens": { "type": "integer" }, "rate_limit": { "type": "string" }, "budget": { "type": "string" }, "timeout": { "type": "string" } }
         }
+      }
+    },
+
+    "evalError": {
+      "type": "object",
+      "required": ["meaning", "max_rate"],
+      "additionalProperties": false,
+      "properties": {
+        "meaning": { "type": "string", "description": "What this error is in this eval, for example 'answers a question no article supports'." },
+        "max_rate": { "type": "string", "description": "The highest acceptable rate, for example '2%' or '0'." },
+        "cost": { "type": "string", "description": "What the error costs when it happens, which is why the rate is set where it is." }
       }
     },
 

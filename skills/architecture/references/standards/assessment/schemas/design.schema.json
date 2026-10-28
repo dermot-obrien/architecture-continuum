@@ -1,0 +1,658 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design.schema.json",
+  "title": "Design specification (draft 0.1.0)",
+  "description": "A design written as data so that it can be assessed: what the design is, which part of the continuum it sits on, what drives it, the elements and connectors it is made of (each typed by a continuum kind), the scenarios it must satisfy, the decisions and open questions it carries, how it is operated, and the evidence behind it. AI and agent characteristics are facets on elements, never kinds of their own: a model is a technology or SBB with an ai facet, and a runtime agent is a service with an agent facet, as the agent-native standards already say. Identifiers of catalogued artefacts use the envelope's patterns, so a design can cite the catalogue without copying it. Draft: see standards/assessment/standard-architecture-assessment.md.",
+  "type": "object",
+  "required": ["schema", "design", "context", "drivers", "elements", "connectors", "scenarios"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "design/0.1.0" },
+
+    "design": {
+      "type": "object",
+      "required": ["id", "title", "type", "version", "status", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(AP|RA|SD)-\\d{3}$",
+          "description": "AP-NNN for an architecture pattern, RA-NNN for a reference architecture, SD-NNN for a solution design (a reference architecture instantiated for one consumer). SD is proposed by this draft and not yet in the envelope."
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["architecture-pattern", "reference-architecture", "solution-design"] },
+        "scope": { "enum": ["problem", "domain", "capability-area", "platform", "hosting-profile", "epic"] },
+        "version": { "$ref": "envelope.schema.json#/$defs/semver" },
+        "status": { "$ref": "envelope.schema.json#/$defs/status" },
+        "lifecycle_state": { "$ref": "envelope.schema.json#/$defs/lifecycleState" },
+        "owner": { "type": "string", "description": "The accountable owner of the design: a person or a team." },
+        "exposure": { "enum": ["staff", "customers-or-partners", "public", "external-agents"], "description": "Who uses or can reach the solution. A triage driver (standard-assessment-triage.md, section 3.2)." },
+        "authors": { "type": "array", "items": { "type": "string" } },
+        "implements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "anyOf": [ { "$ref": "envelope.schema.json#/$defs/architecturePatternId" }, { "$ref": "envelope.schema.json#/$defs/referenceArchitectureId" } ] },
+          "description": "The architecture patterns a reference architecture applies, or the reference architectures a solution design instantiates."
+        },
+        "source": { "type": "string", "description": "The Markdown document this specification is the data of, when there is one, relative to this file." },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+
+    "context": {
+      "type": "object",
+      "description": "Where the design sits on the continuum. Every field names catalogued artefacts; none is copied.",
+      "additionalProperties": false,
+      "properties": {
+        "landscape": { "$ref": "envelope.schema.json#/$defs/landscapeId" },
+        "platform": { "$ref": "envelope.schema.json#/$defs/platformId" },
+        "bounded_contexts": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/bcId" } },
+        "outcomes": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/outcomeId" } },
+        "realises": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/capabilityId" } },
+        "flows": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "serves": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/useCaseId" } },
+        "products": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/productId" } },
+        "features": { "type": "array", "uniqueItems": true, "items": { "$ref": "envelope.schema.json#/$defs/featureId" } }
+      }
+    },
+
+    "drivers": {
+      "type": "object",
+      "required": ["goals", "stakeholders"],
+      "additionalProperties": false,
+      "properties": {
+        "goals": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "non_goals": { "type": "array", "items": { "type": "string" } },
+        "stakeholders": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["role", "concerns"],
+            "additionalProperties": false,
+            "properties": {
+              "role": { "type": "string" },
+              "concerns": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+            }
+          }
+        },
+        "constraints": { "type": "array", "items": { "$ref": "#/$defs/statement" } },
+        "assumptions": { "type": "array", "items": { "$ref": "#/$defs/statement" } },
+        "obligations": {
+          "type": "array",
+          "description": "Regulatory, contractual and policy obligations the design must meet. Naming them is architecture's job; certifying against them is not.",
+          "items": {
+            "type": "object",
+            "required": ["id", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "$ref": "#/$defs/localId" },
+              "source": { "type": "string", "description": "The instrument, for example the EU AI Act Article 50, ISO/IEC 27001, a contract clause." },
+              "classification": { "type": "string", "description": "How the instrument classes this design, for example 'high-risk, Annex III' or 'limited risk'." },
+              "statement": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "profiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["ai-solution", "ai-agent"] },
+      "description": "Characteristics that bring further lenses into an assessment. Declared, and also checked: an element with an ai facet implies ai-solution, one with an agent facet implies ai-agent."
+    },
+
+    "trust_zones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "trust"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "name": { "type": "string" },
+          "trust": { "enum": ["trusted", "partially-trusted", "untrusted"] },
+          "description": { "type": "string" }
+        }
+      }
+    },
+
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "classification", "owner"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "name": { "type": "string" },
+          "classification": { "$ref": "envelope.schema.json#/$defs/classification" },
+          "personal": { "type": "boolean", "description": "Holds personal information." },
+          "owner": { "$ref": "#/$defs/localId", "description": "The element that owns the data, normally a store or a service." },
+          "residency": { "type": "string" },
+          "retention": { "type": "string" },
+          "lineage": { "type": "string", "description": "Where it comes from and what it is derived from." },
+          "used_for_ai": { "enum": ["none", "training", "fine-tuning", "grounding", "evaluation", "memory", "prompt-context"] }
+        }
+      }
+    },
+
+    "elements": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/element" }
+    },
+
+    "connectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "style"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "from": { "$ref": "#/$defs/localId" },
+          "to": { "$ref": "#/$defs/localId" },
+          "style": { "enum": ["request-response", "event", "stream", "batch", "data-access", "tool-call", "agent-to-agent", "model-inference", "human-handoff"] },
+          "protocol": { "type": "string", "description": "For example https, grpc, amqp, mcp/2026-07-28, a2a/1.0." },
+          "contract": {
+            "anyOf": [ { "$ref": "envelope.schema.json#/$defs/apiId" }, { "$ref": "envelope.schema.json#/$defs/eventId" }, { "type": "string" } ],
+            "description": "The versioned contract the connector carries: API-NNN, EV-NNN, or a reference to a schema."
+          },
+          "context_relationship": { "enum": ["published-language", "open-host-service", "customer-supplier", "conformist", "anti-corruption-layer", "shared-kernel", "partnership", "separate-ways"] },
+          "data": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
+          "authentication": { "type": "string", "description": "How the caller is authenticated, or 'none'." },
+          "authorisation": { "type": "string", "description": "How the call is authorised, or 'none'." },
+          "carries_untrusted_content": { "type": "boolean", "description": "The payload can contain content an attacker could influence: user text, web pages, email, documents, tool output." },
+          "description": { "type": "string" }
+        }
+      }
+    },
+
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "type": { "enum": ["functional", "quality", "failure", "misuse"] },
+          "name": { "type": "string" },
+          "use_case": { "$ref": "envelope.schema.json#/$defs/useCaseId" },
+          "flow": { "type": "string" },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["via"],
+              "additionalProperties": false,
+              "properties": {
+                "via": { "$ref": "#/$defs/localId", "description": "The connector the step travels." },
+                "action": { "type": "string" }
+              }
+            }
+          },
+          "quality_attribute": { "$ref": "#/$defs/qualityCharacteristic" },
+          "source": { "type": "string" },
+          "stimulus": { "type": "string" },
+          "environment": { "type": "string" },
+          "artefact": { "type": "string" },
+          "response": { "type": "string" },
+          "response_measure": { "type": "string" },
+          "importance": { "enum": ["high", "medium", "low"] },
+          "difficulty": { "enum": ["high", "medium", "low"] }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "enum": ["quality", "failure", "misuse"] } } },
+            "then": { "required": ["quality_attribute", "stimulus", "response", "response_measure", "importance"] }
+          }
+        ]
+      }
+    },
+
+    "fitness_functions": {
+      "type": "array",
+      "description": "Checks that keep the design true after it is built: automated where the characteristic can be measured.",
+      "items": {
+        "type": "object",
+        "required": ["id", "characteristic", "measure", "threshold"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "characteristic": { "$ref": "#/$defs/qualityCharacteristic" },
+          "measure": { "type": "string" },
+          "threshold": { "type": "string" },
+          "automated": { "type": "boolean" },
+          "runs": { "enum": ["build", "deploy", "continuous", "scheduled", "manual"] },
+          "scenarios": { "type": "array", "items": { "$ref": "#/$defs/localId" } }
+        }
+      }
+    },
+
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "anyOf": [ { "$ref": "envelope.schema.json#/$defs/drId" }, { "$ref": "#/$defs/localId" } ], "description": "DR-NNN when catalogued; a local id while the decision lives only in the design." },
+          "title": { "type": "string" },
+          "status": { "enum": ["proposed", "accepted", "superseded", "rejected"] },
+          "chosen": { "type": "string" },
+          "alternatives": { "type": "array", "items": { "type": "string" } },
+          "rationale": { "type": "string" },
+          "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
+          "reversibility": { "enum": ["two-way-door", "costly", "one-way-door"] },
+          "technical_debt": { "type": "array", "items": { "$ref": "envelope.schema.json#/$defs/technicalDebtId" } },
+          "departure": {
+            "type": "object",
+            "description": "Set when the decision departs from the target state: TOGAF's dispensation. G253's three answers are to enforce the target, grant time-bound relief, or change the target; a departure records the second, and a consideration asks for the third.",
+            "required": ["from", "kind"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string", "description": "What in the target state the design departs from: a catalogued artefact, a standard, a platform or a pattern." },
+              "kind": { "enum": ["time-bound", "permanent"] },
+              "expires": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+              "path_back": { "type": "string", "description": "How the design returns to the target when the departure expires." }
+            },
+            "allOf": [ { "if": { "properties": { "kind": { "const": "time-bound" } } }, "then": { "required": ["expires", "path_back"] } } ]
+          }
+        }
+      }
+    },
+
+    "considerations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "anyOf": [ { "$ref": "envelope.schema.json#/$defs/considerationId" }, { "$ref": "#/$defs/localId" } ] },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "status": { "enum": ["open", "resolved", "withdrawn"] },
+          "resolved_by": { "type": "string" },
+          "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } }
+        }
+      }
+    },
+
+    "risks": {
+      "type": "array",
+      "description": "Risks the design's authors already know of. An assessment adds its own as findings.",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "statement": { "type": "string" },
+          "likelihood": { "enum": ["high", "medium", "low"] },
+          "impact": { "enum": ["high", "medium", "low"] },
+          "mitigation": { "type": "string" },
+          "owner": { "type": "string" },
+          "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } }
+        }
+      }
+    },
+
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "slos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "objective"],
+            "additionalProperties": false,
+            "properties": { "name": { "type": "string" }, "objective": { "type": "string" }, "applies_to": { "type": "array", "items": { "$ref": "#/$defs/localId" } }, "alerting": { "type": "boolean", "description": "An alert fires, to the support team, when the objective is at risk." } }
+          }
+        },
+        "observability": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "logs": { "type": "boolean" },
+            "metrics": { "type": "boolean" },
+            "traces": { "type": "boolean" },
+            "conventions": { "type": "string", "description": "For example OpenTelemetry semantic conventions, with the GenAI conventions' version where models or agents are traced." },
+            "audit_trail": { "type": "boolean", "description": "Who or what did what, retained and tamper-evident." }
+          }
+        },
+        "deployment": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "strategy": { "type": "string" }, "rollback": { "type": "string" } }
+        },
+        "recovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "rto": { "type": "string" }, "rpo": { "type": "string" }, "degraded_mode": { "type": "string" } }
+        },
+        "cost": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "model": { "type": "string", "description": "Reference to the cost model." }, "unit_cost": { "type": "string" }, "budget": { "type": "string" } }
+        },
+        "runbook": { "type": "string" },
+        "support": {
+          "type": "object",
+          "description": "Who runs the solution in production.",
+          "additionalProperties": false,
+          "properties": {
+            "team": { "type": "string" },
+            "hours": { "type": "string", "description": "For example 24x7, or business hours in a named time zone." },
+            "on_call": { "type": "boolean" },
+            "escalation": { "type": "string" }
+          }
+        },
+        "transition": {
+          "type": "object",
+          "description": "How the solution goes into production and what it replaces.",
+          "additionalProperties": false,
+          "properties": {
+            "cutover": { "type": "string" },
+            "data_migration": { "type": "string" },
+            "point_of_no_return": { "type": "string", "description": "The step after which going back means a recovery, not a rollback." },
+            "decommissions": { "type": "array", "items": { "type": "string" }, "description": "What the solution replaces, and the plan to retire it." }
+          }
+        }
+      }
+    },
+
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "ref"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "type": { "enum": ["cost-model", "load-test", "eval-report", "red-team-report", "threat-model", "security-assessment", "privacy-impact-assessment", "ai-impact-assessment", "conformity-assessment", "experiment", "runbook", "prior-assessment", "as-built-record", "acceptance-test", "operational-readiness", "rollback-test", "recovery-test", "control-test", "other"], "description": "as-built-record: what was built, against which version of the design, with every departure from it. operational-readiness: the outcome of an operational or production readiness review. control-test: a test that a limit, an approval gate or a kill switch works as designed." },
+          "ref": { "type": "string" },
+          "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+          "design_version": { "$ref": "envelope.schema.json#/$defs/semver", "description": "The version of this design the evidence was produced against. A production entry assessment relies only on evidence for the version being released." },
+          "outcome": { "enum": ["passed", "passed-with-conditions", "failed"], "description": "For a test or a handed-over assessment: what it concluded." },
+          "covers": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The scenarios, elements or evals the evidence speaks to." }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "localId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$|^(ABB|SBB|DN|ST|DR|ADR|CN|TD|API|EV)-\\d{3}$",
+      "description": "A kebab-case identifier local to this design, or a catalogue identifier where the thing is catalogued."
+    },
+
+    "statement": {
+      "type": "object",
+      "required": ["id", "statement"],
+      "additionalProperties": false,
+      "properties": { "id": { "$ref": "#/$defs/localId" }, "statement": { "type": "string" }, "source": { "type": "string" } }
+    },
+
+    "qualityCharacteristic": {
+      "description": "ISO/IEC 25010:2023 product quality characteristics, with the AI characteristics ISO/IEC 25059:2023 adds or changes, and cost and sustainability from the Well-Architected frameworks.",
+      "enum": [
+        "functional-suitability", "performance-efficiency", "compatibility", "interaction-capability", "reliability", "security", "maintainability", "flexibility", "safety",
+        "functional-correctness", "robustness", "transparency", "intervenability", "user-controllability", "functional-adaptability",
+        "cost", "sustainability"
+      ]
+    },
+
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "origin": { "enum": ["human", "ai-generated", "ai-assisted"] },
+        "authored_by": { "type": "string" },
+        "review_state": { "enum": ["ai-raw", "ai-verified", "human-reviewed", "human-approved"] }
+      }
+    },
+
+    "element": {
+      "type": "object",
+      "required": ["id", "name", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/localId" },
+        "name": { "type": "string" },
+        "kind": {
+          "enum": ["actor", "external-system", "local-role", "abb", "sbb", "technology", "service", "store", "deployment-node"],
+          "description": "The continuum kind of the box. local-role is an unnamed block in an architecture pattern; abb and sbb are building blocks; technology is a vendor's offering; service, store and deployment-node are the runtime. An actor is a person or team; an external-system is outside the design's scope."
+        },
+        "ref": {
+          "anyOf": [
+            { "$ref": "envelope.schema.json#/$defs/abbId" },
+            { "$ref": "envelope.schema.json#/$defs/sbbId" },
+            { "$ref": "envelope.schema.json#/$defs/dnId" },
+            { "$ref": "envelope.schema.json#/$defs/storeId" },
+            { "type": "string", "pattern": "^SV-\\d{3}$|^[a-z][a-z0-9]*(-[a-z0-9]+)*$" }
+          ],
+          "description": "The catalogued artefact the box is, when it is catalogued."
+        },
+        "part_of": { "$ref": "envelope.schema.json#/$defs/bcId", "description": "The bounded context the element lives in. Every abb, sbb, service and store lives in exactly one." },
+        "realises": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "description": "The elements of the abstraction above that this one realises: an sbb realises abbs, a service realises sbbs." },
+        "deployed_to": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
+        "trust_zone": { "$ref": "#/$defs/localId" },
+        "assessed_by": { "type": "string", "pattern": "^AS-\\d{3}$", "description": "The component onboarding or platform assessment that admitted this element to the landscape. Triage derives novelty and platform inheritance from it." },
+        "owner": { "type": "string", "description": "The team that owns and runs it." },
+        "responsibilities": { "type": "array", "items": { "type": "string" } },
+        "technology": { "type": "string", "description": "The named technology, on an sbb, technology, service, store or node." },
+        "ai": { "$ref": "#/$defs/aiFacet" },
+        "agent": { "$ref": "#/$defs/agentFacet" }
+      },
+      "allOf": [
+        { "if": { "required": ["agent"] }, "then": { "properties": { "kind": { "enum": ["service", "sbb", "abb", "local-role"] } }, "required": ["ai"] } }
+      ]
+    },
+
+    "aiFacet": {
+      "type": "object",
+      "description": "Present on any element that uses a model to produce its output: the model itself, a retrieval pipeline, a judge, an agent.",
+      "required": ["role", "model", "evals", "human_oversight"],
+      "additionalProperties": false,
+      "properties": {
+        "role": { "enum": ["generative", "predictive", "classifier", "embedding", "retrieval", "reranker", "judge", "guard"] },
+        "model": {
+          "type": "object",
+          "required": ["name", "hosting", "version_pinned"],
+          "additionalProperties": false,
+          "properties": {
+            "provider": { "type": "string" },
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "version_pinned": { "type": "boolean" },
+            "hosting": { "enum": ["vendor-api", "managed-platform", "self-hosted", "on-device"] },
+            "fallback_model": { "type": "string" },
+            "card": { "type": "string", "description": "Reference to the model card or system card." }
+          }
+        },
+        "grounding": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sources": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
+            "retrieval": { "enum": ["none", "keyword", "vector", "hybrid", "graph", "tool"] },
+            "access_control": { "enum": ["none", "index-level", "document-level", "caller-permission-trimmed"] },
+            "freshness": { "type": "string" }
+          }
+        },
+        "input_trust": { "enum": ["trusted", "mixed", "untrusted"] },
+        "output_handling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "constrained": { "type": "boolean", "description": "Output is schema-constrained or parsed before use." },
+            "validated": { "type": "boolean", "description": "Output is validated or filtered before it reaches a consumer, a tool or a store." },
+            "rendered_as": { "type": "string", "description": "Where the output ends up: displayed text, a tool argument, code, a query, an email." }
+          }
+        },
+        "evals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "metric", "threshold", "gating"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "$ref": "#/$defs/localId" },
+              "kind": { "enum": ["offline", "online", "red-team", "human-review", "llm-judge", "trajectory"] },
+              "dataset": { "type": "string" },
+              "metric": { "type": "string" },
+              "threshold": { "type": "string" },
+              "gating": { "type": "boolean", "description": "A release cannot ship when the eval fails." },
+              "judge_calibrated": { "type": "boolean", "description": "For an llm-judge eval: agreement with human labels has been measured." },
+              "positive_class": { "type": "string", "description": "What counts as a positive in this eval, for example 'the agent answers' or 'the article is relevant'. Without it, precision, recall and F1 have no meaning." },
+              "errors": {
+                "type": "object",
+                "description": "The two kinds of error, each with what it means here and the highest rate the design accepts. Set separately because they rarely cost the same.",
+                "additionalProperties": false,
+                "properties": {
+                  "false_positive": { "$ref": "#/$defs/evalError" },
+                  "false_negative": { "$ref": "#/$defs/evalError" }
+                }
+              },
+              "zero_tolerance": { "type": "boolean", "description": "A single failure fails the eval, as for leaking content a user may not read." },
+              "sample_size": { "type": "integer", "minimum": 1, "description": "The number of test cases behind the threshold." }
+            }
+          }
+        },
+        "drift_monitoring": { "type": "string" },
+        "fallback": { "type": "string", "description": "What happens when the model is unavailable, too slow, too costly, or wrong beyond a threshold." },
+        "human_oversight": { "enum": ["in-the-loop", "on-the-loop", "after-the-fact", "none"] },
+        "disclosure": { "type": "string", "description": "How users are told they are dealing with AI, or that content is generated." },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "max_tokens": { "type": "integer" }, "rate_limit": { "type": "string" }, "budget": { "type": "string" }, "timeout": { "type": "string" } }
+        }
+      }
+    },
+
+    "evalError": {
+      "type": "object",
+      "required": ["meaning", "max_rate"],
+      "additionalProperties": false,
+      "properties": {
+        "meaning": { "type": "string", "description": "What this error is in this eval, for example 'answers a question no article supports'." },
+        "max_rate": { "type": "string", "description": "The highest acceptable rate, for example '2%' or '0'." },
+        "cost": { "type": "string", "description": "What the error costs when it happens, which is why the rate is set where it is." }
+      }
+    },
+
+    "agentFacet": {
+      "type": "object",
+      "description": "Present on an element whose model chooses its own steps and calls tools: a runtime agent. Mirrors the fields of the agent profile that an assessment reads; the full profile is referenced, not copied.",
+      "required": ["autonomy_level", "control_flow", "tools", "identity", "limits"],
+      "additionalProperties": false,
+      "properties": {
+        "profile": { "type": "string", "description": "Reference to the agent profile (agent-profile.schema.json)." },
+        "initiation": {
+          "enum": ["user", "event", "schedule", "self"],
+          "description": "What starts the agent. With approval on its tools, this sets its agency for triage: an agent that starts itself and acts without approval has full agency."
+        },
+        "autonomy_level": {
+          "enum": ["operator", "collaborator", "consultant", "approver", "observer"],
+          "description": "The user's role in the agent's work, after Feng, McDonald and Zhang's five levels: L1 operator to L5 observer."
+        },
+        "control_flow": {
+          "enum": ["workflow", "single-agent", "orchestrator-workers", "handoff", "group-chat", "hierarchical", "swarm"],
+          "description": "workflow: predefined code paths call the model; the others let a model direct the steps."
+        },
+        "injection_defence": {
+          "type": "array",
+          "items": { "enum": ["action-selector", "plan-then-execute", "map-reduce", "dual-llm", "code-then-execute", "context-minimisation", "capability-tracking", "classifier", "none"] },
+          "description": "The design patterns that limit what injected instructions can do (Beurer-Kellner et al., 2025; CaMeL)."
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "effect", "reversible", "tier", "approval"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "via": { "$ref": "#/$defs/localId", "description": "The connector the tool is called over." },
+              "effect": { "enum": ["read", "write", "external-communication", "financial", "destructive", "code-execution"] },
+              "reversible": { "type": "boolean" },
+              "tier": { "enum": ["T0", "T1", "T2", "T3"], "description": "The guardrail tier of the limit on this action (operating model)." },
+              "approval": { "enum": ["autonomous", "human-approved", "forbidden"] },
+              "scope": { "type": "string", "description": "What the tool's credential is limited to." },
+              "reads_untrusted": { "type": "boolean", "description": "The tool's output can carry content an attacker could influence." }
+            }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "short_term": { "type": "string" },
+            "long_term_store": { "$ref": "#/$defs/localId" },
+            "written_from_untrusted": { "type": "boolean" },
+            "retention": { "type": "string" },
+            "isolation": { "enum": ["per-session", "per-user", "per-tenant", "shared"] }
+          }
+        },
+        "identity": {
+          "type": "object",
+          "required": ["scheme", "acts_as"],
+          "additionalProperties": false,
+          "properties": {
+            "scheme": { "enum": ["spiffe", "oauth2", "mtls", "api-key", "platform-managed", "none"] },
+            "workload_identity": { "type": "string" },
+            "acts_as": { "enum": ["itself", "on-behalf-of-user", "shared-service-account"] }
+          }
+        },
+        "guardrails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "tier", "enforced"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "tier": { "enum": ["T0", "T1", "T2", "T3"] },
+              "enforced": { "enum": ["outside-agent", "inside-agent"] },
+              "invariant": { "type": "string" }
+            }
+          }
+        },
+        "peers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agent", "protocol", "authenticated"],
+            "additionalProperties": false,
+            "properties": {
+              "agent": { "$ref": "#/$defs/localId" },
+              "protocol": { "type": "string" },
+              "authenticated": { "type": "boolean" },
+              "trust": { "enum": ["trusted", "partially-trusted", "untrusted"] }
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "required": ["max_steps", "kill_switch"],
+          "additionalProperties": false,
+          "properties": {
+            "max_steps": { "type": "integer", "minimum": 1 },
+            "max_cost": { "type": "string" },
+            "timeout": { "type": "string" },
+            "kill_switch": { "type": "boolean" }
+          }
+        },
+        "trajectory_logging": { "type": "boolean", "description": "Every plan, tool call, input and output is recorded with provenance." }
+      }
+    }
+  }
+}

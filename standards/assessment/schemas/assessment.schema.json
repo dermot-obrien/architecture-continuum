@@ -114,7 +114,8 @@
         "properties": {
           "id": { "type": "string", "pattern": "^F-\\d{3}$" },
           "criterion": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-\\d{2}$", "description": "The lens criterion the finding answers, for example CORE-QA-01." },
-          "result": { "enum": ["met", "partly-met", "not-met", "not-applicable", "not-assessed"] },
+          "result": { "enum": ["met", "partly-met", "not-met", "not-applicable", "not-assessed"], "description": "The overall result. For a criterion decided by both, the reviewer's judgement, never better than tool_result." },
+          "tool_result": { "enum": ["met", "partly-met", "not-met", "not-applicable"], "description": "For a criterion decided by both: what the tool half found, whether the answer is present." },
           "type": {
             "enum": ["gap", "risk", "non-risk", "sensitivity-point", "trade-off-point", "observation"],
             "description": "gap: the design does not say what it must. risk and non-risk, sensitivity and trade-off points: as ATAM defines them. observation: worth recording, not a defect."

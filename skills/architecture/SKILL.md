@@ -1,11 +1,11 @@
 ---
 name: architecture
-description: "Author and check an architecture on the architecture continuum, one flow per level: platforms, business outcomes and use cases, capabilities, bounded contexts, architecture and solution building blocks, services and runtime agents, each to its standard with the golden thread of traceability kept; a capability's definition stage on the ladder and what blocks the next; and a check of every page and register against the continuum's standards, or the scaffold of a new architecture root. Use when asked to create or define one of those artefacts (/architecture platform, strategy, capability, context, abb, sbb, service, runtime-agent), what definition stage a capability is at (/architecture stage, formerly rung), whether an architecture is compliant, or to start one (/architecture check). Also answers to its former names: aaa-create-platform, aaa-create-strategy, aaa-create-capability, aaa-create-context, aaa-create-abb, aaa-create-sbb, aaa-create-service, aaa-create-runtime-agent, aaa-rung, aaa-continuum."
+description: "Author, check and assess an architecture on the architecture continuum, one flow per level: platforms, outcomes and use cases, capabilities, bounded contexts, architecture and solution building blocks, services and runtime agents, each to its standard with traceability kept; a capability's definition stage; a check of pages and registers against the standards; and the triage and assessment of a design against the lenses. Use when asked to create one of those artefacts (/architecture platform, strategy, capability, context, abb, sbb, service, runtime-agent), a capability's stage (/architecture stage, formerly rung), whether an architecture is compliant or to scaffold one (/architecture check), what assessment a design needs (/architecture triage), or to assess one (/architecture assess). Also answers to its former names: aaa-create-platform, aaa-create-strategy, aaa-create-capability, aaa-create-context, aaa-create-abb, aaa-create-sbb, aaa-create-service, aaa-create-runtime-agent, aaa-rung, aaa-continuum."
 license: CC-BY-4.0 AND Apache-2.0
 compatibility: Node.js 18 or newer for the binding check and the continuum check (which also needs ajv, ajv-formats and js-yaml, from npm install here or the workspace); Python 3.11 or newer for the stage flow. PNG export needs draw.io desktop. Carries its own copy of the standards in references/standards/. Artefact locations come from [suite.architecture] of the repository's .agents/skill-bindings.toml; the skill ships no layout of its own.
 metadata:
   author: dermot-obrien
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Architecture
@@ -28,6 +28,8 @@ This skill was ten skills, `aaa-create-platform` to `aaa-create-runtime-agent`, 
 | `/architecture runtime-agent`, "a runtime agent", "an agent profile" | An autonomous agent with tiered guardrails, scope and provenance | [references/flows/runtime-agent.md](references/flows/runtime-agent.md) |
 | `/architecture stage [CAP-NNN]` (or `rung`, its former name), "what stage is this capability at" | Read-only. Each capability's stage, per flow, and what blocks the next | [references/flows/stage.md](references/flows/stage.md) |
 | `/architecture check`, "is this compliant", `/architecture scaffold` | Read-only. Every page and register against the continuum's standards; or the layout of a new root | [references/flows/check.md](references/flows/check.md) |
+| `/architecture triage`, "what assessment does this need", "which tier is this agent" | Read-only except for the triage record. The assessment type and risk tier, AT1 to AT4, and the plan they set | [references/flows/triage.md](references/flows/triage.md) |
+| `/architecture assess`, "assess this design", "review this agent", "is it ready for production" | Read-only except for the record and report. A design specification against the lenses, at the depth its triage set, with findings, dispositions and a proposed outcome | [references/flows/assess.md](references/flows/assess.md) |
 
 Read the flow's reference before acting, and the references it names when it names them. With no flow named, ask which artefact the user means; never guess a level.
 
@@ -63,7 +65,7 @@ A repository that still has the old tables, `[suite.aaa-create-abb]` and the res
 1. Never invent a parent. Where a flow needs a parent that does not exist, propose it with a plausible name and create it only when the user agrees.
 2. Load the standards the flow's discovery reference names before writing anything. A copy the workspace holds wins over the skill's copy in `references/standards/`.
 3. Every artefact links back to its parent in its front matter, and the parent's inverse list is updated in the same change.
-4. The stage and check flows never edit a page. They report, with the file and what to change.
+4. The stage, check, triage and assess flows never edit a page or a design. They report, with the file and what to change; triage and assess also write their own record.
 
 ## Standards
 

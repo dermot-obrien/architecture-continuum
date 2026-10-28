@@ -3,7 +3,7 @@ lens:
   id: core
   prefix: CORE
   title: Core architecture lens
-  version: 0.2.0
+  version: 0.3.0
   applies_when: always
   description: >-
     The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, moves it toward its target state, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
@@ -119,10 +119,10 @@ criteria:
     area: TGT
     question: Is every catalogued artefact the design uses at target or in flight, never retired, and does each one still at baseline have a decision naming what it moves to?
     why: A design that builds on what the target state retires spends money moving away from where the organisation has decided to go.
-    reads: [elements.ref, decisions.departure]
+    reads: [elements, decisions.departure, triage.target_state]
     decided_by: tool
     rule: >-
-      Resolve every elements.ref in the catalogue and read its lifecycle_state. No element references an artefact whose lifecycle_state is retired. Every element referencing an artefact whose lifecycle_state is baseline is named in the affects of a decision with departure set. This criterion reads the catalogue as well as the specification.
+      Take each building block's target-state position as the responsible architect attested it, from the triage record's target_state, or from the catalogue's lifecycle_state where an architect maintains it. Neither the author nor an assessor infers a position. No element is at retired. Every element at baseline or retiring is named in the affects of a decision with departure set. An element with no attested position leaves this criterion not-assessed for that element, and the missing attestation becomes a condition.
     severity: major
     sources: [togaf-compliance, continuum]
   - id: CORE-TGT-02
@@ -226,7 +226,7 @@ criteria:
     why: Reliability, security, performance, operability and cost are judged on every workload by the Well-Architected frameworks; a design silent on one is incomplete.
     reads: [scenarios.quality_attribute]
     decided_by: both
-    rule: Report each of reliability, security, performance-efficiency, maintainability and cost that no quality scenario covers.
+    rule: Report each of reliability, security, performance-efficiency, maintainability and cost that no scenario covers. A quality, failure or misuse scenario counts for the quality_attribute it names.
     severity: major
     sources: [iso25010, wa-aws, wa-azure, wa-google]
   - id: CORE-QA-03
@@ -300,7 +300,8 @@ criteria:
     question: Does every connector that crosses a bounded context or the design's boundary carry a versioned contract?
     reads: [connectors.contract, elements.part_of]
     decided_by: tool
-    rule: Every connector whose ends have different part_of, or where one end is an external-system or actor, has contract.
+    rule: >-
+      Every connector that crosses a bounded context or the design's boundary has contract. A connector crosses when its ends' part_of differ, when exactly one end has part_of, or when either end is an actor, an external-system or a technology. For a connector from an actor, or to an interface a vendor provides, the contract names the channel or the vendor's published interface and its version.
     severity: major
     sources: [continuum, evans, togaf-bb]
   - id: CORE-INT-02
@@ -308,7 +309,7 @@ criteria:
     question: Is the context-map relationship of every cross-context connector stated, and is it the right one?
     reads: [connectors.context_relationship]
     decided_by: both
-    rule: Every connector whose ends have different part_of has context_relationship.
+    rule: Every connector whose ends both have part_of, and differ, has context_relationship. An end with no part_of is outside the design's contexts, and its connectors are judged by CORE-INT-01 instead.
     severity: minor
     sources: [evans, khononov]
   - id: CORE-INT-03
@@ -366,7 +367,8 @@ criteria:
     question: Is every path that carries untrusted content identified, and is that content validated before it is acted on?
     reads: [connectors.carries_untrusted_content]
     decided_by: both
-    rule: Every connector from an actor, an external-system or an untrusted trust zone states carries_untrusted_content.
+    rule: >-
+      Every connector with an actor, an external-system, or an element in a partially-trusted or untrusted zone at either end states carries_untrusted_content, whichever way the content flows. A pull from an outside source brings content in although the puller is the from end.
     severity: major
     sources: [tmm, asvs]
   - id: CORE-SEC-04
@@ -431,7 +433,8 @@ criteria:
     why: R4 Buildable needs a cost model on the realising reference architecture.
     reads: [operations.cost, evidence.type]
     decided_by: tool
-    rule: operations.cost.model is set or evidence has a cost-model; unit_cost and budget are set.
+    rule: >-
+      evidence has an entry of type cost-model, and operations.cost has unit_cost and budget. A sentence in operations.cost.model describing how cost will be modelled is not a cost model, and does not meet this criterion.
     applies_to: design.type is reference-architecture or solution-design
     severity: major
     sources: [ladder, wa-aws]

@@ -65,6 +65,30 @@
       ]
     },
 
+    "target_state": {
+      "type": "array",
+      "description": "The target-state position of each building block the subject uses, attested by the architect responsible for the target architecture it belongs to. Never inferred by the author or by an assessor. CORE-TGT-01 reads it, and triage derives novelty from it.",
+      "items": {
+        "type": "object",
+        "required": ["element", "position", "attested_by", "date"],
+        "additionalProperties": false,
+        "properties": {
+          "element": { "type": "string", "description": "The element's id in the subject's design specification." },
+          "ref": { "type": "string", "description": "The catalogue identifier, when the building block is catalogued." },
+          "position": { "enum": ["target", "in-flight", "baseline", "retiring", "retired"], "description": "target: part of the target architecture. in-flight: on its way to it. baseline: in the landscape but not target, with a successor to come. retiring: on a dated path out. retired: not to be used." },
+          "successor": { "type": "string", "description": "What replaces it in the target state, when it is not target and the architect has named it." },
+          "attested_by": {
+            "type": "object",
+            "required": ["name", "role"],
+            "additionalProperties": false,
+            "properties": { "name": { "type": "string" }, "role": { "type": "string", "description": "For example enterprise architect, or the domain architect for the platform." } }
+          },
+          "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
     "result": {
       "type": "object",
       "required": ["type", "tier", "drivers"],
@@ -100,7 +124,7 @@
           "additionalProperties": false,
           "properties": {
             "depth": { "enum": ["check", "review", "evaluation"] },
-            "lenses": { "type": "array", "items": { "type": "string" } },
+            "lenses": { "type": "array", "items": { "type": "string" }, "description": "The lenses of the assessment about to run. The production lens joins only the production entry assessment." },
             "independent_assessor": { "type": "boolean" },
             "approver": { "type": "string" },
             "evidence": { "type": "array", "items": { "type": "string" } },

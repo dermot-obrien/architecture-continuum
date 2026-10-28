@@ -19,7 +19,7 @@ requires_any = true
 # The tables the ten skills this one replaced were answered in. A key missing from
 # [suite.architecture] is read from them for one release, with a warning.
 legacy_suites = ["aaa-create-platform", "aaa-create-strategy", "aaa-create-capability", "aaa-create-context", "aaa-create-abb", "aaa-create-sbb", "aaa-create-service", "aaa-create-runtime-agent", "aaa-rung", "aaa-continuum"]
-flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "stage", "check"]
+flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "stage", "check", "triage", "assess"]
 
 # A flow's former name, which still selects it.
 [inputs.flow_aliases]

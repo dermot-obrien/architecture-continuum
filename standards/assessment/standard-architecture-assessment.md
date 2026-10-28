@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.4.0
+version: 0.5.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -78,7 +78,7 @@ An assessment is made at one of three depths. Each includes the one before it. W
 
 The evaluation depth is the SEI's ATAM in the shape this bundle needs: the utility tree is built from the design's own quality scenarios, and the risks, sensitivity points and trade-off points are findings like any other. Lighter team-run methods (risk-storming over the design's diagrams, LASR, a decision-centric review of the design's decisions) are acceptable ways of doing a review, as long as their results are recorded as findings against criteria.
 
-An assessor is independent when they did not author the design and are not accountable for delivering it. A review needs at least one independent assessor. An agent may be an assessor; its findings carry provenance like any other agent output, and it does not make the verdict alone.
+An assessor is independent when they did not author the design and are not accountable for delivering it. A review needs at least one independent assessor, and from triage tier AT2 that assessor is a person: an agent may be an assessor, and may be independent, but its findings are reviewed by an independent person before the record is relied on. An agent's findings carry provenance like any other agent output, and it does not make the verdict alone.
 
 ## 4. Process
 
@@ -107,6 +107,10 @@ A finding has a type: `gap` (the design does not say what it must), `risk` and `
 
 A criterion found `met` need not be recorded at review depth unless the result is worth keeping, typically a non-risk or a sensitivity point. A tool run records every criterion.
 
+A criterion decided by `both` has two halves, and the record keeps both: `tool_result` is what the tool half found (whether the answer is present), and `result` is the reviewer's judgement of whether it is good enough. The overall `result` is never better than `tool_result`, and a present answer the reviewer could not judge is `not-assessed`, with the reason.
+
+Evidence a criterion asks for and the design does not have is a finding against that criterion, not a reason to defer. At a design review, evidence that can exist only once the solution is built (eval reports, test results, the outcome of a hand-over) is not yet required: the assessment judges its plan, such as the evals the specification defines. The production entry assessment requires the evidence itself.
+
 ## 6. Where findings go on the continuum
 
 An assessment does not keep its own backlog. Every finding that is not met goes somewhere the continuum already has.
@@ -122,14 +126,16 @@ An assessment does not keep its own backlog. Every finding that is not met goes 
 
 ## 7. Verdict
 
-| Outcome | Rule |
-|---|---|
-| `endorsed` | No finding is `not-met` or `partly-met` at blocker or major severity |
-| `endorsed-with-conditions` | No open blocker; every major finding has a disposition other than `fix-design`, or a dated condition |
-| `not-endorsed` | Any blocker is open |
-| `deferred` | The assessment could not be completed: the specification does not validate, or the evidence it relies on is missing |
+The rules are applied in order, and the first that applies decides the outcome. An open finding is one that is `not-met` or `partly-met`.
 
-The verdict also records a conformance level against the target state, meaning the target architecture the catalogue records (artefacts whose `lifecycle_state` is `target`) and the standards that govern it, using TOGAF's six levels (Enterprise Architecture Capability and Governance, 6.2, figure 6-1, as corrected by Technical Corrigendum 1) with the specification in the place of the implementation: `irrelevant` (nothing in common with the target state), `consistent` (what the design shares with the target state is in accordance, but some required features are missing and the design has features the target state does not cover), `compliant` (everything the design has is covered by the target state and in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence in both directions), and `non-conformant` (any of the above in which something the target state requires is present but not in accordance). "In accordance" carries TOGAF's meaning: it supports the stated strategy, adheres to the stated standards and principles, and provides the stated functionality. Conformance answers whether the design follows the target state; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed. A production entry assessment also records `as_built`, the same scale applied to the built solution against the design (section 8.1).
+| Order | Outcome | Rule |
+|---|---|---|
+| 1 | `deferred` | The assessment cannot be carried out: the specification does not validate, the tier derived from it is above the triage's, or the subject cannot be fixed by its version and digest. Missing evidence is not a reason to defer (section 5) |
+| 2 | `not-endorsed` | Any open blocker; or any open major whose disposition is `fix-design` with no due date |
+| 3 | `endorsed-with-conditions` | Any open major remains: each is disposed of other than by fixing the design, or is a design fix with a due date, which becomes a condition |
+| 4 | `endorsed` | No open blocker or major |
+
+The verdict also records a conformance level against the target state, meaning the target architecture as the responsible architect attests it (in the triage record's `target_state`, or the catalogue's `lifecycle_state` where an architect maintains it) and the standards that govern it, using TOGAF's six levels (Enterprise Architecture Capability and Governance, 6.2, figure 6-1, as corrected by Technical Corrigendum 1) with the specification in the place of the implementation: `irrelevant` (nothing in common with the target state), `consistent` (what the design shares with the target state is in accordance, but some required features are missing and the design has features the target state does not cover), `compliant` (everything the design has is covered by the target state and in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence in both directions), and `non-conformant` (any of the above in which something the target state requires is present but not in accordance). "In accordance" carries TOGAF's meaning: it supports the stated strategy, adheres to the stated standards and principles, and provides the stated functionality. Conformance answers whether the design follows the target state; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed. A production entry assessment also records `as_built`, the same scale applied to the built solution against the design (section 8.1).
 
 ## 8. Where assessment sits on the continuum
 

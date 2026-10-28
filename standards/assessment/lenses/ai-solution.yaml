@@ -3,7 +3,7 @@ lens:
   id: ai-solution
   prefix: AIS
   title: AI solution lens
-  version: 0.1.0
+  version: 0.3.0
   applies_when:
     profile: ai-solution
   description: >-
@@ -18,7 +18,7 @@ areas:
     question: Is the model a pinned, documented, replaceable dependency?
   - id: EVAL
     title: Evaluation as evidence
-    question: Do evals prove the design meets its quality scenarios, and do they gate release?
+    question: Do evals prove the design meets its quality scenarios, with each kind of error costed and measured on enough cases, and do they gate release?
   - id: DATA
     title: Grounding and data
     question: Is the data the model sees owned, permissioned, current and traceable?
@@ -56,7 +56,8 @@ criteria:
     why: An unpinned model changes behaviour without a release; the evals that justified the design no longer apply.
     reads: [elements.ai.model.version_pinned, elements.ai.model.version]
     decided_by: tool
-    rule: Every ai facet has model.version_pinned true and model.version set.
+    rule: >-
+      Every ai facet has model.version_pinned true and model.version set. Where model.hosting is managed-platform and the platform does not let the team pin the model, a decision affecting the element that accepts the platform-managed model, with gating evals rerun on any platform model change as its condition, meets this criterion instead.
     severity: major
     sources: [nist-600-1, owasp-llm03]
   - id: AIS-MOD-02
@@ -117,6 +118,47 @@ criteria:
     rule: An eval of kind red-team or evidence of type red-team-report exists when any ai facet has input_trust mixed or untrusted.
     severity: major
     sources: [owasp-llm, atlas]
+  - id: AIS-EVAL-06
+    area: EVAL
+    question: Does each eval that classifies (retrieval, answer or abstain, routing, a guard) name its positive class and set a separate threshold on false positives and on false negatives, weighted by what each error costs, rather than relying on F1 or accuracy alone?
+    why: >-
+      F1 weighs a false positive and a false negative equally, and accuracy hides both behind the majority class. In most designs the two errors cost very differently: an agent that answers confidently from the wrong source does more harm than one that says it does not know. A better F1 bought by trading precision for recall can make a design worse.
+    reads: [elements.ai.evals.positive_class, elements.ai.evals.errors]
+    decided_by: both
+    rule: >-
+      Every eval whose metric names F1, F-beta, accuracy, precision or recall has positive_class, and errors with both false_positive and false_negative, each with meaning and max_rate. A reviewer checks that the rates reflect the costs, and that any F-beta's beta leans the way the costs do.
+    severity: major
+    sources: [f-measure, nist-600-1, cs-eval]
+  - id: AIS-EVAL-07
+    area: EVAL
+    question: Is abstention evaluated, with questions the sources cannot answer in the test set, and the rate of answering them bounded?
+    why: >-
+      A test set made only of answerable questions cannot measure the costliest error of a grounded assistant, which is answering when it should decline. Without unanswerable and out-of-scope questions, precision is inflated by construction.
+    reads: [elements.ai.evals, elements.ai.grounding]
+    decided_by: both
+    rule: >-
+      Every generative ai facet with grounding has an eval whose positive_class is answering and whose errors.false_positive is answering a question the grounding cannot support. A reviewer checks that the test set holds enough unanswerable and out-of-scope questions to measure that rate.
+    severity: major
+    sources: [nist-600-1, cs-eval, owasp-llm]
+  - id: AIS-EVAL-08
+    area: EVAL
+    question: Is permission trimming tested as people with different access, with zero tolerance for content a user may not read?
+    why: >-
+      A leak of restricted content is not a quality trade-off to balance against recall. It is a security failure, so it gets its own eval, run as test users whose access differs, and a single leak fails it.
+    reads: [elements.ai.grounding.access_control, elements.ai.evals.zero_tolerance, elements.ai.evals.gating]
+    decided_by: tool
+    rule: Every ai facet whose grounding access_control is document-level or caller-permission-trimmed has an eval with zero_tolerance true and gating true.
+    severity: major
+    sources: [owasp-llm02, owasp-llm08, ai-data-security]
+  - id: AIS-EVAL-09
+    area: EVAL
+    question: Is each threshold backed by enough test cases to tell a pass from chance, with the interval reported?
+    why: >-
+      Ninety per cent on a hundred cases is anywhere from about 83 to 95 per cent at 95 per cent confidence. Zero failures in n trials bounds the true failure rate only at about 3 in n (the rule of three), so claiming a leak rate below one per cent needs around three hundred clean probes, and showing a false-answer rate below two per cent needs about one hundred and fifty negatives with none failing by the rule of three, nearer one hundred and ninety by the Wilson interval, and more if any may fail. Size the negatives, not only the whole set.
+    reads: [elements.ai.evals.sample_size, elements.ai.evals.threshold]
+    decided_by: reviewer
+    severity: minor
+    sources: [wilson-interval, rule-of-three]
 
   - id: AIS-DATA-01
     area: DATA
@@ -180,7 +222,8 @@ criteria:
     question: Are token, rate, cost and time limits set on every model call?
     reads: [elements.ai.limits]
     decided_by: tool
-    rule: Every ai facet has limits with budget and timeout.
+    rule: >-
+      Every ai facet has limits with budget and timeout. Where model.hosting is managed-platform and the platform sets call limits the team cannot, limits.budget and a decision accepting the platform's limits meet this criterion instead.
     severity: major
     sources: [owasp-llm10, wa-aws-genai]
   - id: AIS-OPS-02
@@ -188,7 +231,8 @@ criteria:
     question: Are model calls traced with prompts, outputs, tokens and cost, to the GenAI conventions?
     reads: [operations.observability.conventions, operations.observability.traces]
     decided_by: both
-    rule: operations.observability.traces is true and conventions names the GenAI conventions and their version.
+    rule: >-
+      operations.observability.traces is true and conventions names the GenAI conventions and their version. Where model.hosting is managed-platform, conventions may instead name the platform's telemetry, provided it records prompts, outputs and cost per call, and a decision records the gap from the GenAI conventions.
     severity: minor
     sources: [otel-genai]
   - id: AIS-OPS-03
@@ -252,4 +296,8 @@ sources:
   otel-genai: OpenTelemetry GenAI semantic conventions (Development status)
   cyclonedx: CycloneDX 1.7, ECMA-424, machine-learning BOM and model cards
   llm-judge-surveys: Surveys of LLM-as-a-judge, arXiv 2411.15594 and 2412.05579
+  f-measure: C. J. van Rijsbergen, Information Retrieval, 2nd edition (1979), the effectiveness measure from which F1 and F-beta come
+  wilson-interval: E. B. Wilson, Probable inference, the law of succession, and statistical inference, JASA (1927)
+  rule-of-three: Hanley and Lippman-Hand, If nothing goes wrong, is everything all right?, JAMA (1983)
+  cs-eval: Microsoft, Copilot Studio agent evaluation and its test methods (2026)
   anthropic-agents: Anthropic, Building effective agents (2024)

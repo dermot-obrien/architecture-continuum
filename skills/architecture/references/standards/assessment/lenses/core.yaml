@@ -1,0 +1,536 @@
+schema: lens/0.1.0
+lens:
+  id: core
+  prefix: CORE
+  title: Core architecture lens
+  version: 0.3.0
+  applies_when: always
+  description: >-
+    The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, moves it toward its target state, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
+
+areas:
+  - id: DEM
+    title: Demand and drivers
+    question: Does the design answer a stated demand, for stated stakeholders, within stated constraints?
+  - id: TRC
+    title: Place on the continuum
+    question: Can the design be traced up to the capabilities and outcomes it serves and down to what will run?
+  - id: TGT
+    title: Target state
+    question: Does the design move the continuum toward its target state, with every departure from it decided and bounded?
+  - id: STR
+    title: Structure
+    question: Are the elements the right kind and grain, inside the right boundaries?
+  - id: QA
+    title: Quality attributes
+    question: Does the design say, with measures, how it meets the qualities that matter, and what it trades?
+  - id: DEC
+    title: Decisions and open questions
+    question: Are the significant decisions recorded with their alternatives, and the open questions named?
+  - id: INT
+    title: Interfaces and contracts
+    question: Is every interaction carried by a versioned contract, with coupling that is deliberate?
+  - id: DAT
+    title: Data
+    question: Is every significant data set owned, classified and traced?
+  - id: SEC
+    title: Security architecture
+    question: Are trust boundaries, identity and the placement of controls designed, and is the security assessment handed over?
+  - id: OPS
+    title: Operability
+    question: Can the design be observed, deployed, rolled back and recovered, against stated objectives?
+  - id: CST
+    title: Cost and sustainability
+    question: Is the running cost modelled and bounded, and the environmental cost considered?
+  - id: EVO
+    title: Evolvability
+    question: Will the design stay true after it is built, and can it change?
+  - id: RSK
+    title: Risk and obligations
+    question: Are the known risks owned, and the obligations the design must meet named?
+
+criteria:
+  # Demand and drivers
+  - id: CORE-DEM-01
+    area: DEM
+    question: Does the design state its goals, its non-goals and its stakeholders with their concerns?
+    why: An architecture is evaluated against stakeholder concerns; without them there is nothing to judge it against.
+    reads: [drivers.goals, drivers.non_goals, drivers.stakeholders]
+    decided_by: both
+    rule: drivers.goals has at least one entry, drivers.non_goals is present, and every stakeholder has at least one concern.
+    severity: blocker
+    sources: [iso42030, iso42010]
+  - id: CORE-DEM-02
+    area: DEM
+    question: Is each goal traceable to an outcome, a use case or a capability, or explicitly recorded as an assumption?
+    why: Demand justifies a capability; a design whose demand is unstated cannot be prioritised or retired.
+    reads: [context.outcomes, context.serves, context.realises, drivers.assumptions]
+    decided_by: both
+    rule: At least one of context.outcomes, context.serves or context.realises is non-empty, or drivers.assumptions names the demand.
+    severity: major
+    sources: [ladder, togaf-capability]
+  - id: CORE-DEM-03
+    area: DEM
+    question: Are the constraints and assumptions stated, each with its source?
+    reads: [drivers.constraints, drivers.assumptions]
+    decided_by: reviewer
+    severity: minor
+    sources: [togaf-principles, iso42010]
+
+  # Place on the continuum
+  - id: CORE-TRC-01
+    area: TRC
+    question: Does the design name the capabilities it realises, the platform it belongs to and the bounded contexts it touches?
+    why: The definition ladder reads a design's realises; a design that realises nothing counts toward no capability's stage.
+    reads: [context.realises, context.platform, context.bounded_contexts]
+    decided_by: tool
+    rule: context.realises is non-empty; context.platform is set; context.bounded_contexts is non-empty unless design.type is architecture-pattern at conceptual abstraction.
+    severity: major
+    sources: [continuum, ladder]
+  - id: CORE-TRC-02
+    area: TRC
+    question: Does the design's type agree with its abstraction?
+    why: An architecture pattern is conceptual or logical; a reference architecture or a solution design is physical. A design whose boxes do not fit its type is still being written.
+    reads: [design.type, elements.kind]
+    decided_by: tool
+    rule: >-
+      Derive the abstraction from the kinds of the in-scope elements (actor and external-system excluded): all local-role is conceptual; abb with or without local-role is logical; all sbb, technology, service, store or deployment-node is physical; anything else is mixed. An architecture-pattern must be conceptual or logical; a reference-architecture or solution-design must be physical.
+    severity: major
+    sources: [continuum, ladder]
+  - id: CORE-TRC-03
+    area: TRC
+    question: Does a reference architecture or solution design name what it implements?
+    reads: [design.type, design.implements]
+    decided_by: tool
+    rule: When design.type is reference-architecture or solution-design, design.implements is non-empty.
+    severity: minor
+    sources: [continuum]
+  - id: CORE-TRC-04
+    area: TRC
+    question: Is every functional scenario tied to a use case, and does every use case the design serves have a scenario?
+    reads: [scenarios.use_case, context.serves]
+    decided_by: tool
+    rule: Every scenario of type functional has use_case; every id in context.serves appears as the use_case of at least one scenario.
+    severity: major
+    sources: [continuum, uml]
+
+  # Target state
+  - id: CORE-TGT-01
+    area: TGT
+    question: Is every catalogued artefact the design uses at target or in flight, never retired, and does each one still at baseline have a decision naming what it moves to?
+    why: A design that builds on what the target state retires spends money moving away from where the organisation has decided to go.
+    reads: [elements, decisions.departure, triage.target_state]
+    decided_by: tool
+    rule: >-
+      Take each building block's target-state position as the responsible architect attested it, from the triage record's target_state, or from the catalogue's lifecycle_state where an architect maintains it. Neither the author nor an assessor infers a position. No element is at retired. Every element at baseline or retiring is named in the affects of a decision with departure set. An element with no attested position leaves this criterion not-assessed for that element, and the missing attestation becomes a condition.
+    severity: major
+    sources: [togaf-compliance, continuum]
+  - id: CORE-TGT-02
+    area: TGT
+    question: Is every departure from the target state recorded as a decision, and is a time-bound one given an expiry and a path back?
+    why: >-
+      TOGAF grants dispensations rather than ignoring departures, and G253 offers three answers to one: enforce the target, grant time-bound relief, or change the target.
+    reads: [decisions.departure]
+    decided_by: both
+    rule: Every decision with departure set has status accepted, chosen, rationale and departure.from; a departure with kind time-bound also has expires and path_back. A reviewer checks that no departure has gone unrecorded.
+    severity: major
+    sources: [togaf-compliance, g253]
+  - id: CORE-TGT-03
+    area: TGT
+    question: Does the design move its capabilities toward the target state, rather than adding to what is being retired or creating a dependency that blocks a planned retirement?
+    reads: [context.realises, context.platform, elements, connectors, design.lifecycle_state]
+    decided_by: reviewer
+    severity: major
+    sources: [togaf-compliance, togaf-phase-g, continuum]
+  - id: CORE-TGT-04
+    area: TGT
+    question: Where the design shows the target state to be wrong, has that been raised as a consideration to change the target, rather than worked around?
+    why: A target that every design has to work around is not a target. The third of G253's answers is to change the architecture, and it has to be asked for to happen.
+    reads: [considerations, decisions.departure]
+    decided_by: reviewer
+    severity: minor
+    sources: [g253, ladder]
+
+  # Structure
+  - id: CORE-STR-01
+    area: STR
+    question: Is every building block at container grain, never a component or a whole system?
+    why: An identifier assigned at the wrong grain is the most expensive thing to undo in a catalogue.
+    reads: [elements]
+    decided_by: reviewer
+    severity: major
+    sources: [calibration, c4]
+  - id: CORE-STR-02
+    area: STR
+    question: Does every ABB, SBB, service and store live in exactly one bounded context?
+    reads: [elements.kind, elements.part_of]
+    decided_by: tool
+    rule: Every element whose kind is abb, sbb, service or store has part_of.
+    severity: major
+    sources: [continuum]
+  - id: CORE-STR-03
+    area: STR
+    question: Does the realisation chain hold, with no orphans?
+    reads: [elements.realises, elements.kind]
+    decided_by: tool
+    rule: In a physical design every service realises at least one sbb or technology, and every realises reference resolves to an element of the abstraction above.
+    applies_to: design.type is reference-architecture or solution-design
+    severity: minor
+    sources: [continuum, togaf-bb]
+  - id: CORE-STR-04
+    area: STR
+    question: Is every service deployed to a node, and every store owned by one service?
+    reads: [elements.deployed_to, data.owner]
+    decided_by: tool
+    rule: Every service has deployed_to resolving to a deployment-node; every data set's owner resolves to an element.
+    applies_to: design.type is solution-design
+    severity: minor
+    sources: [continuum]
+  - id: CORE-STR-05
+    area: STR
+    question: Does every element and connector reference resolve?
+    reads: [connectors.from, connectors.to, scenarios.steps.via, elements.trust_zone, elements.deployed_to]
+    decided_by: tool
+    rule: Every local id used as a reference is the id of an element, connector, trust zone, data set or scenario in the specification; ids are unique.
+    severity: blocker
+    sources: [iso42010]
+  - id: CORE-STR-06
+    area: STR
+    question: Is every element owned by a team?
+    reads: [elements.owner]
+    decided_by: tool
+    rule: Every element of kind service, store, sbb or deployment-node has owner.
+    severity: minor
+    sources: [teamtopologies, continuum]
+  - id: CORE-STR-07
+    area: STR
+    question: Do platform dependencies run down the landscape and through contracts only?
+    reads: [connectors, context.landscape]
+    decided_by: reviewer
+    severity: major
+    sources: [continuum, hohpe]
+
+  # Quality attributes
+  - id: CORE-QA-01
+    area: QA
+    question: Does the design state quality-attribute scenarios with a stimulus, a response and a measurable response measure?
+    why: A quality that is not stated as a measurable scenario cannot be assessed, only argued about.
+    reads: [scenarios]
+    decided_by: both
+    rule: At least one scenario of type quality exists, and every quality, failure or misuse scenario has stimulus, response, response_measure and importance (the schema enforces the fields).
+    severity: blocker
+    sources: [atam, iso25010, iso42030]
+  - id: CORE-QA-02
+    area: QA
+    question: Are the qualities that matter covered, and is each omission deliberate?
+    why: Reliability, security, performance, operability and cost are judged on every workload by the Well-Architected frameworks; a design silent on one is incomplete.
+    reads: [scenarios.quality_attribute]
+    decided_by: both
+    rule: Report each of reliability, security, performance-efficiency, maintainability and cost that no scenario covers. A quality, failure or misuse scenario counts for the quality_attribute it names.
+    severity: major
+    sources: [iso25010, wa-aws, wa-azure, wa-google]
+  - id: CORE-QA-03
+    area: QA
+    question: Are the scenarios prioritised by importance and difficulty, and do the high, high scenarios have a design response?
+    reads: [scenarios.importance, scenarios.difficulty]
+    decided_by: both
+    rule: Every quality scenario has importance and difficulty.
+    severity: minor
+    sources: [atam]
+  - id: CORE-QA-04
+    area: QA
+    question: Are failure scenarios stated for the dependencies the design cannot control?
+    reads: [scenarios.type, elements.kind]
+    decided_by: both
+    rule: When any element is an external-system or technology, at least one scenario of type failure exists.
+    severity: major
+    sources: [wa-aws, atam]
+  - id: CORE-QA-05
+    area: QA
+    question: Are the trade-offs between qualities identified and recorded as decisions?
+    reads: [decisions, scenarios]
+    decided_by: reviewer
+    severity: major
+    sources: [atam, hardparts]
+
+  # Decisions and open questions
+  - id: CORE-DEC-01
+    area: DEC
+    question: Is each significant decision recorded with its alternatives and rationale?
+    reads: [decisions]
+    decided_by: both
+    rule: Every decision with status accepted has chosen, at least one alternative and rationale.
+    severity: major
+    sources: [iso42010, nygard, togaf-tradeoffs]
+  - id: CORE-DEC-02
+    area: DEC
+    question: Is every open question named as a consideration, or the design states it has none?
+    why: R2 needs the open questions listed; an assessment that finds an unlisted one has found a consideration.
+    reads: [considerations]
+    decided_by: reviewer
+    severity: major
+    sources: [ladder]
+  - id: CORE-DEC-03
+    area: DEC
+    question: Is every consideration resolved by an accepted decision before the design is accepted?
+    reads: [considerations.status, considerations.resolved_by, design.status]
+    decided_by: tool
+    rule: When design.status is accepted or active, no consideration has status open.
+    severity: major
+    sources: [ladder]
+  - id: CORE-DEC-04
+    area: DEC
+    question: Are one-way-door decisions identified and given proportionate scrutiny?
+    reads: [decisions.reversibility]
+    decided_by: both
+    rule: Every accepted decision has reversibility.
+    severity: minor
+    sources: [hardparts, operating-model]
+  - id: CORE-DEC-05
+    area: DEC
+    question: Is debt taken on knowingly recorded against the decision that took it on?
+    reads: [decisions.technical_debt]
+    decided_by: reviewer
+    severity: minor
+    sources: [continuum, fowler-debt]
+
+  # Interfaces and contracts
+  - id: CORE-INT-01
+    area: INT
+    question: Does every connector that crosses a bounded context or the design's boundary carry a versioned contract?
+    reads: [connectors.contract, elements.part_of]
+    decided_by: tool
+    rule: >-
+      Every connector that crosses a bounded context or the design's boundary has contract. A connector crosses when its ends' part_of differ, when exactly one end has part_of, or when either end is an actor, an external-system or a technology. For a connector from an actor, or to an interface a vendor provides, the contract names the channel or the vendor's published interface and its version.
+    severity: major
+    sources: [continuum, evans, togaf-bb]
+  - id: CORE-INT-02
+    area: INT
+    question: Is the context-map relationship of every cross-context connector stated, and is it the right one?
+    reads: [connectors.context_relationship]
+    decided_by: both
+    rule: Every connector whose ends both have part_of, and differ, has context_relationship. An end with no part_of is outside the design's contexts, and its connectors are judged by CORE-INT-01 instead.
+    severity: minor
+    sources: [evans, khononov]
+  - id: CORE-INT-03
+    area: INT
+    question: Is coupling deliberate, with strong integration kept close and distant integration kept to contracts?
+    reads: [connectors]
+    decided_by: reviewer
+    severity: minor
+    sources: [khononov]
+
+  # Data
+  - id: CORE-DAT-01
+    area: DAT
+    question: Is every significant data set named with an owner and a classification?
+    reads: [data]
+    decided_by: both
+    rule: The schema enforces owner and classification; a reviewer checks no significant data set is missing.
+    severity: major
+    sources: [togaf-content, iso42010]
+  - id: CORE-DAT-02
+    area: DAT
+    question: Are residency, retention and lineage stated for personal and restricted data?
+    reads: [data.personal, data.classification, data.residency, data.retention, data.lineage]
+    decided_by: tool
+    rule: Every data set with personal true or classification confidential or restricted has residency, retention and lineage.
+    severity: major
+    sources: [linddun, eu-aiact-annex4]
+  - id: CORE-DAT-03
+    area: DAT
+    question: Does each data set have one owner, and are other writers going through its owner's contract?
+    reads: [data.owner, connectors.style]
+    decided_by: reviewer
+    severity: minor
+    sources: [continuum]
+
+  # Security architecture
+  - id: CORE-SEC-01
+    area: SEC
+    question: Are trust zones declared and every element placed in one?
+    reads: [trust_zones, elements.trust_zone]
+    decided_by: tool
+    rule: trust_zones is non-empty and every element other than an actor has trust_zone.
+    severity: major
+    sources: [tmm, nist-800-160]
+  - id: CORE-SEC-02
+    area: SEC
+    question: Is every connector that crosses a trust boundary authenticated and authorised?
+    reads: [connectors.authentication, connectors.authorisation, elements.trust_zone]
+    decided_by: tool
+    rule: Every connector whose ends lie in different trust zones has authentication and authorisation other than none.
+    severity: blocker
+    sources: [zt-800-207, wa-aws-sec]
+  - id: CORE-SEC-03
+    area: SEC
+    question: Is every path that carries untrusted content identified, and is that content validated before it is acted on?
+    reads: [connectors.carries_untrusted_content]
+    decided_by: both
+    rule: >-
+      Every connector with an actor, an external-system, or an element in a partially-trusted or untrusted zone at either end states carries_untrusted_content, whichever way the content flows. A pull from an outside source brings content in although the puller is the from end.
+    severity: major
+    sources: [tmm, asvs]
+  - id: CORE-SEC-04
+    area: SEC
+    question: Does a threat model exist for this version of the design, and has the cybersecurity assessment been handed over?
+    why: Threat modelling analyses the same representation an architecture assessment reads; it belongs with the design. Whether controls are implemented and effective does not, and is handed over.
+    reads: [evidence.type]
+    decided_by: tool
+    rule: evidence has an entry of type threat-model; a design with status accepted or active also has security-assessment, or the assessment records a hand-over to cybersecurity.
+    severity: major
+    sources: [tmm, nist-800-30, togaf-g152]
+  - id: CORE-SEC-05
+    area: SEC
+    question: Do services and agents run as their own least-privileged identities rather than shared accounts?
+    reads: [elements]
+    decided_by: reviewer
+    severity: major
+    sources: [zt-800-207, nist-800-160]
+
+  # Operability
+  - id: CORE-OPS-01
+    area: OPS
+    question: Are service level objectives stated for what users depend on?
+    reads: [operations.slos]
+    decided_by: tool
+    rule: operations.slos is non-empty.
+    applies_to: design.type is reference-architecture or solution-design
+    severity: major
+    sources: [wa-aws, wa-azure]
+  - id: CORE-OPS-02
+    area: OPS
+    question: Can the running design be observed through logs, metrics, traces and an audit trail, to stated conventions?
+    reads: [operations.observability]
+    decided_by: tool
+    rule: logs, metrics and traces are all true, and conventions is set.
+    applies_to: design.type is reference-architecture or solution-design
+    severity: major
+    sources: [wa-aws, otel]
+  - id: CORE-OPS-03
+    area: OPS
+    question: Are deployment, rollback, recovery objectives and a degraded mode stated?
+    reads: [operations.deployment, operations.recovery]
+    decided_by: tool
+    rule: deployment.strategy, deployment.rollback, recovery.rto, recovery.rpo and recovery.degraded_mode are set.
+    applies_to: design.type is solution-design
+    severity: minor
+    sources: [wa-aws, dora]
+  - id: CORE-OPS-04
+    area: OPS
+    question: Is there a runbook, or a commitment to one before the design is in service?
+    reads: [operations.runbook, evidence.type]
+    decided_by: tool
+    rule: operations.runbook is set, or evidence has a runbook.
+    applies_to: design.status is active
+    severity: minor
+    sources: [ladder]
+
+  # Cost and sustainability
+  - id: CORE-CST-01
+    area: CST
+    question: Is the running cost modelled, with a unit cost and a budget?
+    why: R4 Buildable needs a cost model on the realising reference architecture.
+    reads: [operations.cost, evidence.type]
+    decided_by: tool
+    rule: >-
+      evidence has an entry of type cost-model, and operations.cost has unit_cost and budget. A sentence in operations.cost.model describing how cost will be modelled is not a cost model, and does not meet this criterion.
+    applies_to: design.type is reference-architecture or solution-design
+    severity: major
+    sources: [ladder, wa-aws]
+  - id: CORE-CST-02
+    area: CST
+    question: Is the environmental cost of the design considered where it is material?
+    reads: [scenarios.quality_attribute, decisions]
+    decided_by: reviewer
+    severity: advisory
+    sources: [wa-aws, togaf-g242]
+
+  # Evolvability
+  - id: CORE-EVO-01
+    area: EVO
+    question: Are the architecture's important characteristics protected by fitness functions, automated where they can be?
+    reads: [fitness_functions]
+    decided_by: both
+    rule: fitness_functions is non-empty, and every high-importance quality scenario is named by at least one fitness function's scenarios.
+    severity: major
+    sources: [bea, oaa]
+  - id: CORE-EVO-02
+    area: EVO
+    question: Are the parts most likely to change isolated behind contracts, so they can change without the rest?
+    reads: [elements, connectors, decisions]
+    decided_by: reviewer
+    severity: minor
+    sources: [khononov, gcp-design-for-change]
+
+  # Risk and obligations
+  - id: CORE-RSK-01
+    area: RSK
+    question: Does every known risk have a mitigation and an owner?
+    reads: [risks]
+    decided_by: tool
+    rule: Every risk has mitigation and owner.
+    severity: major
+    sources: [togaf-risk]
+  - id: CORE-RSK-02
+    area: RSK
+    question: Are the regulatory, contractual and policy obligations named, with how the design classes under each?
+    why: Naming obligations is architecture; certifying against them is a separate assessment the design hands over to.
+    reads: [drivers.obligations]
+    decided_by: reviewer
+    severity: major
+    sources: [eu-aiact-annex4, iso42001]
+  - id: CORE-RSK-03
+    area: RSK
+    question: Does the evidence cited exist, cover what it claims and date from this version of the design?
+    reads: [evidence]
+    decided_by: reviewer
+    severity: major
+    sources: [ladder, iso42030]
+
+sources:
+  continuum: This bundle, docs/continuum.md
+  ladder: This bundle, standards/capabilities/standard-definition-ladder.md
+  calibration: This bundle, standards/building-blocks/standard-building-block-calibration.md
+  operating-model: This bundle, standards/agent-native/operating-model.md
+  iso42010: ISO/IEC/IEEE 42010:2022, Architecture description
+  iso42030: ISO/IEC/IEEE 42030:2019, Architecture evaluation framework
+  iso25010: ISO/IEC 25010:2023, Product quality model
+  atam: SEI, Architecture Tradeoff Analysis Method
+  togaf-bb: The Open Group, TOGAF Standard 10th Edition, building blocks
+  togaf-capability: The Open Group, TOGAF Series Guide G211, Business Capabilities v2
+  togaf-principles: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, Architecture Principles
+  togaf-tradeoffs: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, Trade-offs
+  togaf-risk: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, Risk Management
+  togaf-content: The Open Group, TOGAF Standard 10th Edition, Architecture Content
+  togaf-compliance: The Open Group, TOGAF Standard 10th Edition, Enterprise Architecture Capability and Governance, chapter 6, Architecture Compliance
+  togaf-phase-g: The Open Group, TOGAF Standard 10th Edition, ADM, Phase G, Implementation Governance
+  g253: The Open Group, G253, Architecture Compliance Review Checklists (2025)
+  togaf-g152: The Open Group, G152, Integrating Risk and Security within a TOGAF Enterprise Architecture
+  togaf-g242: The Open Group, G242, Environmentally Sustainable Information Systems
+  oaa: The Open Group, Open Agile Architecture Standard, fitness functions and guardrails
+  wa-aws: AWS Well-Architected Framework
+  wa-aws-sec: AWS Well-Architected Framework, Security Pillar
+  wa-azure: Azure Well-Architected Framework
+  wa-google: Google Cloud Well-Architected Framework
+  gcp-design-for-change: Google Cloud Well-Architected Framework, core principles
+  c4: Simon Brown, the C4 model
+  uml: OMG, UML 2.5.1, use cases realised by collaborations
+  evans: Eric Evans, Domain-Driven Design
+  khononov: Vlad Khononov, Balancing Coupling in Software Design (2024)
+  hohpe: Gregor Hohpe, Platform Strategy (2024)
+  teamtopologies: Skelton and Pais, Team Topologies, 2nd edition (2025)
+  hardparts: Ford, Richards, Sadalage and Dehghani, Software Architecture, The Hard Parts (2021)
+  bea: Ford, Parsons, Kua and Sadalage, Building Evolutionary Architectures, 2nd edition (2022)
+  nygard: Michael Nygard, Documenting Architecture Decisions (2011)
+  fowler-debt: Martin Fowler, Technical Debt Quadrant
+  dora: DORA, capabilities and metrics
+  otel: OpenTelemetry semantic conventions
+  tmm: Threat Modeling Manifesto
+  linddun: LINDDUN privacy threat modelling
+  asvs: OWASP Application Security Verification Standard 5.0.0 (2025)
+  nist-800-30: NIST SP 800-30 Rev. 1, Guide for Conducting Risk Assessments
+  nist-800-160: NIST SP 800-160 Vol. 1 Rev. 1, Engineering Trustworthy Secure Systems (2022)
+  zt-800-207: NIST SP 800-207, Zero Trust Architecture (2020)
+  eu-aiact-annex4: Regulation (EU) 2024/1689, Annex IV, technical documentation
+  iso42001: ISO/IEC 42001:2023, AI management system
