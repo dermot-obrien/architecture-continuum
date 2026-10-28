@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 From 0.4.1 on, releases are made by Release Please from the pull requests merged to `main`: a pull request's title is its line here, and the release pull request adds the next section, bumps the version and, when merged, tags `vX.Y.Z` and publishes the GitHub Release. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#releases). Do not add lines here by hand. The skills' own versions, in each `SKILL.md` and in `bundle.json`, stay separate and are bumped in the pull request that changes the skill.
 
+## [0.8.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.7.0...v0.8.0) (2026-10-28)
+
+
+### Added
+
+* **scripts:** install or update the continuum and its skills in one command ([d58f917](https://github.com/dermot-obrien/architecture-continuum/commit/d58f91715ae4cb16424282ec7db34731629d86de))
+* **scripts:** install or update the continuum and its skills in one command ([ed1f974](https://github.com/dermot-obrien/architecture-continuum/commit/ed1f9746c0362a929c73d9ae1b15f92886ebf438))
+* **scripts:** install or update the continuum and its skills in one command ([04d403c](https://github.com/dermot-obrien/architecture-continuum/commit/04d403cd960d5df6e0860936464fa13d494c1cc1))
+
 ## [0.7.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.6.1...v0.7.0) (2026-10-28)
 
 
