@@ -43,11 +43,6 @@ jobs:
       - name: The schema picture matches the schemas and the continuum picture
         run: node scripts/generate-schema-diagram.mjs --check
 
-      # docs/assessment-criteria/ is generated from standards/assessment/lenses/: one page per
-      # criterion, so each has a stable URL on the published site.
-      - name: The criteria pages match the lenses
-        run: node scripts/generate-criteria-pages.mjs --check
-
       # Each skill ships its own copy of the check, so it is complete on its own.
       - name: The skills' post-install checks are one file
         run: |
@@ -179,6 +174,11 @@ jobs:
 
       - name: The foundation validates against the schemas
         run: node scripts/validate-frontmatter.mjs --quiet
+
+      # docs/assessment-criteria/ is generated from standards/assessment/lenses/ (it needs
+      # js-yaml, so it runs after npm ci): one page per criterion, each with a stable URL.
+      - name: The criteria pages match the lenses
+        run: node scripts/generate-criteria-pages.mjs --check
 
       - name: The architecture skill's continuum tests
         run: node --test skills/architecture/tests/*.test.mjs
