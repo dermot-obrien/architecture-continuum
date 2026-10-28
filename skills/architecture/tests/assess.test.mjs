@@ -53,3 +53,30 @@ test("a change re-checks only the criteria that read what changed", { skip: !yam
   assert.ok(ids.includes("CORE-SEC-02"));
   assert.ok(!ids.includes("AIS-EVAL-01"));
 });
+
+test("every tool and shared criterion is automated", { skip: !yaml }, () => {
+  const missing = lenses.flatMap(l => l.criteria.filter(c => c.decided_by !== "reviewer" && !CHECKS[c.id]).map(c => c.id));
+  assert.deepEqual(missing, []);
+});
+
+test("the lethal trifecta is caught, and lifting one leg clears it", { skip: !yaml }, () => {
+  const spec = sd001();
+  const agent = spec.elements.find(e => e.agent);
+  agent.ai.input_trust = "untrusted";
+  const sensitive = (spec.data || []).find(d => d.personal === true || ["confidential", "restricted"].includes(d.classification));
+  agent.ai.grounding = { ...(agent.ai.grounding || {}), sources: [sensitive.id] };
+  agent.agent.tools[0] = { ...agent.agent.tools[0], effect: "external-communication", approval: "autonomous" };
+  const run = s => check(s, lensesFor(s, "new-design", lenses)).find(r => r.criterion === "AGT-INJ-01").result;
+  assert.equal(run(spec), "not-met");
+  agent.agent.tools = agent.agent.tools.map(t => ({ ...t, approval: "human-approved" }));
+  assert.equal(run(spec), "met");
+});
+
+test("target-state positions come from the triage record", { skip: !yaml }, () => {
+  const spec = sd001();
+  const block = spec.elements.find(e => ["sbb", "technology"].includes(e.kind));
+  const triage = { target_state: spec.elements.filter(e => ["sbb", "technology", "deployment-node"].includes(e.kind)).map(e => ({ element: e.id, position: e.id === block.id ? "retired" : "target" })) };
+  const r = check(spec, lensesFor(spec, "new-design", lenses), { triage }).find(x => x.criterion === "CORE-TGT-01");
+  assert.notEqual(r.result, "met");
+  assert.ok(r.notes.some(n => n.includes("retired")));
+});
