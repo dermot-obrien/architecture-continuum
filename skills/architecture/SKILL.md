@@ -5,7 +5,7 @@ license: CC-BY-4.0 AND Apache-2.0
 compatibility: Node.js 18 or newer for the binding check and the continuum check (which also needs ajv, ajv-formats and js-yaml, from npm install here or the workspace); Python 3.11 or newer for the stage flow. PNG export needs draw.io desktop. Carries its own copy of the standards in references/standards/. Artefact locations come from [suite.architecture] of the repository's .agents/skill-bindings.toml; the skill ships no layout of its own.
 metadata:
   author: dermot-obrien
-  version: "0.15.0"
+  version: "0.16.0"
 ---
 
 # Architecture

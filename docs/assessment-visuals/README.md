@@ -8,4 +8,4 @@ Pictures of the [Architecture Assessment Standard](../../standards/assessment/st
 | [viewpoints-deck.html](viewpoints-deck.html) | The same six viewpoints as seven slides, for presenting |
 | [lens-atlas.html](lens-atlas.html) | Every lens, area and criterion, with who decides each (tool, tool and reviewer, or reviewer) and its default severity, generated from `standards/assessment/lenses/` |
 
-They show standard 0.7.0 with core lens 0.6.0, AI solution 0.4.0, AI agent 0.1.0 and production 0.1.1: 121 criteria, 26 of them blockers. When a lens changes, regenerate the atlas's data from the lens files and check the counts on the viewpoints.
+They show standard 0.7.0 with core lens 0.6.0, AI solution 0.4.0, AI agent 0.1.0 and production 0.1.1: 121 criteria, 26 of them blockers. The privacy lens (0.1.0, 8 criteria) came later and is not drawn in them. When a lens changes, regenerate the atlas's data from the lens files and check the counts on the viewpoints.

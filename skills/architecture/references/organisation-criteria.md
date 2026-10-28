@@ -5,7 +5,7 @@ sidebar_label: "Organisation criteria"
 
 # An organisation's own assessment criteria
 
-The architecture skill ships the method of the [Architecture Assessment Standard](standards/assessment/standard-architecture-assessment.md) and four lenses of criteria: core, AI solution, AI agent and production. An organisation that assesses against criteria of its own keeps them in its own repository, and one binding tells the skill where they are. The skill and its scripts stay as installed; only the criteria change.
+The architecture skill ships the method of the [Architecture Assessment Standard](standards/assessment/standard-architecture-assessment.md) and five lenses of criteria: core, AI solution, AI agent, privacy and production. An organisation that assesses against criteria of its own keeps them in its own repository, and one binding tells the skill where they are. The skill and its scripts stay as installed; only the criteria change.
 
 ## What an organisation can change
 

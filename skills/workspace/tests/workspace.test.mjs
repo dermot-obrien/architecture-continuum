@@ -180,7 +180,7 @@ test("regenerate writes the portfolio's inventory page when it is bound and the 
   write(".agents/skill-bindings.toml", '[suite.portfolio]\ninventory = "../docs/portfolio.md"\n');
   // A stand-in for the portfolio skill: it records how it was run, where the real one writes the page.
   write(".agents/skills/portfolio/scripts/portfolio.py",
-    "import os, sys\nos.makedirs('docs', exist_ok=True)\nopen('docs/portfolio.md', 'w').write(' '.join(sys.argv[1:]) + '\\n')\n");
+    "import os, sys\nos.makedirs('docs', exist_ok=True)\nopen('docs/portfolio.md', 'w', newline='').write(' '.join(sys.argv[1:]) + '\\n')\n");
   const lines = [];
   const err = console.error;
   console.error = (m) => lines.push(m);
