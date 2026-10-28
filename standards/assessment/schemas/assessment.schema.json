@@ -68,6 +68,13 @@
             "properties": { "id": { "type": "string" }, "version": { "$ref": "envelope.schema.json#/$defs/semver" } }
           }
         },
+        "criteria_set": {
+          "type": "object",
+          "required": ["id"],
+          "additionalProperties": false,
+          "description": "The criteria set the lenses came from: architecture-continuum for the shipped lenses, or the id and version of the organisation's assessment.yaml. Absent means the shipped lenses.",
+          "properties": { "id": { "type": "string" }, "version": { "$ref": "envelope.schema.json#/$defs/semver" }, "builtin": { "enum": ["extend", "replace"] } }
+        },
         "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
         "assessors": {
           "type": "array",

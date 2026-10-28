@@ -1,0 +1,70 @@
+# An organisation's own lens: valid against lens.schema.json, with a declarative check on each
+# criterion a tool decides, so it is machine-checked without code.
+schema: lens/0.1.0
+lens:
+  id: acme-data
+  prefix: ACME
+  title: Acme data rules
+  version: 1.0.0
+  applies_when: always
+  description: The data rules every Acme design meets, from the Acme data policy.
+areas:
+  - id: DAT
+    title: Data
+    question: Is the design's data kept where, and for as long as, Acme's data policy says?
+  - id: GOV
+    title: Governance
+    question: Are the design's decisions recorded and accepted?
+criteria:
+  - id: ACME-DAT-01
+    area: DAT
+    question: Is every personal data set kept in the EU or the EEA?
+    why: Acme's data policy keeps personal data in the EU or EEA, so no transfer assessment is needed.
+    reads: [data.personal, data.residency]
+    decided_by: tool
+    rule: Every data set with personal true has residency EU or EEA.
+    severity: blocker
+    sources: [acme-data-policy]
+    check:
+      for_each: data
+      where: { personal: true }
+      require:
+        residency: [EU, EEA]
+      message: "personal data set {id} is not kept in the EU or EEA (residency: {residency})"
+  - id: ACME-DAT-02
+    area: DAT
+    question: Does every data set say how long it is kept?
+    reads: [data.retention]
+    decided_by: tool
+    rule: Every data set states retention.
+    severity: major
+    sources: [acme-data-policy]
+    check:
+      for_each: data
+      require:
+        retention: { present: true }
+      message: "data set {id} states no retention"
+  - id: ACME-GOV-01
+    area: GOV
+    question: Is at least one decision accepted, and does every decision name its alternatives?
+    reads: [decisions.status, decisions.alternatives]
+    decided_by: both
+    rule: At least one decision has status accepted, and every decision lists alternatives; a reviewer judges whether they were real.
+    severity: major
+    check:
+      - for_each: decisions
+        where: { status: accepted }
+        count: { min: 1 }
+        message: no decision is accepted
+      - for_each: decisions
+        require:
+          alternatives: { min_items: 1 }
+        message: "decision {id} names no alternatives"
+  - id: ACME-GOV-02
+    area: GOV
+    question: Was the design discussed at the Acme architecture forum before assessment?
+    reads: [design]
+    decided_by: reviewer
+    severity: minor
+sources:
+  acme-data-policy: Acme Data Policy, version 4 (internal).

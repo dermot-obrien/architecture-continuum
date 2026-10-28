@@ -1,0 +1,27 @@
+# The criteria an organisation's assessments apply, kept in its own repository and named by the
+# [suite.architecture] binding assessment in .agents/skill-bindings.toml:
+#
+#   [suite.architecture]
+#   assessment = "../governance/assessment"
+#
+# An example for a fictional retailer, Acme. It keeps the shipped lenses, adds two of its own,
+# leaves one shipped criterion out and changes two severities. Valid against
+# assessment-config.schema.json.
+schema: assessment-config/0.1.0
+id: acme
+version: 1.0.0
+title: Acme architecture criteria
+builtin: extend
+# Omitted, every .yaml in lenses/ is read; listed here to show the order is the organisation's.
+lenses:
+  - lenses/acme-data.yaml
+  - lenses/acme-payments.yaml
+exclude:
+  - CORE-CST-02
+overrides:
+  CORE-CST-01:
+    severity: minor
+    note: Cost is governed by the FinOps review at Acme, not by architecture assessment.
+  AIS-EVAL-09:
+    severity: blocker
+    note: Acme's AI policy makes an evaluation plan a condition of approval.

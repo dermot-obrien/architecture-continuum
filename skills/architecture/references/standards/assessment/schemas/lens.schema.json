@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "lens.schema.json",
-  "title": "Assessment lens (draft 0.1.0)",
-  "description": "A set of criteria an assessment applies to a design specification. The core lens applies to every design; further lenses apply when a design declares, or is found to have, a profile. Each criterion says what it asks, why, what in the specification it reads, whether a tool can decide it or a reviewer must, how severe a failure is by default, and where it comes from. Draft: see standards/assessment/standard-architecture-assessment.md.",
+  "title": "Assessment lens (draft 0.2.0)",
+  "description": "A set of criteria an assessment applies to a design specification. The core lens applies to every design; further lenses apply when a design declares, or is found to have, a profile. Each criterion says what it asks, why, what in the specification it reads, whether a tool can decide it or a reviewer must, how severe a failure is by default, and where it comes from. A criterion decided by tool or both may carry a declarative check, so an organisation's own criteria are machine-checked without code. Draft: see standards/assessment/standard-architecture-assessment.md.",
   "type": "object",
   "required": ["schema", "lens", "criteria"],
   "additionalProperties": false,
@@ -50,7 +50,11 @@
           "rule": { "type": "string", "description": "For a tool-decided criterion, the check in words precise enough to implement." },
           "applies_to": { "type": "string", "description": "When the criterion applies, if not always." },
           "severity": { "enum": ["blocker", "major", "minor", "advisory"], "description": "The default severity of a not-met result. An assessor may change it with a reason." },
-          "sources": { "type": "array", "items": { "type": "string" } }
+          "sources": { "type": "array", "items": { "type": "string" } },
+          "check": {
+            "description": "A machine-checkable form of the rule: one rule or a list of rules over the design specification. Each rule picks items with for_each (a dotted path, stepping into every list on the way) and where, then requires fields of each, or counts them. Each required field of each item is a clause: every clause holding is met, some partly-met, none not-met, and nothing to check not-applicable. A shipped criterion is checked by code instead; a criterion with neither is reported as manual.",
+            "anyOf": [ { "$ref": "#/$defs/rule" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/rule" } } ]
+          }
         }
       }
     },
@@ -58,6 +62,42 @@
       "type": "object",
       "additionalProperties": { "type": "string" },
       "description": "Short source keys used by the criteria, each mapped to the full citation."
+    }
+  },
+  "$defs": {
+    "matcher": {
+      "description": "What the values at a field must be. A string, number or boolean means equals it; a list means each value is one of it. Over several values (a path through a list), equals, in and matches must hold for every value, and present for at least one.",
+      "anyOf": [
+        { "type": ["string", "number", "boolean"] },
+        { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "present": { "type": "boolean" },
+            "equals": { "type": ["string", "number", "boolean"] },
+            "in": { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
+            "not_in": { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
+            "matches": { "type": "string", "description": "A regular expression, case-insensitive." },
+            "min_items": { "type": "integer", "minimum": 0 },
+            "max_items": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "conditions": { "type": "object", "additionalProperties": { "$ref": "#/$defs/matcher" }, "description": "Field path, relative to the item (. for the item itself), to matcher. All must hold." },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "anyOf": [ { "required": ["require"] }, { "required": ["count"] } ],
+      "properties": {
+        "for_each": { "type": "string", "description": "Dotted path to the items checked, such as data or elements.agent.tools. Omitted, the rule checks the specification itself." },
+        "where": { "$ref": "#/$defs/conditions", "description": "Only the items meeting these are checked." },
+        "require": { "$ref": "#/$defs/conditions", "description": "What each chosen item must meet; each field is a clause." },
+        "count": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "min": { "type": "integer", "minimum": 0 }, "max": { "type": "integer", "minimum": 0 } }, "description": "Instead of require: how many items may match where. One clause." },
+        "message": { "type": "string", "description": "The note when a clause fails. {id}, {name} or any field path of the item is filled in, and {field} with the required field." }
+      }
     }
   }
 }

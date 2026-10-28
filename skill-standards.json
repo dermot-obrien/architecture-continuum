@@ -38,6 +38,10 @@
       {
         "from": "docs/continuum.md",
         "to": "references/continuum.md"
+      },
+      {
+        "from": "docs/organisation-criteria.md",
+        "to": "references/organisation-criteria.md"
       }
     ]
   }
