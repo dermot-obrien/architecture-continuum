@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.5.0
+version: 0.6.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -104,13 +104,15 @@ The steps follow the architecture evaluation process of ISO/IEC/IEEE 42020, clau
 | `not-applicable` | The criterion's `applies_to` condition is false for this design |
 | `not-assessed` | It applies but was not answered at this depth; the finding says why |
 
+A rule with several clauses is `met` when every clause holds, `partly-met` when some do, and `not-met` when none does. A rule whose condition the design does not trigger is `not-applicable` through its `applies_to`, never `met` by default.
+
 A finding has a type: `gap` (the design does not say what it must), `risk` and `non-risk` (a decision that is or is not problematic for the qualities it affects), `sensitivity-point` (a decision one quality's response turns on), `trade-off-point` (a decision that moves several qualities in opposite directions), or `observation`. The last four are ATAM's. Severity is `blocker`, `major`, `minor` or `advisory`; each criterion sets a default, and an assessor may move it with a reason in the statement.
 
 A criterion found `met` need not be recorded at review depth unless the result is worth keeping, typically a non-risk or a sensitivity point. A tool run records every criterion.
 
 A criterion decided by `both` has two halves, and the record keeps both: `tool_result` is what the tool half found (whether the answer is present), and `result` is the reviewer's judgement of whether it is good enough. The overall `result` is never better than `tool_result`, and a present answer the reviewer could not judge is `not-assessed`, with the reason.
 
-Evidence a criterion asks for and the design does not have is a finding against that criterion, not a reason to defer. At a design review, evidence that can exist only once the solution is built (eval reports, test results, the outcome of a hand-over) is not yet required: the assessment judges its plan, such as the evals the specification defines. The production entry assessment requires the evidence itself.
+Evidence a criterion asks for and the design does not have is a finding against that criterion, not a reason to defer. Nor is a specification its author has not yet confirmed (`provenance.review_state` `ai-raw`): the assessment proceeds on it, records its review state, and makes the author's confirmation a condition; a finding that rests on a reading the author then corrects is checked again. At a design review, evidence that can exist only once the solution is built (eval reports, test results, the outcome of a hand-over) is not yet required: the assessment judges its plan, such as the evals the specification defines. The production entry assessment requires the evidence itself.
 
 ## 6. Where findings go on the continuum
 

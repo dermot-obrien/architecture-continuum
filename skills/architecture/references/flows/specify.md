@@ -10,7 +10,7 @@ No bindings are required. It reads `design.schema.json` (with `envelope.schema.j
 
 ## Steps
 
-1. **Read the document whole**, with its diagrams. Note its type: an architecture pattern (AP), a reference architecture (RA) or a solution design (SD), and its version.
+1. **Read the document whole**, with its diagrams. Note its type: an architecture pattern (AP), a reference architecture (RA) or a solution design (SD), and its version. If it is a solution design written from the pattern skill's template, use template mode: translate it table by table by the mapping in [specify-solution-design.md](../specify-solution-design.md), which replaces steps 2 to 8, then validate and write as steps 9 and 10 say. Otherwise go on as below.
 2. **Fix the header.** `design`: id, title, type, version, status, owner, authors, and `source` pointing at the document. `exposure`: who uses or reaches the solution. Record `provenance` as `ai-generated` and `ai-raw`: the author confirms the specification before it is assessed.
 3. **Place it on the continuum.** `context`: the capabilities it realises, the platform, bounded contexts, outcomes, use cases, products, each by its catalogue identifier. Ask for any identifier the document does not give; never coin one.
 4. **Write the drivers.** Goals, non-goals, stakeholders with their concerns, constraints and assumptions with their sources, obligations with how each instrument classes the design.

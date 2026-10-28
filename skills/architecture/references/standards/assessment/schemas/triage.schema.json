@@ -22,6 +22,7 @@
           "properties": {
             "name": { "type": "string" },
             "design": { "type": "string", "pattern": "^(AP|RA|SD)-\\d{3}$", "description": "The design specification, once there is one." },
+            "review_state": { "enum": ["ai-raw", "ai-verified", "human-reviewed", "human-approved"], "description": "The specification's provenance.review_state when triage read it. ai-raw means its author has not yet confirmed it: triage proceeds, and the confirmation is a condition." },
             "description": { "type": "string" },
             "owner": { "type": "string" }
           }
@@ -50,7 +51,7 @@
         "reversibility": { "enum": ["two-way-door", "costly", "one-way-door"] },
         "platform": {
           "type": "object",
-          "description": "The assessed platform the subject runs on, if any, and whether the subject sits inside its envelope.",
+          "description": "The platform the subject runs on, if any, and whether the subject sits inside its envelope. assessment names the assessment that admitted the platform; leave it out when the platform has not been assessed, and the subject inherits nothing from it.",
           "required": ["name", "within_envelope"],
           "additionalProperties": false,
           "properties": {
@@ -75,7 +76,7 @@
         "properties": {
           "element": { "type": "string", "description": "The element's id in the subject's design specification." },
           "ref": { "type": "string", "description": "The catalogue identifier, when the building block is catalogued." },
-          "position": { "enum": ["target", "in-flight", "baseline", "retiring", "retired", "not-target"], "description": "target: part of the target architecture. in-flight: on its way to it. baseline: in the landscape today but not target, with a successor to come. retiring: on a dated path out. retired: not to be used. not-target: neither in the landscape today nor part of the target architecture, so a design that uses it brings in technology the target does not plan for." },
+          "position": { "enum": ["target", "in-flight", "baseline", "retiring", "retired", "contained", "not-target"], "description": "target: part of the target architecture. in-flight: on its way to it. baseline: in the landscape today but not target, with a successor to come. retiring: on a dated path out. retired: not to be used. contained: in the landscape today and kept for the uses it already has, but not to be extended to new ones, so a design that newly relies on it extends what the target state has decided to hold where it is. not-target: neither in the landscape today nor part of the target architecture, so a design that uses it brings in technology the target does not plan for." },
           "successor": { "type": "string", "description": "What replaces it in the target state, when it is not target and the architect has named it." },
           "permitted_use": { "type": "string", "description": "The use the position holds for, when the architect limits it: for example, a platform that is target only for running one kind of workload. Use beyond it is a departure." },
           "attested_by": {

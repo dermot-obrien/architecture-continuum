@@ -259,7 +259,7 @@
               "kind": { "enum": ["time-bound", "permanent"] },
               "expires": { "$ref": "envelope.schema.json#/$defs/isoDate" },
               "path_back": { "type": "string", "description": "How the design returns to the target when the departure expires." },
-              "approved_by": { "type": "string", "description": "Who approved the departure. For a not-target building block (CORE-TGT-05) this is the exception authority the organisation names, such as the architecture board, after escalation: the responsible architect cannot approve it alone." },
+              "approved_by": { "type": "string", "description": "Who approved the departure. For a not-target building block, or a new use of a contained one (CORE-TGT-05) this is the exception authority the organisation names, such as the architecture board, after escalation: the responsible architect cannot approve it alone." },
               "escalation": { "type": "string", "description": "The escalation that led to the approval: to whom, when, and a reference to its decision." }
             },
             "allOf": [ { "if": { "properties": { "kind": { "const": "time-bound" } } }, "then": { "required": ["expires", "path_back"] } } ]
@@ -280,6 +280,8 @@
           "options": { "type": "array", "items": { "type": "string" } },
           "status": { "enum": ["open", "resolved", "withdrawn"] },
           "resolved_by": { "type": "string" },
+          "owner": { "type": "string", "description": "Who answers the question (CORE-DEC-02)." },
+          "due": { "type": "string", "format": "date", "description": "When the answer is needed (CORE-DEC-02)." },
           "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } }
         }
       }

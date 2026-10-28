@@ -12,4 +12,6 @@ This folder holds the ServiceNow knowledge agent test case run the way the metho
 
 The earlier runs of the same test case (TR-001 to TR-004 and AS-002 to AS-004, one folder up) started from a specification written straight from a research page. They are kept as the record of how the method was developed. Catalogue identifiers in this example are illustrative.
 
+[TR-006](TR-006-servicenow-knowledge-agent.triage.yaml) re-triages the same specification after two method changes: servicenowkb3 is re-attested at the new position `contained` (in use, not to be extended), and attested building blocks with no catalogue entry no longer count as new. The tier falls from AT3 to AT2. AS-005 was made under TR-005, at the same depth and lenses, so its review covers the lower tier, and its blocker stands: a new use of a contained block needs the same escalated exception.
+
 The outcome proposed is not endorsed: the connection that copies ServiceNow articles into Microsoft 365 is not part of the target state, and no exception has been escalated. A person confirms the outcome.
