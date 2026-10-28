@@ -29,12 +29,12 @@ Run every command below from the root of the repository you are installing into.
 Take the latest release from the [releases page](https://github.com/dermot-obrien/architecture-continuum/releases); the commands below name the one current when this page was written.
 
 ```powershell
-$Version = 'v0.6.1'  # x-release-please-version
+$Version = 'v0.7.0'  # x-release-please-version
 git clone --quiet --depth 1 --branch $Version https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
 ```bash
-VERSION=v0.6.1  # x-release-please-version
+VERSION=v0.7.0  # x-release-please-version
 git clone --quiet --depth 1 --branch "$VERSION" https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
