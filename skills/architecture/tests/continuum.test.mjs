@@ -231,3 +231,45 @@ test("scaffold's bindings are one [suite.architecture] table", () => {
     rmSync(ws, { recursive: true, force: true });
   }
 });
+
+test("the portfolio signature: collaborations, candidates, placeholders, archived pages and archive stubs", () => {
+  const { ws, root } = workspace();
+  const put = (rel, text) => {
+    const abs = path.join(root, rel);
+    mkdirSync(path.dirname(abs), { recursive: true });
+    writeFileSync(abs, text);
+  };
+  try {
+    put("solution/patterns/CL-001-incident-response/index.md", `---\nkind: pattern\nid: CL-001\ntitle: "CL-001 Incident response"\n${common()}pattern_type: collaboration\npattern_scope: domain\nportfolio:\n  priority: high\n  target_quarter: "2027-Q1"\n  committed: true\n---\n\n# CL-001 Incident response\n`);
+    put("solution/patterns/RA-002-ingress/index.md", `---\nkind: pattern\nid: RA-002\ntitle: "RA-002 Ingress"\n${common()}pattern_type: reference-architecture\nportfolio:\n  state: placeholder\n  committed: true\n  since: 2026-10-18\n  backlog_ref: "BL-6"\n---\n\n# RA-002 Ingress\n`);
+    put("demand/use-cases/UC-002-cancel/index.md", `---\nkind: use-case\nid: UC-002\ntitle: "UC-002 Cancel"\n${common()}portfolio:\n  state: placeholder\n---\n\n# UC-002 Cancel\n`);
+    const ucs = path.join(root, "demand/use-cases.csv");
+    writeFileSync(ucs, readFileSync(ucs, "utf8") + "UC-002,Cancel,,,,,,,draft,use-cases/UC-002-cancel/index.md\n");
+    put("candidates/event-sourced-ledger.md", `---\nkind: candidate\nid: event-sourced-ledger\ntitle: Event-sourced ledger\ncandidate_type: architecture-pattern\nportfolio:\n  priority: medium\n---\n\n# Event-sourced ledger\n`);
+    put("candidates/whiteboard/index.md", `---\nkind: candidate\ntitle: Pricing flow\nstatus: Draft\nportfolio:\n  state: needs-conversion\n  reason: "A picture awaiting the agent"\n  since: 2026-10-18\n---\n\n# Pricing flow\n`);
+    put("archive/solution/patterns/AP-002-old/index.md", `---\nkind: pattern\nid: AP-002\ntitle: "AP-002 Old"\n${common()}pattern_type: architecture-pattern\npattern_scope: problem\nunlisted: true\nportfolio:\n  state: archived\n  since: 2026-10-18\n  archived_from: solution/patterns/AP-002-old\n---\n\n# AP-002 Old\n`);
+    put("solution/patterns/AP-002-old/index.md", `---\ntitle: "AP-002 Old (archived)"\nmoved_to: ../../../archive/solution/patterns/AP-002-old/index.md\nunlisted: true\n---\n\n# AP-002 Old\n`);
+    let r = run(ws);
+    assert.deepEqual(r.findings.filter((f) => f.level === "error"), [], JSON.stringify(r.findings, null, 1));
+
+    // A collaboration applies no other pattern; a reference architecture past placeholder names one.
+    const cl = path.join(root, "solution/patterns/CL-001-incident-response/index.md");
+    writeFileSync(cl, readFileSync(cl, "utf8").replace("pattern_scope: domain\n", "pattern_scope: domain\nimplements: [AP-001]\n"));
+    const ra = path.join(root, "solution/patterns/RA-002-ingress/index.md");
+    writeFileSync(ra, readFileSync(ra, "utf8").replace("  state: placeholder\n", "  state: draft\n"));
+    r = run(ws);
+    const fm3 = r.findings.filter((f) => f.code === "FM-003");
+    assert.ok(fm3.some((f) => f.file.includes("CL-001")), JSON.stringify(fm3, null, 1));
+    assert.ok(fm3.some((f) => f.file.includes("RA-002") && /implements|pattern_scope/.test(f.message)), JSON.stringify(fm3, null, 1));
+
+    // A candidate carries no state and no series identifier; a portfolio block has only its own fields.
+    const cand = path.join(root, "candidates/event-sourced-ledger.md");
+    writeFileSync(cand, readFileSync(cand, "utf8").replace("id: event-sourced-ledger", "id: AP-009").replace("  priority: medium\n", "  priority: medium\n  state: draft\n"));
+    const uc = path.join(root, "demand/use-cases/UC-002-cancel/index.md");
+    writeFileSync(uc, readFileSync(uc, "utf8").replace("  state: placeholder\n", "  state: placeholder\n  target_quarter: Q1\n  owner: someone\n"));
+    r = run(ws);
+    const files = r.findings.filter((f) => f.code === "FM-003").map((f) => f.file);
+    assert.ok(files.some((f) => f.includes("event-sourced-ledger")), codes(r).join());
+    assert.ok(files.some((f) => f.includes("UC-002")), codes(r).join());
+  } finally { rmSync(ws, { recursive: true, force: true }); }
+});

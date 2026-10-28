@@ -2,10 +2,10 @@
 name: workspace
 description: "Initialise or reinitialise a repository that uses the architecture skills. Clears out what retired tooling left behind (framework submodules, aaw-* and aar-* skills, the old modules block, stale installed copies and build output), installs the skills .agents/skills.json declares, writes the repository's door script so its check and regeneration skip quietly when the skills are missing, wires package.json and .gitignore, and runs the Docusaurus build. Use when asked to set up, initialise, reinitialise, reset or clean a repository for the architecture skills, to clear out old skill or framework remnants, to make a site build without the skills installed, or to reinstall the skills and rebuild the site."
 license: Apache-2.0
-compatibility: Node.js 18 or newer and git; no npm packages. The build needs the repository's own Docusaurus packages. Regeneration runs the pattern and model skills (Python 3.11 or newer, PyYAML) and markdown-deck (its npm packages, and a Chromium-based browser for PDFs) when they are installed, and skips each one that is not.
+compatibility: Node.js 18 or newer and git; no npm packages. The build needs the repository's own Docusaurus packages. Regeneration runs the pattern and model skills (Python 3.11 or newer, PyYAML), the portfolio skill (Python 3.11 or newer) and markdown-deck (its npm packages, and a Chromium-based browser for PDFs) when they are installed, and skips each one that is not.
 metadata:
   author: dermot-obrien
-  version: "0.1.2"
+  version: "0.2.0"
 ---
 
 # Workspace
@@ -48,7 +48,7 @@ Install replaces a file or script only when this skill wrote it; `--force` repla
 | npm script | Runs |
 |---|---|
 | `check:architecture` | The continuum check (`--strict`) and the cross-reference check |
-| `prebuild`, `regenerate` | The pattern skill's diagrams, exports and walkthroughs for each bound folder, then the decks and PDFs |
+| `prebuild`, `regenerate` | The pattern skill's diagrams, exports and walkthroughs for each bound folder, then the portfolio skill's inventory page when `[suite.portfolio] inventory` is bound, then the decks and PDFs |
 | `reinit` | `init`, installing the skills first when they are missing |
 | `skills`, `skills:check` | The installer: install the locked skills, or say what changed |
 

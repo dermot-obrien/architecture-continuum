@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "pattern.schema.json",
-  "title": "Pattern document (v1.1.0): architecture pattern or reference architecture",
-  "description": "One of the two kinds of pattern document the continuum names, authored by the pattern skill: an architecture pattern (AP-NNN, technology-agnostic, conceptual or logical, its boxes local roles or ABBs) or a reference architecture (RA-NNN, technology-specific, physical, its boxes SBBs and technologies, applying one or more architecture patterns). The type is declared as pattern_type and must agree with the identifier's series.",
+  "title": "Pattern document (v1.1.0): architecture pattern, reference architecture or collaboration",
+  "description": "One of the three kinds of pattern document the continuum names, authored by the pattern skill: an architecture pattern (AP-NNN, technology-agnostic, conceptual or logical, its boxes local roles or ABBs), a reference architecture (RA-NNN, technology-specific, physical, its boxes SBBs and technologies, applying one or more architecture patterns) or a collaboration (CL-NNN, participants working together, with lighter rules: its boxes need not be catalogued building blocks). The type is declared as pattern_type and must agree with the identifier's series. A placeholder (portfolio.state placeholder) need not yet carry pattern_scope, or a reference architecture's implements.",
   "type": "object",
   "allOf": [
     {
@@ -15,15 +15,16 @@
         },
         "id": {
           "type": "string",
-          "pattern": "^(AP|RA)-\\d{3}$"
+          "pattern": "^(AP|RA|CL)-\\d{3}$"
         },
         "pattern_type": {
           "type": "string",
           "enum": [
             "architecture-pattern",
-            "reference-architecture"
+            "reference-architecture",
+            "collaboration"
           ],
-          "description": "architecture-pattern: technology-agnostic, series AP. reference-architecture: technology-specific, series RA, applies architecture patterns."
+          "description": "architecture-pattern: technology-agnostic, series AP. reference-architecture: technology-specific, series RA, applies architecture patterns. collaboration: participants working together, series CL."
         },
         "pattern_scope": {
           "type": "string",
@@ -110,9 +111,33 @@
         }
       },
       "required": [
-        "pattern_type",
-        "pattern_scope"
+        "pattern_type"
       ]
+    },
+    {
+      "$comment": "Every pattern says its scope, except a placeholder, which has no content yet.",
+      "if": {
+        "properties": {
+          "portfolio": {
+            "properties": {
+              "state": {
+                "const": "placeholder"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          }
+        },
+        "required": [
+          "portfolio"
+        ]
+      },
+      "else": {
+        "required": [
+          "pattern_scope"
+        ]
+      }
     },
     {
       "$comment": "The series says the type: an architecture pattern is AP-NNN, composes ABBs only, and applies no other pattern.",
@@ -147,7 +172,7 @@
       }
     },
     {
-      "$comment": "A reference architecture is RA-NNN, applies at least one architecture pattern, composes SBBs only, and is applied by no other document.",
+      "$comment": "A reference architecture is RA-NNN, applies at least one architecture pattern (once it is more than a placeholder), composes SBBs only, and is applied by no other document.",
       "if": {
         "properties": {
           "pattern_type": {
@@ -165,8 +190,7 @@
             "pattern": "^RA-\\d{3}$"
           },
           "implements": {
-            "type": "array",
-            "minItems": 1
+            "type": "array"
           },
           "composes": {
             "type": "array",
@@ -175,12 +199,76 @@
             }
           }
         },
-        "required": [
-          "implements"
-        ],
         "not": {
           "required": [
             "implemented_by"
+          ]
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "portfolio": {
+                  "properties": {
+                    "state": {
+                      "const": "placeholder"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                }
+              },
+              "required": [
+                "portfolio"
+              ]
+            },
+            "else": {
+              "required": [
+                "implements"
+              ],
+              "properties": {
+                "implements": {
+                  "type": "array",
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "$comment": "A collaboration is CL-NNN, names its participants without building-block rigour, and neither applies nor is applied by another pattern.",
+      "if": {
+        "properties": {
+          "pattern_type": {
+            "const": "collaboration"
+          }
+        },
+        "required": [
+          "pattern_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CL-\\d{3}$"
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "implements"
+              ]
+            },
+            {
+              "required": [
+                "implemented_by"
+              ]
+            }
           ]
         }
       }

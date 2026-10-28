@@ -25,7 +25,12 @@
         "realised_by":           { "type": "array", "items": { "anyOf": [{ "$ref": "envelope.schema.json#/$defs/architecturePatternId" }, { "$ref": "envelope.schema.json#/$defs/referenceArchitectureId" }] }, "uniqueItems": true, "description": "The architecture patterns whose scenarios walk this use case's scenarios across building blocks, and the reference architectures that make them concrete. The inverse of serves on the pattern." },
         "fulfilled_by_features": { "type": "array", "items": { "$ref": "envelope.schema.json#/$defs/featureId" }, "uniqueItems": true, "description": "The product features that fulfil the use case. The inverse of fulfils on the feature." }
       },
-      "required": ["primary_actor", "supports_outcome", "success_criteria"]
+      "required": []
+    },
+    {
+      "$comment": "Every use case names its actor, its outcome and its criteria, except a placeholder (portfolio.state placeholder), which has no content yet.",
+      "if": { "properties": { "portfolio": { "properties": { "state": { "const": "placeholder" } }, "required": ["state"] } }, "required": ["portfolio"] },
+      "else": { "required": ["primary_actor", "supports_outcome", "success_criteria"] }
     }
   ]
 }

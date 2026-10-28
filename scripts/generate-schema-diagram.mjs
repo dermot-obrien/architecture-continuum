@@ -194,7 +194,7 @@ for (const line of LINES) for (const f of line.fields) {
 for (const f of Object.keys(IN_A_BOX)) if (!fields.has(f)) problems.push(`${f} is listed as drawn in a box, but no schema has it`);
 for (const f of fields.keys()) if (!drawn.has(f) && !IN_A_BOX[f]) problems.push(`${f} has no line: add one to LINES or list it in IN_A_BOX`);
 // Placeholder kinds with no relationship fields yet, so nothing to draw.
-const NO_BOX = { view: 'placeholder', event: 'placeholder' };
+const NO_BOX = { view: 'placeholder', event: 'placeholder', candidate: 'not an artefact: a possible pattern, noted until it is promoted' };
 for (const k of KINDS) if (!NO_BOX[k] && !Object.values(BOXES).some((b) => b.kind === k)) problems.push(`kind ${k} has no box`);
 
 const edges = [...fs.readFileSync(CONTINUUM, 'utf8').matchAll(/<mxCell\b[^>]*?\bedge="1"[^>]*>/g)].map((m) => {
@@ -311,7 +311,7 @@ const tables = [
   '|---|---|---|---|',
   ...[...new Set(kindRows)],
   '',
-  `Not drawn: ${Object.keys(NO_BOX).map((k) => `\`${k}\``).join(' and ')}, placeholders with no relationship fields yet. Two fields name artefacts of any kind and are not drawn as lines: ${Object.entries(IN_A_BOX).filter(([, v]) => v === 'any kind').map(([f]) => `\`${f}\``).join(' and ')}.`,
+  `Not drawn: ${Object.keys(NO_BOX).filter((k) => NO_BOX[k] === 'placeholder').map((k) => `\`${k}\``).join(' and ')}, placeholders with no relationship fields yet${Object.entries(NO_BOX).filter(([, v]) => v !== 'placeholder').map(([k, v]) => `; \`${k}\`, ${v}`).join('')}. Two fields name artefacts of any kind and are not drawn as lines: ${Object.entries(IN_A_BOX).filter(([, v]) => v === 'any kind').map(([f]) => `\`${f}\``).join(' and ')}.`,
   '',
   '## The lines',
   '',
