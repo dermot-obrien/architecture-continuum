@@ -4,7 +4,7 @@ Every command this repository ships, with its options as its `--help` prints the
 
 On macOS and Linux type `python3` where this page says `python`.
 
-- [Installing](#installing): `skills.mjs`, the seeder
+- [Installing](#installing): `update-skills`, `skills.mjs`, the seeder
 - [Skill tools](#skill-tools): `stage.py`, the post-install checks, `check.mjs --json`
 - [Validation](#validation): skills, bundle, front matter
 - [Ontology tools](#ontology-tools): validate, consolidate, namespace-divergent
@@ -12,6 +12,15 @@ On macOS and Linux type `python3` where this page says `python`.
 - [Exporting diagrams](#exporting-diagrams)
 
 ## Installing
+
+### update-skills.ps1, update-skills.sh
+
+```text
+.\scripts\update-skills.ps1 [-CheckOnly] [-WithPortfolio] [-Yes]
+bash scripts/update-skills.sh [--check-only] [--with-portfolio] [--yes]
+```
+
+Installs the continuum and the skills it works with into a repository, or updates them, run from that repository's root (a git repository). Without a `.agents/skills.json` it declares `architecture` and `workspace` at the continuum's latest release, `pattern`, `use-case` and `cross-reference` (and with `-WithPortfolio`, `portfolio`, `draft` and `convert`), `model` and `markdown-deck`, each at its latest `<skill>--vX.Y.Z` tag, then runs `workspace init` from the continuum's release. With one, it moves every source it knows to its latest release (a source still naming `ai-assisted-architecture` moves to `architecture-continuum`), leaves the rest alone, reinstalls with `scripts/architecture.mjs reinit` (else `scripts/skills.mjs sync --copy`) and runs `skills.mjs check`. The continuum's latest release is read from GitHub's releases, so a stray tag cannot outrank it. `-CheckOnly` shows what would change and changes nothing; `-Yes` does not ask first. Needs git and Node 18 or later. Exit 0 done, 1 a step failed, 2 usage or a problem to fix first. Both run on their own, so they can be downloaded from `https://raw.githubusercontent.com/dermot-obrien/architecture-continuum/main/scripts/`.
 
 ### skills.mjs
 
@@ -26,7 +35,7 @@ node <aaw>/bin/skills.mjs check
 node <aaw>/bin/skills.mjs remove <name>...
 ```
 
-`install` copies the named skills, or every skill in `<aaa>/bundle.json`, into `.agents/skills/` and links `.claude/skills/<name>` at each when `.claude` exists (`--copy` copies instead). `sync` installs what a committed `.agents/skills.json` declares, such as `{ "sources": [ { "bundle": "https://github.com/dermot-obrien/ai-assisted-architecture.git", "ref": "main" } ] }`, and removes what it no longer declares; `--locked` installs exactly the commits in `.agents/skills.lock.json`, and needs a plain `sync` to have written that lock first. `check` exits 1 when an installed skill has changed or is missing. `--from <folder>` installs from copies on the machine with no network, and `SKILLS_BASE_URL` clones from a mirror. AAW's README documents the rest; [Installation](installation.md) shows each route.
+`install` copies the named skills, or every skill in `<aaa>/bundle.json`, into `.agents/skills/` and links `.claude/skills/<name>` at each when `.claude` exists (`--copy` copies instead). `sync` installs what a committed `.agents/skills.json` declares, such as `{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.7.0" } ] }`, and removes what it no longer declares; `--locked` installs exactly the commits in `.agents/skills.lock.json`, and needs a plain `sync` to have written that lock first. `check` exits 1 when an installed skill has changed or is missing. `--from <folder>` installs from copies on the machine with no network, and `SKILLS_BASE_URL` clones from a mirror. AAW's README documents the rest; [Installation](installation.md) shows each route.
 
 Version 0.3.0 and earlier shipped `aaa install`, which ran through AAW's framework engine. It was removed in 0.4.0; the `v0.3.0` tag still has it.
 

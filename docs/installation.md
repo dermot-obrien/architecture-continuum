@@ -34,21 +34,23 @@ The installer is `bin/skills.mjs` in [AI-Assisted Work](https://github.com/dermo
 
 ```bash
 git clone https://github.com/dermot-obrien/ai-assisted-work path/to/ai-assisted-work
-git clone https://github.com/dermot-obrien/ai-assisted-architecture path/to/ai-assisted-architecture
-node path/to/ai-assisted-work/bin/skills.mjs install --bundle path/to/ai-assisted-architecture
+git clone https://github.com/dermot-obrien/architecture-continuum path/to/architecture-continuum
+node path/to/ai-assisted-work/bin/skills.mjs install --bundle path/to/architecture-continuum
 ```
 
-Run it from the workspace root, or pass `--workspace <dir>`. Name a skill after the command to install only that one, for example `... install --bundle path/to/ai-assisted-architecture architecture`. `skills.mjs list --bundle <clone>` shows what the bundle holds. The installer records where each skill came from in `.agents/skills.lock.json`.
+Run it from the workspace root, or pass `--workspace <dir>`. Name a skill after the command to install only that one, for example `... install --bundle path/to/architecture-continuum architecture`. `skills.mjs list --bundle <clone>` shows what the bundle holds. The installer records where each skill came from in `.agents/skills.lock.json`.
 
 ## Route 2: a declared, locked set of skills
 
 For a team workspace, declare the skills in a committed `.agents/skills.json` and let the installer fetch them from GitHub:
 
+<!-- x-release-please-start-version -->
 ```json
-{ "sources": [ { "bundle": "https://github.com/dermot-obrien/ai-assisted-architecture.git", "ref": "main" } ] }
+{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.7.0" } ] }
 ```
+<!-- x-release-please-end -->
 
-Add `"skills": ["architecture"]` to the source to take only that skill, and use a tag such as `v0.4.0` as the `ref` to pin a release. Keep a copy of `skills.mjs` in the workspace (for example `scripts/skills.mjs`, copied from AAW's `bin/skills.mjs`), then:
+Add `"skills": ["architecture"]` to the source to take only that skill. Pin a release tag, never `main`: the tag is what the lock and the release notes describe. The [install quick start](quick-install.md) declares the skills the continuum works with beside it, and its install script writes the declaration for you. Keep a copy of `skills.mjs` in the workspace (for example `scripts/skills.mjs`, copied from AAW's `bin/skills.mjs`), then:
 
 ```bash
 node scripts/skills.mjs sync --copy            # the first time, and to take newer commits: writes .agents/skills.lock.json
@@ -63,12 +65,12 @@ With no installer at all, copy the folders yourself, at workspace or user level,
 
 ```powershell
 New-Item -ItemType Directory -Force .agents/skills | Out-Null
-Copy-Item -Recurse path/to/ai-assisted-architecture/skills/architecture, path/to/ai-assisted-architecture/skills/workspace .agents/skills/
+Copy-Item -Recurse path/to/architecture-continuum/skills/architecture, path/to/architecture-continuum/skills/workspace .agents/skills/
 ```
 
 ```bash
 mkdir -p .agents/skills
-cp -r path/to/ai-assisted-architecture/skills/architecture path/to/ai-assisted-architecture/skills/workspace .agents/skills/
+cp -r path/to/architecture-continuum/skills/architecture path/to/architecture-continuum/skills/workspace .agents/skills/
 ```
 
 For every workspace, copy into a user-level folder from the table above instead, such as `~/.agents/skills/`. Run the [post-install checks](commands.md#post-install-checks) afterwards.
@@ -98,7 +100,7 @@ Then set `ontology.schema` to a path that exists; see [Configuration](configurat
 `foundation/` is a generic starter model that no skill needs. To copy a profile of it into a workspace, run the seeder from a clone:
 
 ```bash
-node path/to/ai-assisted-architecture/scripts/seed-foundation.mjs --workspace . --profile core
+node path/to/architecture-continuum/scripts/seed-foundation.mjs --workspace . --profile core
 ```
 
 See [Commands](commands.md#seed-foundationmjs) for its options.
@@ -121,17 +123,17 @@ The skills are enough on their own. If your team keeps always-on instruction fil
 ## Verify
 
 ```bash
-node path/to/ai-assisted-architecture/scripts/validate-bundle.mjs --run-checks . path/to/ai-assisted-architecture
+node path/to/architecture-continuum/scripts/validate-bundle.mjs --run-checks . path/to/architecture-continuum
 node path/to/ai-assisted-work/bin/skills.mjs check
 ```
 
-The first prints one `ok` line per installed skill once each is bound; the second confirms every installed copy matches what was installed. Then type `/` in your agent: the `/aaa-*` skills should be listed.
+The first prints one `ok` line per installed skill once each is bound; the second confirms every installed copy matches what was installed. Then type `/` in your agent: `/architecture` and `/workspace` should be listed.
 
 ## Update and remove
 
-To update, pull the clone and run `skills.mjs install --bundle <clone>` again, or `skills.mjs update`; with a declared set, run `skills.mjs sync --copy` and commit the new lock. Installing replaces the skill folders and leaves your artefacts, bindings and config alone.
+To update, pull the clone and run `skills.mjs install --bundle <clone>` again, or `skills.mjs update`. With a declared set, run the install script from `scripts/update-skills.ps1` or `scripts/update-skills.sh`, which moves every declared source to its latest release tag and reinstalls (see [the install quick start](quick-install.md#to-a-newer-release)), or move the `ref`s by hand, run `skills.mjs sync --copy`, and commit the new lock. Installing replaces the skill folders and leaves your artefacts, bindings and config alone.
 
-To remove, run `skills.mjs remove <name>...`, or delete `.agents/skills/aaa-*` and `.claude/skills/aaa-*` (and the source from `.agents/skills.json`). Delete `.aaa-config.yaml` if you made one. Your artefacts are yours and stay.
+To remove, run `skills.mjs remove <name>...`, or delete `.agents/skills/architecture`, `.agents/skills/workspace` and their links under `.claude/skills/` (and the source from `.agents/skills.json`). Delete `.aaa-config.yaml` if you made one. Your artefacts are yours and stay.
 
 ## The old installer
 

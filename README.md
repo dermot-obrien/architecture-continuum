@@ -67,7 +67,7 @@ The `pattern` skill, which authors an architecture pattern as one Markdown docum
 
 You need git, Node.js 18 or later and Python 3.11 or later. draw.io desktop is optional, for PNG export of diagrams. No package registry is needed.
 
-The [install quick start](docs/quick-install.md) installs the continuum and every skill it works with (`pattern`, `use-case`, `cross-reference`, `model` and `markdown-deck`) into a repository with one declaration and one command, and says how to reinstall over an installation, move to a newer release, or move from the old `aaa-*` skills. The rest of this section is the installer underneath.
+The [install quick start](docs/quick-install.md) installs the continuum and every skill it works with (`pattern`, `use-case`, `cross-reference`, `model` and `markdown-deck`) into a repository with one declaration and one command, and says how to reinstall over an installation, move to a newer release, or move from the old `aaa-*` skills. Its install script, `scripts/update-skills.ps1` or `scripts/update-skills.sh`, does a fresh install or an update in one command, with every skill at its latest release tag. The rest of this section is the installer underneath.
 
 Each skill is complete on its own: `architecture` carries the standards it reads, the `.aaa-config.yaml` template and its own binding resolver, and needs no other skill. Install them with `bin/skills.mjs`, the standalone skills installer in [AI-Assisted Work](https://github.com/dermot-obrien/ai-assisted-work) (AAW), from the workspace root:
 

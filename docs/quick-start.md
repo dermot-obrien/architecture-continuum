@@ -41,20 +41,20 @@ The skills come from this repository, and the installer that copies them into a 
 
 ```bash
 git clone https://github.com/dermot-obrien/ai-assisted-work ../ai-assisted-work
-git clone https://github.com/dermot-obrien/ai-assisted-architecture ../ai-assisted-architecture
+git clone https://github.com/dermot-obrien/architecture-continuum ../architecture-continuum
 ```
 
 ## 3. Install the skills
 
 ```bash
-node ../ai-assisted-work/bin/skills.mjs install --bundle ../ai-assisted-architecture
+node ../ai-assisted-work/bin/skills.mjs install --bundle ../architecture-continuum
 ```
 
 It prints one line per skill:
 
 ```text
-installed architecture 0.7.0 from bundle ai-assisted-architecture (.claude/skills linked)
-installed workspace 0.1.0 from bundle ai-assisted-architecture (.claude/skills linked)
+installed architecture 0.10.1 from bundle architecture-continuum (.claude/skills linked)
+installed workspace 0.1.2 from bundle architecture-continuum (.claude/skills linked)
 ```
 
 You now have the two skills in `.agents/skills/` and a lock file, `.agents/skills.lock.json`, recording where they came from. The architecture skill is complete on its own: it carries the standards it reads and its own binding resolver. `(.claude/skills linked)` appears only when you created `.claude`.
@@ -64,7 +64,7 @@ You now have the two skills in `.agents/skills/` and a lock file, `.agents/skill
 The foundation catalogue is optional content that no skill needs, but it gives `/architecture stage` something to report on. Copy its `core` profile into the workspace:
 
 ```bash
-node ../ai-assisted-architecture/scripts/seed-foundation.mjs --workspace .
+node ../architecture-continuum/scripts/seed-foundation.mjs --workspace .
 ```
 
 It ends with:
@@ -126,7 +126,7 @@ with one.
 Each skill ships a post-install check. Run them the way an installer does:
 
 ```bash
-node ../ai-assisted-architecture/scripts/validate-bundle.mjs --run-checks . ../ai-assisted-architecture
+node ../architecture-continuum/scripts/validate-bundle.mjs --run-checks . ../architecture-continuum
 ```
 
 You should see two `ok` lines. Each also prints `warning: .aaa-config.yaml: not found`, which is harmless: the file is optional and only sets a workspace ontology schema (see [Configuration](configuration.md#aaa-configyaml)).
