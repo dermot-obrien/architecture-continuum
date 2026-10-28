@@ -2,7 +2,7 @@
 document_type: standards
 title: "Architecture Assessment Standard"
 classification: internal
-version: 0.2.0
+version: 0.4.0
 status: draft
 created: 2026-10-28
 last_modified: 2026-10-28
@@ -21,6 +21,7 @@ triggers:
 This standard says how a design on the continuum is assessed: what is read, against what, at what depth, by whom, and where each finding goes. It is general. Nothing in it is specific to a kind of solution; what is specific to AI solutions and AI agents lives in lenses that a design brings in by what it contains. It is a draft, written from the research in [Architecture assessment on the continuum](../../docs/architecture-assessment.md), and it is the contract a future `/architecture assess` flow will implement.
 
 > **Cross-references:**
+> - [Assessment Triage Standard](standard-assessment-triage.md): how the assessment type and risk tier are chosen before an assessment starts, and what each tier requires.
 > - [The continuum](../../docs/continuum.md): the kinds every element of a design is typed by.
 > - [Definition Ladder Standard](../capabilities/standard-definition-ladder.md): the stages an assessment can gate.
 > - [Building Block Calibration Standard](../building-blocks/standard-building-block-calibration.md): the grain a review checks.
@@ -32,7 +33,7 @@ This standard says how a design on the continuum is assessed: what is read, agai
 
 ## 1. What an assessment is, and what it is not
 
-An architecture assessment judges whether a design is fit for its purpose: whether it answers its demand, sits correctly on the continuum, meets its quality attributes with stated measures, records its decisions, and can be operated, afforded and changed. It reads the design, not the running system, and it ends in findings and a verdict. The vocabulary is ISO/IEC/IEEE 42030's: analysis establishes facts about the design; assessment applies the stakeholders' values to those facts.
+An architecture assessment judges whether a design is fit for its purpose: whether it answers its demand, sits correctly on the continuum, moves it toward its target state, meets its quality attributes with stated measures, records its decisions, and can be operated, afforded and changed. It reads the design, not the running system, and it ends in findings and a verdict. The vocabulary is ISO/IEC/IEEE 42030's: analysis establishes facts about the design; assessment applies the stakeholders' values to those facts.
 
 It is one of several judgements the bundle makes, and it is kept apart from the others because each answers a different question.
 
@@ -67,7 +68,7 @@ A design declares `profiles`, and a tool also derives them: an element with an `
 
 ## 3. Depths
 
-An assessment is made at one of three depths. Each includes the one before it.
+An assessment is made at one of three depths. Each includes the one before it. Which depth, and who assesses, is not chosen case by case: triage fixes it before the assessment starts, from the assessment type and the risk tier, AT1 Light to AT4 Critical ([Assessment Triage Standard](standard-assessment-triage.md)). The table below gives the depths themselves; the triage standard gives which tier gets which.
 
 | Depth | What happens | Who | When |
 |---|---|---|---|
@@ -128,7 +129,7 @@ An assessment does not keep its own backlog. Every finding that is not met goes 
 | `not-endorsed` | Any blocker is open |
 | `deferred` | The assessment could not be completed: the specification does not validate, or the evidence it relies on is missing |
 
-The verdict also records a conformance level against the continuum and its standards, using TOGAF's six levels (Enterprise Architecture Capability and Governance, 6.2, figure 6-1, as corrected by Technical Corrigendum 1) with the specification in the place of the implementation: `irrelevant` (nothing in common with the standards), `consistent` (what the design shares with the standards is in accordance, but some required features are missing and the design has features the standards do not cover), `compliant` (everything the design has is covered by the standards and in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence in both directions), and `non-conformant` (any of the above in which something the standards require is present but not in accordance). "In accordance" carries TOGAF's meaning: it supports the stated strategy, adheres to the stated standards and principles, and provides the stated functionality. Conformance answers whether the design follows the standards; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed. A production entry assessment also records `as_built`, the same scale applied to the built solution against the design (section 8.1).
+The verdict also records a conformance level against the target state, meaning the target architecture the catalogue records (artefacts whose `lifecycle_state` is `target`) and the standards that govern it, using TOGAF's six levels (Enterprise Architecture Capability and Governance, 6.2, figure 6-1, as corrected by Technical Corrigendum 1) with the specification in the place of the implementation: `irrelevant` (nothing in common with the target state), `consistent` (what the design shares with the target state is in accordance, but some required features are missing and the design has features the target state does not cover), `compliant` (everything the design has is covered by the target state and in accordance, but some required features are missing), `conformant` (everything required is present and in accordance, with extra features beyond it), `fully-conformant` (full correspondence in both directions), and `non-conformant` (any of the above in which something the target state requires is present but not in accordance). "In accordance" carries TOGAF's meaning: it supports the stated strategy, adheres to the stated standards and principles, and provides the stated functionality. Conformance answers whether the design follows the target state; the outcome answers whether it is fit for purpose. A design can be conformant and not endorsed. A production entry assessment also records `as_built`, the same scale applied to the built solution against the design (section 8.1).
 
 ## 8. Where assessment sits on the continuum
 
@@ -155,7 +156,7 @@ A solution goes into production only after a formal assessment of it as built: t
 | Trigger | `production-entry`: before a solution first goes into production, and before a change goes live that alters a one-way-door decision, a trust boundary, an agent's actions or the data a model sees. Other changes take the ordinary route in section 8 |
 | Depth | Review at least, evaluation for a solution that is costly to reverse or high-risk. A check alone is never enough |
 | Lenses | `core`, the lenses its profiles bring in, and `production` |
-| Assessors | A lead assessor independent of the design and of its delivery, always; a security architect. The service owner and operations take part as stakeholders, not as assessors |
+| Assessors | A lead assessor independent of the design and of its delivery, always; a security architect. The service owner and operations take part as stakeholders, not as assessors. At triage tier AT1 only, the team runs the production lens's tool criteria itself and the owner approves; every rule below still applies |
 | Approval | The accountable service owner approves or declines in the record, with the date. An agent may assess but never approves |
 
 Beyond section 7, these rules apply:
@@ -186,7 +187,7 @@ These assessments are not lenses, and are not to be written as lenses. A lens is
 
 ## 10. Writing a lens
 
-A lens is a YAML file valid against `lens.schema.json`. Each criterion asks one question that a design can answer, reads named paths of the specification, and says whether a tool can decide it. A tool criterion carries a `rule` precise enough to implement without judgement; a reviewer criterion says what the reviewer should look for. Criteria ids are `<PREFIX>-<AREA>-NN` and never reused; a changed criterion keeps its id and the lens's minor version moves, a removed criterion's id is retired, and a change that would turn earlier results wrong moves the major version. Every criterion cites its sources by key, and the keys resolve in the lens's `sources`.
+A lens is a YAML file valid against `lens.schema.json`. Each criterion asks one question that a design can answer, reads named paths of the specification, and says whether a tool can decide it. A tool criterion carries a `rule` precise enough to implement without judgement; a reviewer criterion says what the reviewer should look for. A tool criterion may read the catalogue as well as the specification, through the identifiers the specification cites, as `CORE-TGT-01` does for `lifecycle_state`; its rule says so. Criteria ids are `<PREFIX>-<AREA>-NN` and never reused; a changed criterion keeps its id and the lens's minor version moves, a removed criterion's id is retired, and a change that would turn earlier results wrong moves the major version. Every criterion cites its sources by key, and the keys resolve in the lens's `sources`.
 
 ## 11. Open items
 
@@ -195,3 +196,4 @@ A lens is a YAML file valid against `lens.schema.json`. Each criterion asks one 
 - The tool criteria are specified, not implemented.
 - There is no worked example of a production entry assessment yet; AS-001 is a design review.
 - A privacy-by-design lens is a candidate, not written.
+- The target-state criteria read `lifecycle_state`, which is all the catalogue records of the target today. Transition architectures and the roadmap grouping are pending in the metamodel, so which transition a design belongs to cannot yet be checked.

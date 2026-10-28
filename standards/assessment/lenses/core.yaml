@@ -3,10 +3,10 @@ lens:
   id: core
   prefix: CORE
   title: Core architecture lens
-  version: 0.1.0
+  version: 0.2.0
   applies_when: always
   description: >-
-    The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
+    The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, moves it toward its target state, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
 
 areas:
   - id: DEM
@@ -15,6 +15,9 @@ areas:
   - id: TRC
     title: Place on the continuum
     question: Can the design be traced up to the capabilities and outcomes it serves and down to what will run?
+  - id: TGT
+    title: Target state
+    question: Does the design move the continuum toward its target state, with every departure from it decided and bounded?
   - id: STR
     title: Structure
     question: Are the elements the right kind and grain, inside the right boundaries?
@@ -110,6 +113,43 @@ criteria:
     rule: Every scenario of type functional has use_case; every id in context.serves appears as the use_case of at least one scenario.
     severity: major
     sources: [continuum, uml]
+
+  # Target state
+  - id: CORE-TGT-01
+    area: TGT
+    question: Is every catalogued artefact the design uses at target or in flight, never retired, and does each one still at baseline have a decision naming what it moves to?
+    why: A design that builds on what the target state retires spends money moving away from where the organisation has decided to go.
+    reads: [elements.ref, decisions.departure]
+    decided_by: tool
+    rule: >-
+      Resolve every elements.ref in the catalogue and read its lifecycle_state. No element references an artefact whose lifecycle_state is retired. Every element referencing an artefact whose lifecycle_state is baseline is named in the affects of a decision with departure set. This criterion reads the catalogue as well as the specification.
+    severity: major
+    sources: [togaf-compliance, continuum]
+  - id: CORE-TGT-02
+    area: TGT
+    question: Is every departure from the target state recorded as a decision, and is a time-bound one given an expiry and a path back?
+    why: >-
+      TOGAF grants dispensations rather than ignoring departures, and G253 offers three answers to one: enforce the target, grant time-bound relief, or change the target.
+    reads: [decisions.departure]
+    decided_by: both
+    rule: Every decision with departure set has status accepted, chosen, rationale and departure.from; a departure with kind time-bound also has expires and path_back. A reviewer checks that no departure has gone unrecorded.
+    severity: major
+    sources: [togaf-compliance, g253]
+  - id: CORE-TGT-03
+    area: TGT
+    question: Does the design move its capabilities toward the target state, rather than adding to what is being retired or creating a dependency that blocks a planned retirement?
+    reads: [context.realises, context.platform, elements, connectors, design.lifecycle_state]
+    decided_by: reviewer
+    severity: major
+    sources: [togaf-compliance, togaf-phase-g, continuum]
+  - id: CORE-TGT-04
+    area: TGT
+    question: Where the design shows the target state to be wrong, has that been raised as a consideration to change the target, rather than worked around?
+    why: A target that every design has to work around is not a target. The third of G253's answers is to change the architecture, and it has to be asked for to happen.
+    reads: [considerations, decisions.departure]
+    decided_by: reviewer
+    severity: minor
+    sources: [g253, ladder]
 
   # Structure
   - id: CORE-STR-01
@@ -460,6 +500,9 @@ sources:
   togaf-tradeoffs: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, Trade-offs
   togaf-risk: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, Risk Management
   togaf-content: The Open Group, TOGAF Standard 10th Edition, Architecture Content
+  togaf-compliance: The Open Group, TOGAF Standard 10th Edition, Enterprise Architecture Capability and Governance, chapter 6, Architecture Compliance
+  togaf-phase-g: The Open Group, TOGAF Standard 10th Edition, ADM, Phase G, Implementation Governance
+  g253: The Open Group, G253, Architecture Compliance Review Checklists (2025)
   togaf-g152: The Open Group, G152, Integrating Risk and Security within a TOGAF Enterprise Architecture
   togaf-g242: The Open Group, G242, Environmentally Sustainable Information Systems
   oaa: The Open Group, Open Agile Architecture Standard, fitness functions and guardrails

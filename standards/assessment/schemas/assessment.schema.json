@@ -8,7 +8,14 @@
   "allOf": [
     {
       "if": { "properties": { "assessment": { "properties": { "trigger": { "const": "production-entry" } }, "required": ["trigger"] } } },
-      "then": { "required": ["approval"], "properties": { "verdict": { "required": ["as_built"] }, "assessment": { "properties": { "depth": { "enum": ["review", "evaluation"] } } } } }
+      "then": { "required": ["approval"], "properties": { "verdict": { "required": ["as_built"] } } }
+    },
+    {
+      "description": "A production entry assessment is a review or deeper, except at triage tier AT1, where the team runs the production lens's tool criteria and the owner approves.",
+      "if": {
+        "properties": { "assessment": { "properties": { "trigger": { "const": "production-entry" } }, "required": ["trigger"], "not": { "properties": { "triage": { "properties": { "tier": { "const": "AT1" } }, "required": ["tier"] } }, "required": ["triage"] } } }
+      },
+      "then": { "properties": { "assessment": { "properties": { "depth": { "enum": ["review", "evaluation"] } } } } }
     }
   ],
   "additionalProperties": false,
@@ -35,6 +42,18 @@
         },
         "trigger": { "enum": ["new-design", "change", "stage-gate", "production-entry", "periodic", "incident", "request"], "description": "production-entry: the formal assessment of a solution as built, before it goes into production (standard, section 8.1). It brings in the production lens, and the record then needs an approval and an as-built conformance level." },
         "stage_gate": { "type": "string", "pattern": "^R[0-6]$", "description": "The definition stage the assessment gates, when it gates one." },
+        "triage": {
+          "type": "object",
+          "description": "The triage that chose this assessment (standard-assessment-triage.md): its record, the assessment type and the risk tier.",
+          "required": ["type", "tier"],
+          "additionalProperties": false,
+          "properties": {
+            "ref": { "type": "string", "pattern": "^TR-\\d{3}$" },
+            "type": { "enum": ["component-onboarding", "platform", "architecture-design", "solution", "ai-solution", "agent", "change", "production-entry"] },
+            "tier": { "enum": ["AT1", "AT2", "AT3", "AT4"] },
+            "derived_tier": { "enum": ["AT1", "AT2", "AT3", "AT4"], "description": "The tier the check derived from the specification. When it is higher than tier, the assessment stops and resumes at the derived tier." }
+          }
+        },
         "depth": {
           "enum": ["check", "review", "evaluation"],
           "description": "check: the automatic criteria only, run against the specification. review: every applicable criterion, automatic and reviewer. evaluation: a review plus scenario-based analysis with stakeholders (utility tree, sensitivity and trade-off points)."
@@ -180,7 +199,7 @@
         "outcome": { "enum": ["endorsed", "endorsed-with-conditions", "not-endorsed", "deferred"] },
         "conformance": {
           "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],
-          "description": "TOGAF's levels of conformance (figure 6-1, as corrected by Technical Corrigendum 1), judged against the continuum and its standards: how far the design's features and the standards' requirements coincide, and whether what they share is in accordance."
+          "description": "TOGAF's levels of conformance (figure 6-1, as corrected by Technical Corrigendum 1), judged against the target state: the target architecture the catalogue records and the standards that govern it. How far the design's features and the target's requirements coincide, and whether what they share is in accordance."
         },
         "as_built": {
           "enum": ["irrelevant", "consistent", "compliant", "conformant", "fully-conformant", "non-conformant"],

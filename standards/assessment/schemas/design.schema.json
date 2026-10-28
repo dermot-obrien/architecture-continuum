@@ -26,6 +26,7 @@
         "status": { "$ref": "envelope.schema.json#/$defs/status" },
         "lifecycle_state": { "$ref": "envelope.schema.json#/$defs/lifecycleState" },
         "owner": { "type": "string", "description": "The accountable owner of the design: a person or a team." },
+        "exposure": { "enum": ["staff", "customers-or-partners", "public", "external-agents"], "description": "Who uses or can reach the solution. A triage driver (standard-assessment-triage.md, section 3.2)." },
         "authors": { "type": "array", "items": { "type": "string" } },
         "implements": {
           "type": "array",
@@ -247,7 +248,20 @@
           "rationale": { "type": "string" },
           "affects": { "type": "array", "items": { "$ref": "#/$defs/localId" } },
           "reversibility": { "enum": ["two-way-door", "costly", "one-way-door"] },
-          "technical_debt": { "type": "array", "items": { "$ref": "envelope.schema.json#/$defs/technicalDebtId" } }
+          "technical_debt": { "type": "array", "items": { "$ref": "envelope.schema.json#/$defs/technicalDebtId" } },
+          "departure": {
+            "type": "object",
+            "description": "Set when the decision departs from the target state: TOGAF's dispensation. G253's three answers are to enforce the target, grant time-bound relief, or change the target; a departure records the second, and a consideration asks for the third.",
+            "required": ["from", "kind"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string", "description": "What in the target state the design departs from: a catalogued artefact, a standard, a platform or a pattern." },
+              "kind": { "enum": ["time-bound", "permanent"] },
+              "expires": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+              "path_back": { "type": "string", "description": "How the design returns to the target when the departure expires." }
+            },
+            "allOf": [ { "if": { "properties": { "kind": { "const": "time-bound" } } }, "then": { "required": ["expires", "path_back"] } } ]
+          }
         }
       }
     },
@@ -518,6 +532,10 @@
       "additionalProperties": false,
       "properties": {
         "profile": { "type": "string", "description": "Reference to the agent profile (agent-profile.schema.json)." },
+        "initiation": {
+          "enum": ["user", "event", "schedule", "self"],
+          "description": "What starts the agent. With approval on its tools, this sets its agency for triage: an agent that starts itself and acts without approval has full agency."
+        },
         "autonomy_level": {
           "enum": ["operator", "collaborator", "consultant", "approver", "observer"],
           "description": "The user's role in the agent's work, after Feng, McDonald and Zhang's five levels: L1 operator to L5 observer."

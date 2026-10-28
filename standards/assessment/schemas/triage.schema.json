@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "triage.schema.json",
+  "title": "Assessment triage record (draft 0.1.0)",
+  "description": "The record of triaging one subject before it is assessed: the answers to the triage questions, the tier each risk driver gives, the resulting assessment type and risk tier (the highest any driver gives), any override, and the assessment plan that follows. The tier is derived again from the design specification once it is complete, and the derived tier wins. Draft: see standards/assessment/standard-assessment-triage.md.",
+  "type": "object",
+  "required": ["schema", "triage", "answers", "result"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "triage/0.1.0" },
+
+    "triage": {
+      "type": "object",
+      "required": ["id", "subject", "date", "by"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^TR-\\d{3}$", "description": "TR-NNN. Proposed by this draft and not yet in the envelope." },
+        "subject": {
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "design": { "type": "string", "pattern": "^(AP|RA|SD)-\\d{3}$", "description": "The design specification, once there is one." },
+            "description": { "type": "string" },
+            "owner": { "type": "string" }
+          }
+        },
+        "date": { "$ref": "envelope.schema.json#/$defs/isoDate" },
+        "by": { "type": "string", "description": "Who answered the questions." },
+        "supersedes": { "type": "string", "pattern": "^TR-\\d{3}$", "description": "The earlier triage of the same subject, when this is a re-triage after a change." }
+      }
+    },
+
+    "answers": {
+      "type": "object",
+      "required": ["subject_kind", "uses_model", "data_classification", "personal_data", "exposure", "effect_on_people", "novelty", "reversibility"],
+      "additionalProperties": false,
+      "properties": {
+        "subject_kind": { "enum": ["component", "platform", "architecture-design", "solution", "ai-solution", "agent", "change", "production-entry"] },
+        "uses_model": { "type": "boolean" },
+        "reach": { "enum": ["knowledge", "read", "write", "external", "consequential"], "description": "Required when uses_model is true: what the most capable model-backed element can touch." },
+        "agency": { "enum": ["none", "prescribed", "supervised", "full"], "description": "Required when uses_model is true: how far it acts without a person, after AWS's Agentic AI Security Scoping Matrix." },
+        "data_classification": { "$ref": "envelope.schema.json#/$defs/classification" },
+        "personal_data": { "enum": ["none", "staff", "customers", "special-category-at-scale"] },
+        "exposure": { "enum": ["staff", "customers-or-partners", "public", "external-agents"] },
+        "untrusted_content": { "enum": ["none", "read-only", "with-approved-actions", "unattended-trifecta"], "description": "Untrusted content in a model's context, and what else the same session can do." },
+        "effect_on_people": { "enum": ["none-or-transparency", "supports-decisions", "makes-decisions-or-high-risk", "prohibited"] },
+        "novelty": { "enum": ["catalogued-target", "baseline-or-departure", "new-to-landscape"] },
+        "reversibility": { "enum": ["two-way-door", "costly", "one-way-door"] },
+        "platform": {
+          "type": "object",
+          "description": "The assessed platform the subject runs on, if any, and whether the subject sits inside its envelope.",
+          "required": ["name", "within_envelope"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "assessment": { "type": "string", "pattern": "^AS-\\d{3}$" },
+            "within_envelope": { "type": "boolean" }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "uses_model": { "const": true } } }, "then": { "required": ["reach", "agency", "untrusted_content"] } }
+      ]
+    },
+
+    "result": {
+      "type": "object",
+      "required": ["type", "tier", "drivers"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["component-onboarding", "platform", "architecture-design", "solution", "ai-solution", "agent", "change", "production-entry", "stopped"], "description": "stopped: a prohibited practice; the subject is not assessed for approval." },
+        "tier": { "$ref": "#/$defs/tier" },
+        "drivers": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The tier each driver gives. The result's tier is the highest of them, or the override.",
+          "items": {
+            "type": "object",
+            "required": ["driver", "tier"],
+            "additionalProperties": false,
+            "properties": {
+              "driver": { "enum": ["reach-and-agency", "data", "exposure", "untrusted-content", "effect-on-people", "novelty", "reversibility"] },
+              "tier": { "$ref": "#/$defs/tier" },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "override": {
+          "type": "object",
+          "description": "A tier raised above the high-water mark. Tiers are never lowered.",
+          "required": ["tier", "reason", "by"],
+          "additionalProperties": false,
+          "properties": { "tier": { "$ref": "#/$defs/tier" }, "reason": { "type": "string" }, "by": { "type": "string" } }
+        },
+        "inherits": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]+-[A-Z]+-\\d{2}$" }, "description": "Criteria met by inheritance from the assessed platform, inside its envelope." },
+        "plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "depth": { "enum": ["check", "review", "evaluation"] },
+            "lenses": { "type": "array", "items": { "type": "string" } },
+            "independent_assessor": { "type": "boolean" },
+            "approver": { "type": "string" },
+            "evidence": { "type": "array", "items": { "type": "string" } },
+            "handovers": { "type": "array", "items": { "enum": ["cybersecurity", "privacy", "ai-impact", "regulatory-conformity", "safety", "other"] } },
+            "staged_rollout": { "type": "boolean" },
+            "reassess": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "tier": { "enum": ["AT1", "AT2", "AT3", "AT4"], "description": "AT1 Light, AT2 Standard, AT3 Enhanced, AT4 Critical. Not the guardrail tiers T0 to T3." }
+  }
+}

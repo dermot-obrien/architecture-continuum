@@ -12,6 +12,9 @@ Three things are outside it, and you should plan for them separately: whether se
 
 ## Before you start
 
+Ask for triage first. A few questions about what you are building (what it can reach, how far it acts on its own, what data it sees, who uses it, whether anything in it is new to the landscape) fix the assessment type and the risk tier, AT1 Light to AT4 Critical, and the tier decides everything else: how deep the assessment goes, whether an independent assessor is needed, what evidence you must bring, who approves and how often it is assessed again. The [Assessment Triage Standard](../standards/assessment/standard-assessment-triage.md) has the questions and three worked examples. Answer them honestly: once your specification is complete the check derives the tier again from it, and the derived tier wins. The cheapest way to a lighter assessment is a design change that removes a driver, such as a person approving each consequential action, or keeping untrusted content out of a session that can act.
+
+
 | Ask | Why it matters | Where to find it |
 |---|---|---|
 | What type is my design? | An architecture pattern is conceptual or logical, its boxes local roles or ABBs; a reference architecture or a solution design is physical, every box an SBB, a technology, a service, a store or a node. A design whose boxes do not fit its type is reported (`CORE-TRC-02`) | [The continuum](continuum.md) |
@@ -38,11 +41,13 @@ Cite the catalogue, never copy it. Where a thing is catalogued (a capability, a 
 | `connectors` | Every interaction: style, protocol, the versioned contract it carries, the context-map relationship across contexts, authentication and authorisation, and whether the payload can carry untrusted content | `CORE-INT-01` to `03`, `CORE-SEC-02` (blocker), `CORE-SEC-03` | A connector across a trust boundary with `authentication: none`; untrusted content not marked |
 | `scenarios` | Functional scenarios tied to the use cases you serve; quality, failure and misuse scenarios with stimulus, response, a measurable response measure, importance and difficulty | `CORE-QA-01` (blocker) to `05`, `CORE-TRC-04` | "Fast" or "highly available" with no number; no failure scenario for a dependency you do not control |
 | `fitness_functions` | The checks that keep the important characteristics true after build: measure, threshold, when they run, and which scenarios they protect | `CORE-EVO-01` | A high-importance scenario no fitness function protects |
-| `decisions` | Each significant decision with what was chosen, the alternatives, the rationale, what it affects, how reversible it is and the debt it took on | `CORE-DEC-01`, `04`, `05`, `CORE-QA-05` | A decision with no alternative; a one-way door not marked as one |
+| `decisions` | Each significant decision with what was chosen, the alternatives, the rationale, what it affects, how reversible it is and the debt it took on; a `departure` on any decision that departs from the target state, with an expiry and a path back when it is time-bound | `CORE-DEC-01`, `04`, `05`, `CORE-QA-05`, `CORE-TGT-01`, `02` | A decision with no alternative; a one-way door not marked as one; a non-standard technology used with no departure recorded |
 | `considerations` | Every open question, with its options; none open on an accepted design | `CORE-DEC-02`, `03` | Open questions left in prose, where no tool can see them |
 | `risks` | Risks you already know of, each with likelihood, impact, mitigation and owner | `CORE-RSK-01` | A risk with no owner; a mitigation that only moves the risk |
 | `operations` | SLOs, observability (logs, metrics, traces, audit trail, conventions), deployment and rollback, recovery objectives and degraded mode, cost model with unit cost and budget, runbook | `CORE-OPS-01` to `04`, `CORE-CST-01` | A reference architecture with no cost model, which also blocks R4 |
 | `evidence` | Each piece of evidence with its type, a reference, a date and what it covers: threat model, cost model, load test, eval report, red-team report, impact assessments, prior assessments | `CORE-SEC-04`, `CORE-RSK-03` | Evidence from an earlier version of the design; a threat model of a different boundary |
+
+Know where your design stands against the target state before you write it. Every catalogued artefact you cite has a `lifecycle_state`: a retired one should not appear in a new design, and a baseline one needs a decision naming what it moves to (`CORE-TGT-01`). Where you depart from the target on purpose, say so as a departure; where you think the target is wrong, raise a consideration to change it rather than working around it (`CORE-TGT-04`). The verdict's conformance level is judged against the target state, so an unrecorded departure costs you twice.
 
 Write the risks you know about. A risk you record with an owner is a finding the assessor does not have to make, and it shows the design was thought about; a risk the assessor finds that you had seen and left out is worse than one nobody saw.
 
@@ -72,7 +77,7 @@ The agent-native standards hold the mechanisms the lens asks for: the guardrail 
 
 ## Check your own design first
 
-Run the check depth yourself before you ask for a review. Until the tool criteria are implemented, that means validating the specification against the schema with any JSON Schema 2020-12 validator and then walking the criteria marked `decided_by: tool` by hand, using each one's `rule`, which is written to be applied without judgement. The 39 tool criteria and the presence half of the 30 marked `both` are things you can settle alone, and every one you settle is review time spent on judgement instead.
+Run the check depth yourself before you ask for a review. Until the tool criteria are implemented, that means validating the specification against the schema with any JSON Schema 2020-12 validator and then walking the criteria marked `decided_by: tool` by hand, using each one's `rule`, which is written to be applied without judgement. The 50 tool criteria and the presence half of the 37 marked `both` are things you can settle alone, and every one you settle is review time spent on judgement instead.
 
 Then clear the blockers. A review with an open blocker ends `not-endorsed` whatever else is true, and a blocker cannot be accepted as a risk.
 
@@ -138,6 +143,7 @@ Start the hand-over assessments early. They are not lenses and the production en
 - Every dependency you do not control has a failure scenario.
 - Every connector across a trust boundary is authenticated and authorised, and untrusted content is marked.
 - Every significant decision has its alternatives and reversibility; every open question is a consideration.
+- Nothing retired is used, every baseline artefact has a decision naming what it moves to, and every departure from the target state is recorded, with an expiry and a path back when it is time-bound.
 - Risks you know of have owners; obligations you are under are named with how they class the design.
 - A reference architecture or solution design has SLOs, observability, recovery and a cost model.
 - The threat model is for this version, and the cybersecurity assessment has been asked for.
