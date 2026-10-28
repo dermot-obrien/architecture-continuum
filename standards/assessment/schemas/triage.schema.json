@@ -75,8 +75,9 @@
         "properties": {
           "element": { "type": "string", "description": "The element's id in the subject's design specification." },
           "ref": { "type": "string", "description": "The catalogue identifier, when the building block is catalogued." },
-          "position": { "enum": ["target", "in-flight", "baseline", "retiring", "retired"], "description": "target: part of the target architecture. in-flight: on its way to it. baseline: in the landscape but not target, with a successor to come. retiring: on a dated path out. retired: not to be used." },
+          "position": { "enum": ["target", "in-flight", "baseline", "retiring", "retired", "not-target"], "description": "target: part of the target architecture. in-flight: on its way to it. baseline: in the landscape today but not target, with a successor to come. retiring: on a dated path out. retired: not to be used. not-target: neither in the landscape today nor part of the target architecture, so a design that uses it brings in technology the target does not plan for." },
           "successor": { "type": "string", "description": "What replaces it in the target state, when it is not target and the architect has named it." },
+          "permitted_use": { "type": "string", "description": "The use the position holds for, when the architect limits it: for example, a platform that is target only for running one kind of workload. Use beyond it is a departure." },
           "attested_by": {
             "type": "object",
             "required": ["name", "role"],

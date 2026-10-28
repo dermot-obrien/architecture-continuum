@@ -3,7 +3,7 @@ lens:
   id: core
   prefix: CORE
   title: Core architecture lens
-  version: 0.3.0
+  version: 0.4.0
   applies_when: always
   description: >-
     The criteria every design is assessed against, whatever it is built from. They ask whether the design answers its demand, sits correctly on the continuum, moves it toward its target state, says how it meets its quality attributes, records its decisions, and can be operated, afforded and changed. Security appears here only as architecture: trust boundaries, identity and the placement of controls. Whether those controls are implemented and effective is a cybersecurity assessment's question, handed over, not answered here.
@@ -122,7 +122,7 @@ criteria:
     reads: [elements, decisions.departure, triage.target_state]
     decided_by: tool
     rule: >-
-      Take each building block's target-state position as the responsible architect attested it, from the triage record's target_state, or from the catalogue's lifecycle_state where an architect maintains it. Neither the author nor an assessor infers a position. No element is at retired. Every element at baseline or retiring is named in the affects of a decision with departure set. An element with no attested position leaves this criterion not-assessed for that element, and the missing attestation becomes a condition.
+      Take each building block's target-state position as the responsible architect attested it, from the triage record's target_state, or from the catalogue's lifecycle_state where an architect maintains it. Neither the author nor an assessor infers a position. No element is at retired. Every element at baseline, retiring or not-target is named in the affects of a decision with departure set; a not-target element brings in technology the target does not plan for, so its departure says why it cannot wait for a target alternative. Where a position carries a permitted_use, an element used beyond it is a departure too, and a reviewer judges the use against the limit. An element with no attested position leaves this criterion not-assessed for that element, and the missing attestation becomes a condition.
     severity: major
     sources: [togaf-compliance, continuum]
   - id: CORE-TGT-02
@@ -150,6 +150,17 @@ criteria:
     decided_by: reviewer
     severity: minor
     sources: [g253, ladder]
+  - id: CORE-TGT-05
+    area: TGT
+    question: Is every building block the target state does not plan for brought in only by an exception approved through escalation?
+    why: >-
+      Continuing to use something already in place is a tolerable exception. Bringing in technology that is neither in use nor planned commits the organisation to it, against a target state it has already defined. That is not the responsible architect's decision alone: it is escalated to the exception authority, before the design relies on it, not closed as a gap afterwards.
+    reads: [triage.target_state, decisions.departure, decisions.status]
+    decided_by: tool
+    rule: >-
+      Every element attested at not-target is named in the affects of a decision with status accepted and departure set, whose departure has escalation recorded and approved_by naming the exception authority the organisation designates (for example the architecture board), not the responsible architect alone. An element at not-target with no such decision fails this criterion.
+    severity: blocker
+    sources: [togaf-compliance, g253]
 
   # Structure
   - id: CORE-STR-01

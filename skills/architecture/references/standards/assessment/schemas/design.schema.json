@@ -258,7 +258,9 @@
               "from": { "type": "string", "description": "What in the target state the design departs from: a catalogued artefact, a standard, a platform or a pattern." },
               "kind": { "enum": ["time-bound", "permanent"] },
               "expires": { "$ref": "envelope.schema.json#/$defs/isoDate" },
-              "path_back": { "type": "string", "description": "How the design returns to the target when the departure expires." }
+              "path_back": { "type": "string", "description": "How the design returns to the target when the departure expires." },
+              "approved_by": { "type": "string", "description": "Who approved the departure. For a not-target building block (CORE-TGT-05) this is the exception authority the organisation names, such as the architecture board, after escalation: the responsible architect cannot approve it alone." },
+              "escalation": { "type": "string", "description": "The escalation that led to the approval: to whom, when, and a reference to its decision." }
             },
             "allOf": [ { "if": { "properties": { "kind": { "const": "time-bound" } } }, "then": { "required": ["expires", "path_back"] } } ]
           }

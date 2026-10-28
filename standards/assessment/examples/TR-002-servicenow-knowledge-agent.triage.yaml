@@ -1,0 +1,126 @@
+# The re-triage of SD-002 at version 0.1.0, before its design review (trigger new-design). It
+# supersedes TR-001, the design author's triage. Every driver is derived again from the
+# specification (standard-assessment-triage.md, sections 3.1 to 3.4), and where a derived driver
+# is higher than TR-001's declared one, the derived driver wins. The target-state positions are
+# the responsible architect's attestation, recorded as given; none is inferred.
+#
+# Where each answer comes from:
+#   subject_kind, uses_model: elements.svc-kb-agent has an ai facet and no agent facet (no tools).
+#   reach: elements.svc-kb-agent.ai.grounding (sources data-kb-index, retrieval hybrid,
+#     access_control caller-permission-trimmed), and no agent facet, so no tools. An indexed
+#     enterprise source retrieved per user is read, not knowledge.
+#   agency: no tools, so none.
+#   untrusted_content: connectors.c-agent-index.carries_untrusted_content true,
+#     elements.svc-kb-agent.ai.input_trust mixed; no tool writes or reaches outside.
+#   data_classification: data[].classification, highest confidential (data-kb-articles,
+#     data-kb-index, data-transcripts).
+#   personal_data: data.data-transcripts.personal true; staff questions (drivers.obligations.obl-privacy).
+#   exposure: design.exposure staff.
+#   effect_on_people: drivers.obligations.obl-ai-transparency (limited risk, Article 50 only);
+#     drivers.non_goals rule out any decision about people.
+#   novelty: elements teams, entra, graph-index (kind technology) and sbb-kb-connection (kind sbb)
+#     have no ref; no element has assessed_by.
+#   reversibility: decisions[].reversibility, all two-way-door.
+schema: triage/0.1.0
+
+triage:
+  id: TR-002
+  subject:
+    name: ServiceNow knowledge agent in Teams
+    design: SD-002
+    description: A Copilot Studio agent in Teams answering staff questions from ServiceNow knowledge articles indexed into the Microsoft Graph semantic index by the servicenowkb3 Copilot connector connection, with no tools. Triaged at design version 0.1.0 for a design review before acceptance.
+    owner: Digital workplace team
+  date: "2026-10-28"
+  by: Architecture agent (independent assessor, role agent), from the specification; target-state positions attested by Dermot O'Brien, responsible architect
+  supersedes: TR-001
+
+answers:
+  subject_kind: ai-solution
+  uses_model: true
+  reach: read
+  agency: none
+  untrusted_content: read-only
+  data_classification: confidential
+  personal_data: staff
+  exposure: staff
+  effect_on_people: none-or-transparency
+  novelty: new-to-landscape
+  reversibility: two-way-door
+
+target_state:
+  - element: sbb-kb-connection
+    position: baseline
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: >-
+      Attested at triage in the architect's words: "the ServiceNow connector and, more importantly, the M365 ingestion and semantic querying building blocks are not target state". The ServiceNow connector and the Microsoft 365 ingestion are this element, the Copilot connector connection servicenowkb3. Recorded as baseline, the schema's value for in the landscape but not target. No successor was named.
+  - element: graph-index
+    position: baseline
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: >-
+      Attested at triage in the architect's words: "the ServiceNow connector and, more importantly, the M365 ingestion and semantic querying building blocks are not target state". Semantic querying is this element, the Microsoft Graph semantic index. Recorded as baseline, the schema's value for in the landscape but not target. No successor was named.
+  - element: sbb-copilot-studio
+    ref: SBB-044
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Attested at triage, in the architect's words, Copilot Studio "are target".
+  - element: teams
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Attested at triage, in the architect's words, Microsoft Teams "are target".
+  - element: entra
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Attested at triage, in the architect's words, Microsoft Entra ID "are target". The deployment node node-pp-prod (DN-009) is not covered by the attestation and is left unattested; its position is a question for the responsible architect.
+
+result:
+  type: ai-solution
+  tier: AT3
+  drivers:
+    - driver: reach-and-agency
+      tier: AT2
+      note: >-
+        Reach read, agency none: AT2 (section 3.1). Derived from elements.svc-kb-agent.ai.grounding (data-kb-index, caller-permission-trimmed) and the absence of an agent facet, so no tools. input_trust is mixed, not untrusted, and the untrusted article text is internal, so the external reach row does not apply. Same as TR-001.
+    - driver: data
+      tier: AT2
+      note: Highest data[].classification is confidential (data-kb-articles, data-kb-index, data-transcripts); personal data is staff questions in data-transcripts, not customers' or special-category data. Same as TR-001.
+    - driver: exposure
+      tier: AT1
+      note: design.exposure is staff. Same as TR-001.
+    - driver: untrusted-content
+      tier: AT2
+      note: >-
+        Present (connectors.c-agent-index.carries_untrusted_content true: article text written by many contributors; input_trust mixed), in a session with no tool that writes or reaches outside: AT2. Same as TR-001.
+    - driver: effect-on-people
+      tier: AT1
+      note: drivers.obligations.obl-ai-transparency classes it as limited risk with the Article 50 duty only, which AIS-HUM-02 checks; no decision about people (drivers.non_goals). Same as TR-001.
+    - driver: novelty
+      tier: AT3
+      note: >-
+        Derived higher than TR-001's declared catalogued-target (AT1), so the derived driver wins. Four elements of kind sbb or technology have no ref, which the rule reads as new to the landscape (section 3.4): teams, entra, graph-index and sbb-kb-connection. Only sbb-copilot-studio (SBB-044) and node-pp-prod (DN-009) are catalogued. No element names an admitting assessment in assessed_by, so Copilot Studio counts as a platform not yet assessed, nothing is inherited, and TR-001's answer that the subject sits within an assessed platform's envelope has nothing to cite. Two attested positions are baseline (sbb-kb-connection, graph-index), which alone would give AT2 as a departure. The attestation places all four uncatalogued blocks in the landscape (baseline means in the landscape), which conflicts with reading a missing ref as new; the rule as written gives AT3 and is applied, and the conflict is reported for a person to settle. A component new to the landscape needs its onboarding assessment first (section 7); this triage records that prerequisite as a condition rather than stopping, because the attestation says the blocks are already in use.
+    - driver: reversibility
+      tier: AT1
+      note: Every decision (d-copilot-connector, d-reuse-kb3, d-auth-microsoft) is a two-way door. Same as TR-001.
+  plan:
+    depth: review
+    lenses: [core, ai-solution]
+    independent_assessor: true
+    approver: The architecture board or its delegate, with the service owner (Digital workplace team)
+    evidence:
+      - "Due at this design review: a threat model for design version 0.1.0 (CORE-SEC-04)"
+      - "Due at this design review: a cost model (CORE-CST-01; a cost model where one is required)"
+      - "Due at this design review: the results of the checks on servicenowkb3 that d-reuse-kb3 names as its condition"
+      - "Due at this design review: catalogue entries, or onboarding assessments, for teams, entra, graph-index and sbb-kb-connection, which have no ref"
+      - "Due at this design review: the plans for every gating eval, an injection test of article content and a load test, judged as plans"
+      - "Due at production entry: eval reports for every gating eval, against the version being released"
+      - "Due at production entry: injection test results for untrusted article content (AT3), and a red-team report"
+      - "Due at production entry: a load test against sc-latency (AT3)"
+      - "Due at production entry: the outcomes of the full security assessment and the privacy impact assessment"
+    handovers: [cybersecurity, privacy]
+    staged_rollout: false
+    reassess: >-
+      Every six months and on a change (AT3). A change to the connection's scope or query string, the model, the audience, the knowledge bases in scope (HR bases above all) or a first tool is re-triaged before it is made. What would move the tier: catalogue refs for the four uncatalogued blocks would bring novelty to AT2 (baseline departures) and the tier to AT2; an assessed platform element with assessed_by would let the subject inherit controls; adding any tool would raise reach and agency.
