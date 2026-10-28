@@ -215,6 +215,7 @@ Working backwards from a skill that assesses a design, the skill needs a design 
 | The design specification | [`design.schema.json`](../standards/assessment/schemas/design.schema.json) | A design as YAML: its id (AP, RA or the proposed SD), its place on the continuum by catalogue identifiers, drivers and obligations, trust zones, data, elements typed by continuum kinds, connectors with contracts and trust, functional, quality, failure and misuse scenarios, fitness functions, decisions, considerations, risks, operations and evidence; `ai` and `agent` facets on elements |
 | The criteria | [`lens.schema.json`](../standards/assessment/schemas/lens.schema.json) and the [`core`](../standards/assessment/lenses/core.yaml), [`ai-solution`](../standards/assessment/lenses/ai-solution.yaml) and [`ai-agent`](../standards/assessment/lenses/ai-agent.yaml) lenses | 92 criteria, each with what it reads, whether a tool or a reviewer decides it, a default severity and its sources; the AI lenses are brought in by profiles the design declares and a tool derives |
 | The record | [`assessment.schema.json`](../standards/assessment/schemas/assessment.schema.json) | Subject by id, version and digest; depth; lenses and versions; independent assessors; findings with ATAM's types; dispositions to considerations, decision records and technical debt; risk themes; hand-overs; a verdict with TOGAF's conformance levels |
+| The author's guide | [`design-author-guide.md`](design-author-guide.md) | What the author of a design writes, checks and clears before a review, and what each disposition asks of them afterwards |
 | The example | [SD-001](../standards/assessment/examples/SD-001-delivery-exception-agent.design.yaml) and [AS-001](../standards/assessment/examples/AS-001-delivery-exception-agent.assessment.yaml) | The delivery-exception agent from `/architecture runtime-agent`, specified with deliberate gaps, and reviewed against all three lenses: not endorsed, because its customer email is generated after untrusted carrier text is in context and is bounded only by a limit the agent holds |
 
 The choices behind it, and the alternatives set aside:
@@ -237,6 +238,26 @@ The choices behind it, and the alternatives set aside:
 5. Wire the record into `/architecture stage`, so that an endorsed assessment whose digest matches the design is accepted as the reviewer half of a stage's check, and a changed design loses it.
 6. Add lenses as the need appears: data platforms, regulated industries, sovereign hosting, readiness.
 
+## Alignment with current practice
+
+The draft standard was checked, practice by practice, against what the research above found to be current. It is aligned on substance: what it asks of a design, the vocabulary of its findings, and its split between tool and reviewer. It departs in four places. Three of them are about how much ceremony surrounds a review, which is exactly where practice has moved furthest. The fourth is that its continuous half does not exist yet.
+
+| Practice | Where it comes from | In the standard | Alignment |
+|---|---|---|---|
+| Judge a design against its stakeholders' concerns, with a planned evaluation and a report | ISO/IEC/IEEE 42030 and 42020 | Drivers and stakeholders as blocker criteria; the eight steps of section 4 follow 42020 clause 9; the record is the evaluation report | Aligned |
+| Quality attributes as measurable scenarios, prioritised; risks, non-risks, sensitivity and trade-off points | ATAM and its lightweight family | Scenario fields in the schema; `CORE-QA-01` to `05`; ATAM's finding types; the utility tree at evaluation depth | Aligned |
+| Decisions recorded with alternatives, and reviewed as decisions | ADRs, DCAR | `CORE-DEC-01` to `05`; `record-decision` dispositions | Aligned |
+| Threat modelling done with the design, controls assessed separately | Threat Modeling Manifesto, NIST SP 800-160, the security pillars | `CORE-SEC-04`; section 9's hand-over | Aligned |
+| Lightweight, proportionate review instead of a heavyweight board | LASR, risk-storming, the advice process, DORA on change approval | Three depths; LASR, risk-storming and DCAR accepted as ways of doing a review | Aligned on depth. Departs on independence: a review needs an assessor who neither wrote nor delivers the design, where LASR and the advice process have the team review its own work and seek advice rather than approval |
+| A conversation that ends in an improvement plan, not an audit that ends in a pass or fail | AWS Well-Architected reviews; ATAM, which gives risks and no verdict | Findings, dispositions and an improvement path through considerations, decisions and debt; but also an `endorsed` or `not-endorsed` outcome | Departs, deliberately: the verdict exists because the definition ladder needs something to gate on. Section 7 keeps it apart from conformance, and an `accept-risk` or `accept-as-debt` disposition keeps most findings out of it |
+| Every decidable criterion decided by a tool, on every change | Fitness functions, policy and architecture rules as code, service scorecards, the Well-Architected Agent | `decided_by: tool` on 39 of 92 criteria; the check depth; `CORE-EVO-01` asks the design for its own fitness functions | Aligned in design, not yet in practice: the tool criteria are specified and not implemented, so until step 2 above is done every check is a reading by hand |
+| Agents as assessors, with a person accountable | AWS Well-Architected Agent; Google's assessment skills; Thoughtworks on LLM-assisted drift reduction | An agent may assess with provenance; a person makes the verdict (A5) | Aligned |
+| AI judged by evals and agents by what they can do | NIST AI 600-1, OWASP's two lists, the AWS and Azure AI guidance, IMDA | The AI solution and agent lenses | Aligned, with the three W260 candidates and the six G253 gaps above as the next criteria |
+| Help for the author before the review, so the review spends its time on judgement | Well-Architected's self-service review; LASR's preparation; the advice process's expectation that the decider seeks advice early | Not in the standard | Was missing; now the [design author's guide](design-author-guide.md) |
+| The assessment practice measured, so that it can be lightened or tightened on evidence | DORA's capability measures; the advice process's reflection on decisions | Not present | Departs: nothing records how long assessments take, which findings recur, or whether incidents trace back to risks that were found or missed |
+
+Two of the departures are choices for the owner, added below as A7 and A8. The other two need work rather than a decision: implementing the tool criteria, and recording the few measures that would tell whether the assessments are worth what they cost (time from request to verdict, findings per criterion across designs, and incidents traced to a finding or to its absence).
+
 ## Decisions for the owner
 
 | # | Decision | Options | Recommended |
@@ -247,6 +268,8 @@ The choices behind it, and the alternatives set aside:
 | A4 | Where the lenses live | In this bundle's standards; in a bundle of their own; in each workspace | In this bundle, under `standards/assessment/lenses/`, with workspaces able to add lenses of their own through a binding |
 | A5 | Who may make a verdict | A person only; a person or an agent; an agent with a person's countersignature for blockers | A person, on findings that an agent may make. The agent-native principle that the human budget is spent on the irreversible applies: a verdict is what lets a design be built |
 | A6 | Whether an endorsed assessment is required at R3 and R4 | Required; optional evidence | Required at R4, optional at R3, until the tool exists to make the R3 review cheap |
+| A7 | Whether every review needs an independent assessor | Always; only at evaluation depth and for a design whose decisions include a one-way door; never, with the team reviewing itself as in LASR | Only at evaluation depth and for a one-way-door design. A team-run review of a design whose decisions are all two-way doors is what current practice does, and the check depth still runs on it |
+| A8 | Whether the outcome is a pass or fail verdict | Keep the four outcomes; findings and an improvement plan only, with the ladder reading open blockers directly | Keep the outcomes, since the ladder needs one, but present the record findings-first, so the outcome reads as a summary of the dispositions rather than a mark |
 
 ## Caveats
 

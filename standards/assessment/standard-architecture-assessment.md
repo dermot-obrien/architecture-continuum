@@ -27,6 +27,7 @@ This standard says how a design on the continuum is assessed: what is read, agai
 > - Schemas: [`design.schema.json`](schemas/design.schema.json), [`lens.schema.json`](schemas/lens.schema.json), [`assessment.schema.json`](schemas/assessment.schema.json).
 > - Lenses: [`core`](lenses/core.yaml), [`ai-solution`](lenses/ai-solution.yaml), [`ai-agent`](lenses/ai-agent.yaml).
 > - A worked example: [SD-001](examples/SD-001-delivery-exception-agent.design.yaml) and its assessment [AS-001](examples/AS-001-delivery-exception-agent.assessment.yaml).
+> - For the author of a design being assessed: [Preparing a design for assessment](../../docs/design-author-guide.md).
 
 ## 1. What an assessment is, and what it is not
 

@@ -25,6 +25,7 @@ Each level takes its definition from the practice that owns it, and the handover
 | [`docs/continuum.drawio`](docs/continuum.drawio) | The same diagram as an editable draw.io source, uncompressed |
 | [Architectural Framework](docs/architectural-framework.md) | The reasoning behind the hierarchy, with the sources that informed it |
 | [Architecture assessment](docs/architecture-assessment.md) | Research on assessing designs: TOGAF, ISO/IEC/IEEE 42030, ATAM and continuous practice, AI solutions and AI agents, and where architecture assessment ends and cybersecurity assessment begins; with a draft [assessment standard](standards/assessment/standard-architecture-assessment.md), design specification schema and lenses |
+| [Preparing a design for assessment](docs/design-author-guide.md) | For the author of a design being assessed: what the assessment reads, how to write the design specification, the blockers to clear first, and what to do with the findings |
 
 ## What the bundle holds
 
