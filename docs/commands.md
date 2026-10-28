@@ -5,7 +5,7 @@ Every command this repository ships, with its options as its `--help` prints the
 On macOS and Linux type `python3` where this page says `python`.
 
 - [Installing](#installing): `update-skills`, `skills.mjs`, the seeder
-- [Skill tools](#skill-tools): `stage.py`, the post-install checks, `check.mjs --json`
+- [Skill tools](#skill-tools): `stage.py`, `assess.mjs`, the post-install checks, `check.mjs --json`
 - [Validation](#validation): skills, bundle, front matter
 - [Ontology tools](#ontology-tools): validate, consolidate, namespace-divergent
 - [Maintainer scripts](#maintainer-scripts)
@@ -58,6 +58,15 @@ Copies a foundation profile into a workspace: the capability model files (`capab
 Ends with a `seed complete` line giving the number of capabilities, ABBs and SBBs copied. A profile name it does not know prints `! profile not found` and is skipped.
 
 ## Skill tools
+
+### assess.mjs
+
+```text
+node .agents/skills/architecture/bin/assess.mjs check <spec.design.yaml> [--triage <triage.yaml>] [--trigger <trigger>] [--json] [--fail-on blocker|major|none]
+node .agents/skills/architecture/bin/assess.mjs changed <old.design.yaml> <new.design.yaml> [--trigger <trigger>] [--json]
+```
+
+`check` is the assessment's check depth as a tool: it validates a design specification against `design.schema.json`, then applies every criterion decided by `tool`, and the presence half of every criterion decided by `both`, from the lenses the design brings in (core always; ai-solution and ai-agent by facet; production with `--trigger production-entry`). A criterion it does not yet automate is reported as `manual`, for a person to apply by its rule. With `--triage`, the target-state criteria read the attested positions. It exits 1 when a criterion at or above `--fail-on` (default `blocker`) is not met, so it can gate a pull request. `changed` lists the fields that differ between two versions of a specification and the criteria whose `reads` touch them: what a change assessment re-checks. It needs ajv, ajv-formats and js-yaml, as the continuum check does.
 
 ### stage.py
 
