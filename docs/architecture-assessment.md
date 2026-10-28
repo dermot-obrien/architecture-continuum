@@ -282,6 +282,8 @@ The draft standard was checked, practice by practice, against what the research 
 
 Two of the departures are choices for the owner, added below as A7 and A8. The other two need work rather than a decision: implementing the tool criteria, and recording the few measures that would tell whether the assessments are worth what they cost (time from request to verdict, findings per criterion across designs, and incidents traced to a finding or to its absence).
 
+Standard 0.8.0 answers the weight with section 3.1, Keeping it light: an advice process by default up to AT2, people answering only the criteria the tier asks for, change assessments limited to what changed, a one-page record up to AT2, time-boxed sessions, and a tool that applies 78 of the 92 tool-decided and shared criteria today. The anchors do not lighten: triage, blockers, approved exceptions, a person confirming, and production evidence.
+
 ## Decisions for the owner
 
 | # | Decision | Options | Recommended |
