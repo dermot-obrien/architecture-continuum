@@ -19,7 +19,7 @@ requires_any = true
 # The tables the ten skills this one replaced were answered in. A key missing from
 # [suite.architecture] is read from them for one release, with a warning.
 legacy_suites = ["aaa-create-platform", "aaa-create-strategy", "aaa-create-capability", "aaa-create-context", "aaa-create-abb", "aaa-create-sbb", "aaa-create-service", "aaa-create-runtime-agent", "aaa-rung", "aaa-continuum"]
-flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "stage", "check"]
+flows = ["platform", "strategy", "capability", "context", "abb", "sbb", "service", "runtime-agent", "stage", "check", "specify", "triage", "assess", "report"]
 
 # A flow's former name, which still selects it.
 [inputs.flow_aliases]
@@ -128,3 +128,8 @@ description = """The agent profile JSON Schema an authored profile is validated 
 type = "file"
 flows = ["runtime-agent"]
 description = """The repository's ontology validator, run over each record the runtime-agent flow writes. Unbound means the same: authored, not validated."""
+
+[inputs.options.catalogueUrl]
+type = "str"
+flows = ["triage", "report"]
+description = """The URL prefix of the catalogue that holds this architecture's identified artefacts, such as https://catalogue.example.com/items/. The triage and report flows turn every catalogue identifier in a report or readout (CAP-033, SBB-044, SD-002, AS-003 and the rest) into a link by appending the identifier to this prefix. Unset, identifiers are written as plain text. A requester may also give it when the flow runs, which wins over the binding."""

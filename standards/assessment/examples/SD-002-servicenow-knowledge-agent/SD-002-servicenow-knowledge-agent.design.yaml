@@ -1,0 +1,557 @@
+# SD-002 ServiceNow Knowledge Agent in Teams, written as a design specification by the specify
+# flow from ./index.md (version 0.1.0). Every element, connector and scenario cites the section
+# and row of the document it comes from. Fields the document does not answer are left out and
+# listed in SD-002-servicenow-knowledge-agent.gaps.md beside this file. Specified again from the
+# revised document, which added Importance and Difficulty to the scenarios, Metric and Threshold
+# to the evals, and a Bounded context column to Building Blocks, without changing its version.
+schema: design/0.1.0
+
+design:
+  id: SD-002
+  title: ServiceNow Knowledge Agent in Teams
+  type: solution-design          # front matter pattern_type
+  scope: problem                 # front matter pattern_scope
+  version: 0.1.0
+  status: proposed               # front matter status: Proposed
+  owner: Digital workplace team
+  authors: [Workplace architect]
+  exposure: staff
+  implements: [RA-007]           # front matter implements; Patterns Applied
+  source: ./index.md
+  provenance:
+    origin: ai-generated
+    review_state: ai-raw
+
+context:
+  # Where It Sits, and front matter realises
+  platform: PL-005
+  bounded_contexts: [BC-012]
+  outcomes: [OC-004]
+  realises: [CAP-033]
+  serves: [UC-031]
+
+drivers:
+  # Goals and Non-Goals (both goals have a blank Measure)
+  goals:
+    - Staff get a correct, cited answer from a published ServiceNow knowledge article in Teams, without searching the portal
+    - Fewer service desk contacts for questions an article already answers
+  non_goals:
+    - Raising, updating or closing incidents or requests; a later phase with tools
+    - Answering from anything other than ServiceNow knowledge articles
+  # Stakeholders
+  stakeholders:
+    - role: Staff
+      concerns: [A correct answer quickly, a link to the article, never an invented one]
+    - role: Knowledge base owners
+      concerns: [Answers that say what the article says, gaps reported back]
+    - role: Service desk lead
+      concerns: [Fewer repeat contacts, no wrong guidance in the service desk's name]
+    - role: Information security and privacy
+      concerns: [No article shown to someone ServiceNow would not show it to, HR content above all]
+  # Constraints, Assumptions and Obligations
+  constraints:
+    - id: con-servicenowkb3
+      statement: Knowledge reaches Microsoft 365 through the existing Copilot connector connection servicenowkb3, owned by the Microsoft 365 admin
+      source: Microsoft 365 admin center, Copilot connectors
+    - id: con-eval-authentication
+      statement: Copilot Studio agent evaluation supports only agents on No authentication or Authenticate with Microsoft
+      source: Microsoft Learn, About agent evaluation
+  assumptions:
+    - id: asm-volume
+      statement: About 2,000 questions a working day across 9,000 staff
+  obligations:
+    - id: obl-ai-transparency
+      source: EU AI Act, Article 50
+      classification: Limited risk; staff interact with an AI system
+      statement: Staff are told they are dealing with an AI system
+    - id: obl-gdpr
+      source: GDPR
+      classification: Processing as employer
+      statement: Processing of staff personal data in questions and transcripts
+
+# Derived from the ai facet on knowledge-agent. No agent facet: Model-Backed Components says the
+# agent has no tools and is a configured assistant that reads and answers.
+profiles: [ai-solution]
+
+# Trust Zones and Data, first table
+trust_zones:
+  - id: tz-01
+    name: Microsoft 365 tenant
+    trust: trusted
+    description: Teams, Entra ID, the Graph index and the servicenowkb3 connection
+  - id: tz-02
+    name: Power Platform production managed environment
+    trust: trusted
+    description: Copilot Studio and the agent
+  - id: tz-03
+    name: ServiceNow instance
+    trust: trusted
+    description: Knowledge management and the Service Portal
+
+# Trust Zones and Data, second table
+data:
+  - id: ds-01   # DS-01
+    name: ServiceNow knowledge articles and their user criteria
+    classification: confidential
+    personal: false
+    owner: servicenow-instance   # Owner: 02 ServiceNow instance
+    residency: EU
+    retention: As set in ServiceNow knowledge management
+    lineage: Written and published by knowledge base contributors in ServiceNow
+    used_for_ai: none
+  - id: ds-02   # DS-02
+    name: Indexed copy of the articles in Microsoft Graph, each with a read ACL
+    classification: confidential
+    personal: false
+    owner: graph-index           # Owner: 05 Microsoft Graph semantic index
+    residency: EU, the Microsoft 365 tenant's geography
+    retention: Removed at the next full crawl after the article is retired or deleted in ServiceNow
+    lineage: Copied from DS-01 by the servicenowkb3 connection; ACL built from knowledge base and article user criteria, identities mapped to Entra by email
+    used_for_ai: grounding
+  - id: ds-03   # DS-03
+    name: Conversation transcripts
+    classification: confidential
+    personal: true
+    owner: knowledge-agent       # Owner: 07 ServiceNow knowledge agent
+    residency: EU, the environment's geography
+    retention: 30 days in Dataverse; audit records under the tenant's Purview retention
+    lineage: Staff questions and the agent's answers
+    used_for_ai: none
+
+# Building Blocks. Role in this solution is written as the element's responsibility. Catalogue
+# Mapping records every local number (01 to 07) as a gap, so only SBB-044 and DN-009 carry a ref.
+# part_of comes from the Bounded context column.
+elements:
+  - id: staff                    # Building Blocks row 01 Staff
+    name: Staff
+    kind: actor
+    responsibilities: [Staff in the agent's security group, who ask questions]
+  - id: servicenow-instance      # Building Blocks row 02 ServiceNow instance
+    name: ServiceNow instance
+    kind: external-system
+    trust_zone: tz-03
+    responsibilities: [Knowledge management and the Service Portal, where articles are written and opened]
+  - id: teams                    # Building Blocks row 03 Microsoft Teams
+    name: Microsoft Teams
+    kind: technology
+    technology: Microsoft Teams
+    trust_zone: tz-01
+    responsibilities: [The Teams and Microsoft 365 channel staff ask in]
+  - id: entra-id                 # Building Blocks row 04 Microsoft Entra ID
+    name: Microsoft Entra ID
+    kind: technology
+    technology: Microsoft Entra ID
+    trust_zone: tz-01
+    responsibilities: [Signs staff in, and issues the tokens the agent and the connection use]
+  - id: graph-index              # Building Blocks row 05 Microsoft Graph semantic index
+    name: Microsoft Graph semantic index
+    kind: technology
+    technology: Microsoft Graph semantic index
+    trust_zone: tz-01
+    responsibilities: [Holds the indexed articles as external items and returns those the user may read]
+  - id: servicenowkb3            # Building Blocks row 06 servicenowkb3 connection (Source RA-007)
+    name: servicenowkb3 connection
+    kind: sbb
+    part_of: BC-012
+    owner: Microsoft 365 admin
+    trust_zone: tz-01
+    responsibilities: [Crawls published, active articles in the chosen knowledge bases, carries user criteria across as read ACLs, and maps ServiceNow users to Entra identities]
+  - id: copilot-studio           # Building Blocks row SBB-044 Copilot Studio (Source RA-007)
+    name: Copilot Studio
+    kind: sbb
+    ref: SBB-044
+    part_of: BC-012
+    technology: Copilot Studio
+    owner: Power Platform team
+    trust_zone: tz-02
+    responsibilities: [The platform the agent is built and run on]
+  - id: pp-production-env        # Building Blocks row DN-009 Power Platform production environment
+    name: Power Platform production environment
+    kind: deployment-node
+    ref: DN-009
+    owner: Power Platform team
+    trust_zone: tz-02
+    responsibilities: [Where the agent runs]
+  - id: knowledge-agent          # Building Blocks row 07 ServiceNow knowledge agent (Source RA-007)
+    name: ServiceNow knowledge agent
+    kind: service
+    part_of: BC-012
+    owner: Digital workplace team
+    trust_zone: tz-02
+    deployed_to: [pp-production-env]   # Deployed to: DN-009
+    realises: [copilot-studio]         # Realises: SBB-044 Copilot Studio
+    responsibilities:
+      - Answers staff questions only from articles the asking user may read; cites the articles it used, or says it found none and points to the portal
+    # Model-Backed Components, both tables, row 07; Evals, rows EVAL-01 to EVAL-06
+    ai:
+      role: generative
+      model:
+        provider: Microsoft
+        name: Copilot Studio generative orchestration model
+        version_pinned: false
+        hosting: managed-platform
+      grounding:
+        sources: [ds-02]
+        retrieval: hybrid
+        access_control: caller-permission-trimmed   # "The asking user's permissions"
+        freshness: Article changes within 15 minutes; knowledge base permission changes at the daily full crawl, or within 30 minutes with identity sync
+      input_trust: mixed
+      output_handling:
+        constrained: false
+        validated: true
+        rendered_as: Displayed text in Teams, with citations linking to the Service Portal
+      evals:
+        - id: eval-01   # Evals row EVAL-01 Answer or abstain
+          kind: offline
+          dataset: 400 questions; 60 percent answerable, 25 percent in-domain with no article, 15 percent out of scope
+          metric: Precision and recall of answering, F0.5 reported
+          threshold: Both error rates within their ceilings
+          gating: true
+          positive_class: The agent answers
+          errors:
+            false_positive:
+              meaning: Answers a question no article supports, or answers from the wrong article
+              max_rate: 2%
+              cost: Staff act on wrong guidance that carries an authoritative-looking citation
+            false_negative:
+              meaning: Declines a question an article answers
+              max_rate: 20%
+              cost: A service desk contact the agent could have saved
+          sample_size: 400
+        - id: eval-02   # Evals row EVAL-02 Correctness
+          kind: llm-judge
+          judge_calibrated: false        # Kind: LLM judge, not calibrated
+          dataset: The answerable questions, with answers written by knowledge base owners
+          metric: Compare meaning pass rate on answered cases
+          threshold: At least 90 percent
+          gating: true
+          sample_size: 240
+        - id: eval-03   # Evals row EVAL-03 Citation
+          kind: offline
+          dataset: The answerable questions, with the expected article number
+          metric: Citation precision, and share of cases citing the expected article
+          threshold: Both error rates within their ceilings
+          gating: true
+          positive_class: A cited article is relevant
+          errors:
+            false_positive:
+              meaning: Cites an irrelevant, outdated or retired article
+              max_rate: 5%
+            false_negative:
+              meaning: The expected article is not among those cited
+              max_rate: 15%
+          sample_size: 240
+        - id: eval-04   # Evals row EVAL-04 Permission leakage
+          kind: offline
+          dataset: Probes as test users with different ServiceNow access, for canary phrases planted in restricted test articles
+          metric: Count of responses containing content the test user may not read
+          threshold: Zero leaks
+          gating: true
+          positive_class: Restricted content appears in a response
+          zero_tolerance: true
+          sample_size: 300
+        - id: eval-05   # Evals row EVAL-05 Content safety
+          kind: offline
+          dataset: The full test set and 100 adversarial prompts
+          metric: Content safety at the strictest level for each type
+          threshold: No response above the permitted level
+          gating: true
+          zero_tolerance: true
+          sample_size: 500
+        - id: eval-06   # Evals row EVAL-06 Online feedback
+          kind: online
+          dataset: "Live use: thumbs-down rate and decline rate per week"
+          metric: Thumbs-down rate and decline rate per week
+          threshold: Thumbs-down below 10 percent; decline rate reviewed with knowledge base owners
+          gating: false
+      drift_monitoring: Gating evals rerun weekly and after any change to the connection's query string, because the knowledge bases change under the agent with every crawl
+      fallback: When no article supports an answer, or the service is unavailable, the agent says so and links to the Service Portal search
+      human_oversight: in-the-loop
+      disclosure: The agent's name and first message say it is an AI assistant that answers from ServiceNow articles
+
+# Interfaces. The Consumer calls the Provider (template guidance), so Consumer is written as from
+# and Provider as to.
+# Contract and Errors and retry are blank on every row.
+connectors:
+  - id: if-01   # Interfaces row IF-01
+    from: staff
+    to: teams
+    style: request-response
+    protocol: Teams client
+    authentication: Entra ID, the user's own sign-in
+    authorisation: Agent available only to the security group
+    description: Question
+  - id: if-02   # Interfaces row IF-02
+    from: teams
+    to: knowledge-agent
+    style: request-response
+    protocol: Teams and Microsoft 365 channel
+    authentication: Authenticate with Microsoft, Entra single sign-on
+    authorisation: Agent sharing limited to the security group
+    description: Question as the user; cited answer
+  - id: if-03   # Interfaces row IF-03
+    from: knowledge-agent
+    to: graph-index
+    style: data-access
+    protocol: Microsoft Graph search, as the user
+    authentication: Delegated user token with ExternalItem.Read.All
+    authorisation: Results trimmed to the item ACLs the user is in
+    data: [ds-02]
+    carries_untrusted_content: true
+    description: "Articles the user may read. Untrusted content: article text is written by many contributors, so it is treated as untrusted model input"
+  - id: if-04   # Interfaces row IF-04
+    from: servicenowkb3
+    to: servicenow-instance
+    style: batch
+    protocol: ServiceNow REST table API and the Microsoft Copilot scripted REST API
+    authentication: Federated Auth, an Entra-issued OIDC token for a machine integration user
+    authorisation: Custom read role on the documented tables; HR content reader for HR knowledge bases
+    data: [ds-01]
+    description: Crawl articles and user criteria
+  - id: if-05   # Interfaces row IF-05
+    from: servicenowkb3
+    to: graph-index
+    style: batch
+    protocol: Microsoft Graph external items
+    authentication: Microsoft first-party connector application
+    authorisation: Writes only to the servicenowkb3 connection
+    data: [ds-02]
+    description: Articles as external items with ACLs
+  - id: if-06   # Interfaces row IF-06
+    from: staff
+    to: servicenow-instance
+    style: request-response
+    protocol: HTTPS, Service Portal
+    authentication: ServiceNow single sign-on with Entra ID
+    authorisation: ServiceNow knowledge user criteria, applied again when a citation is opened
+    description: Open the cited article
+  - id: if-07   # Interfaces row IF-07 (Authentication and Authorisation blank)
+    from: servicenowkb3
+    to: entra-id
+    style: request-response
+    protocol: OpenID Connect; Entra users
+    description: Token and identities for mapping
+
+scenarios:
+  # Scenarios, S1. Steps 4 and 5 travel IF-03 and IF-02 in the response direction.
+  - id: s1
+    type: functional
+    name: Staff ask how to reset multi-factor authentication
+    use_case: UC-031
+    steps:
+      - via: if-01
+        action: A member of the agent's security group asks a question in Teams
+      - via: if-02
+        action: Teams passes the question with the user's Entra identity; with Authenticate with Microsoft the user is not prompted to sign in
+      - via: if-03
+        action: The agent queries the Graph index as that user, through the servicenowkb3 connection, its only knowledge source
+      - via: if-03
+        action: The index returns only the articles whose ACL admits that user, as mapped from ServiceNow user criteria
+      - via: if-02
+        action: The agent answers from those articles alone, with citations, or says it has no article and points to the portal
+      - via: if-06
+        action: A citation opens the article in the Service Portal, where ServiceNow applies its own access check again
+  # Scenarios, S2 (no use case named)
+  - id: s2
+    type: functional
+    name: The connection indexes the articles
+    steps:
+      - via: if-07
+        action: The connector gets an Entra-issued OIDC token for a machine integration user (Federated Auth), so there is no secret to store or rotate
+      - via: if-04
+        action: "It crawls published, active articles in the chosen knowledge bases: changes every 15 minutes, a full crawl daily"
+      - via: if-04
+        action: In the Advanced flow it evaluates script-based user criteria through the scripted REST API, and picks up identity changes every 30 minutes
+      - via: if-07
+        action: It matches ServiceNow users to Entra users by email against UPN or mail, so the ACL names real tenant identities
+      - via: if-05
+        action: It writes each article into the Graph index with a read ACL built from its knowledge base and article user criteria
+  # Quality, Failure and Misuse Scenarios, row Q1
+  - id: q1
+    type: quality
+    name: Answers say what the article says
+    quality_attribute: functional-correctness
+    source: Staff
+    stimulus: A question an article answers
+    environment: Normal operation
+    artefact: 07 ServiceNow knowledge agent
+    response: The answer matches the article and cites it
+    response_measure: At least 90 percent of answered cases pass compare meaning; wrong answers at most 2 percent of all questions
+    importance: high
+    difficulty: high
+  # Quality, Failure and Misuse Scenarios, row Q2
+  - id: q2
+    type: quality
+    name: The agent declines when no article answers
+    quality_attribute: robustness
+    source: Staff
+    stimulus: A question no article answers, or one outside IT and workplace topics
+    environment: Normal operation
+    artefact: 07 ServiceNow knowledge agent
+    response: The agent says it found no article and links to the portal search
+    response_measure: Answers given to such questions at most 2 percent in EVAL-01
+    importance: high
+    difficulty: medium
+  # Quality, Failure and Misuse Scenarios, row Q3
+  - id: q3
+    type: quality
+    name: Answers arrive quickly
+    quality_attribute: performance-efficiency
+    source: Staff
+    stimulus: A question at the Monday morning peak
+    environment: 400 questions an hour
+    artefact: 07 ServiceNow knowledge agent
+    response: The answer appears in Teams
+    response_measure: 95 percent within 10 seconds
+    importance: medium
+    difficulty: low
+  # Quality, Failure and Misuse Scenarios, row M1
+  - id: m1
+    type: misuse
+    name: Staff ask about an HR article they may not read
+    quality_attribute: security
+    source: A member of staff without HR access
+    stimulus: A question whose only answer is in a restricted HR article
+    environment: Normal operation
+    artefact: 05 Microsoft Graph semantic index and 07 ServiceNow knowledge agent
+    response: The agent does not use or reveal the article, and declines
+    response_measure: Zero leaks in 300 probes across test users
+    importance: high
+    difficulty: high
+  # Quality, Failure and Misuse Scenarios, row F1
+  - id: f1
+    type: failure
+    name: The connection stops crawling
+    quality_attribute: reliability
+    source: ServiceNow or the connector
+    stimulus: Crawls fail for 48 hours
+    environment: Normal operation
+    artefact: 06 servicenowkb3 connection
+    response: The agent keeps answering from the last index; the stale crawl is detected and the owner alerted
+    response_measure: Alert within 26 hours of the last successful full crawl
+    importance: medium
+    difficulty: medium
+
+# Fitness Functions
+fitness_functions:
+  - id: ff-01   # FF-01 Gating evals
+    characteristic: functional-correctness
+    measure: Pass of the gating evals in the release pipeline
+    threshold: All gating evals within their thresholds
+    automated: true
+    runs: deploy
+    scenarios: [q1, q2]
+  - id: ff-02   # FF-02 Leakage
+    characteristic: security
+    measure: Restricted content in responses to the leakage probes
+    threshold: Zero
+    automated: true
+    runs: scheduled
+    scenarios: [m1]
+  - id: ff-03   # FF-03 Crawl freshness
+    characteristic: reliability
+    measure: Time since the connection's last successful full crawl
+    threshold: Under 26 hours
+    automated: true
+    runs: continuous
+    scenarios: [f1]
+
+# Decisions. Departure is blank on every row.
+decisions:
+  - id: dec-01   # DEC-01 (accepted)
+    title: Ground the agent through the ServiceNow Knowledge Copilot connector
+    status: accepted
+    chosen: The Copilot connector, indexing into Microsoft Graph with ServiceNow permissions carried across
+    alternatives:
+      - The Power Platform ServiceNow connector as real-time knowledge
+      - Copilot Studio's own ServiceNow knowledge source
+    rationale: Microsoft's guidance for knowledge Q&A at scale; citations and index-speed retrieval; real-time knowledge is still preview and needs a ServiceNow connection per user
+    affects: [servicenowkb3, graph-index]   # Pattern Realisation, second row, names DEC-01
+    reversibility: two-way-door
+  - id: dec-02   # DEC-02 (proposed)
+    title: Reuse the existing connection servicenowkb3
+    status: proposed
+    chosen: Reuse, once the checks on its configuration pass
+    alternatives: [A dedicated connection for this agent]
+    rationale: One index and one permission model across Search, Microsoft 365 Copilot and the agent
+    affects: [servicenowkb3]   # named in the decision's title
+    reversibility: two-way-door
+  - id: dec-03   # DEC-03 (accepted)
+    title: Sign users in with Authenticate with Microsoft
+    status: accepted
+    chosen: Authenticate with Microsoft
+    alternatives: [Manual Entra ID authentication with Teams single sign-on]
+    rationale: Microsoft's choice for the Teams and Microsoft 365 channel, and the only option Copilot Studio agent evaluation supports. To confirm in the tenant that Graph connector knowledge is returned under it
+    reversibility: two-way-door
+
+# Open Questions (Owner and Needed by blank on both rows)
+considerations:
+  - id: oq-01
+    question: Which knowledge bases should the agent answer from, and does servicenowkb3's query string match?
+    options:
+      - The connection's current scope
+      - IT and workplace knowledge bases only
+      - A dedicated connection with a narrower query string
+    status: open
+  - id: oq-02
+    question: Should HR knowledge bases be in scope before their permissions are proven in the leakage eval?
+    options:
+      - Exclude until proven
+      - Include with the HR content reader role in place
+    status: open
+
+# Risks and Trade-offs
+risks:
+  - id: rsk-01
+    statement: An article is shown to staff ServiceNow would not show it to, through a misconfigured connection rather than the agent
+    likelihood: medium
+    impact: high
+    mitigation: Checks on servicenowkb3 before reuse; the gating leakage eval; HR bases excluded until proven
+    owner: Microsoft 365 admin
+  - id: rsk-02
+    statement: The agent paraphrases an article wrongly, with a citation that makes the answer look authoritative
+    likelihood: medium
+    impact: medium
+    mitigation: Answer-or-abstain and correctness evals gate release, with false positives capped at 2 percent
+    owner: Digital workplace team
+
+# Operations (Transition blank), with Cross-Cutting Concerns, Observability
+operations:
+  slos:
+    - name: Answer latency
+      objective: 95 percent of answers within 10 seconds, monthly
+      alerting: true
+    - name: Index freshness
+      objective: A successful full crawl in every 26-hour window
+      alerting: true
+  observability:
+    logs: true
+    metrics: true
+    traces: true
+    conventions: Copilot Studio telemetry to Application Insights   # names the platform's telemetry, not a convention
+    audit_trail: true
+  deployment:
+    strategy: Solutions promoted from dev to test to production by Power Platform pipelines, gated on the evals
+    rollback: Republish the previous solution version, or withdraw the agent's availability in Teams
+  recovery:
+    rto: 4 hours
+    rpo: "Not applicable: the agent holds no state that cannot be rebuilt from ServiceNow"
+    degraded_mode: The Service Portal search
+  cost:
+    model: Copilot Credits forecast from the question volume and the share of staff without a Microsoft 365 Copilot licence. Grounded answers free for licensed users; Copilot Credits for others
+    budget: Capped at 600 USD a month, pay as you go
+  support:
+    team: Digital workplace team
+    hours: Business hours, Europe/London
+    on_call: false
+    escalation: Service desk, then the Power Platform team for platform faults and the Microsoft 365 admin for the connection
+
+# Evidence. Its Outcome, "Supports DEC-01, DEC-02 and DEC-03", is not a test outcome, so it is
+# written as covers rather than outcome.
+evidence:
+  - id: ev-research
+    type: other
+    ref: https://claude.ai/artifact/1841k54oQ8RZRuSHpvQJQS
+    date: 2026-10-28
+    design_version: 0.1.0
+    covers: [dec-01, dec-02, dec-03]

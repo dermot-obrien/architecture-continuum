@@ -1,0 +1,274 @@
+schema: lens/0.1.0
+lens:
+  id: ai-agent
+  prefix: AGT
+  title: AI agent lens
+  version: 0.1.0
+  applies_when:
+    profile: ai-agent
+  description: >-
+    The criteria a design adds when any element is an agent: a model that chooses its own steps, calls tools, keeps memory and acts in the world. An agent is a service with an ai facet and an agent facet, so the core and AI solution lenses apply to it too. This lens asks what changes when the design's behaviour is chosen at run time: whether agency is justified, whether every action is inventoried and bounded where the agent cannot change the bound, whether injected instructions can reach a consequential action, and whether the agent can be watched, stopped and held to account. It carries the bundle's own agent-native rules (guardrail tiers, capability scope, provenance) into an assessment.
+
+areas:
+  - id: JUS
+    title: Justified agency
+    question: Is an agent needed, at the autonomy it is given?
+  - id: ACT
+    title: Actions and blast radius
+    question: Is every action inventoried, tiered, and bounded outside the agent's reach?
+  - id: INJ
+    title: Injection and trust
+    question: Can untrusted content steer the agent into a consequential action?
+  - id: ID
+    title: Identity and privilege
+    question: Does the agent act as itself, with only the privilege its task needs?
+  - id: MEM
+    title: Memory and context
+    question: Can what the agent remembers be poisoned or leak across users?
+  - id: MAS
+    title: Multi-agent and supply chain
+    question: Are peers, tools and protocols authenticated, pinned and contained?
+  - id: CTL
+    title: Control and accountability
+    question: Can the agent be watched, limited, stopped and held to account?
+  - id: EVAL
+    title: Evaluating behaviour
+    question: Is the agent evaluated on what it does, repeatedly, not only on what it ends with?
+
+criteria:
+  - id: AGT-JUS-01
+    area: JUS
+    question: Does the design justify an agent over a workflow, and a multi-agent topology over a single agent?
+    why: Every major vendor's guidance says to start with the simplest pattern that works; each step up adds failure modes.
+    reads: [elements.agent.control_flow, decisions]
+    decided_by: reviewer
+    severity: major
+    sources: [anthropic-agents, openai-agents, azure-orchestration, gcp-agent-patterns]
+  - id: AGT-JUS-02
+    area: JUS
+    question: Is the autonomy level declared and proportionate to the impact and reversibility of what the agent does?
+    reads: [elements.agent.autonomy_level, elements.agent.tools]
+    decided_by: both
+    rule: Every agent facet has autonomy_level; an agent at approver or observer has no tool that is irreversible and autonomous.
+    severity: blocker
+    sources: [knight-levels, imda-agentic]
+
+  - id: AGT-ACT-01
+    area: ACT
+    question: Is every action the agent can take in the world listed, with its effect and whether it can be undone?
+    why: An action not listed has no guardrail.
+    reads: [elements.agent.tools]
+    decided_by: both
+    rule: Every agent facet has at least one tool, and every tool has effect, reversible, tier and approval (the schema enforces the fields). A reviewer checks the list is complete against the connectors the agent can call.
+    severity: blocker
+    sources: [runtime-agent, aws-agentic-lens]
+  - id: AGT-ACT-02
+    area: ACT
+    question: Do irreversible, financial, destructive and external-communication actions need human approval, or sit behind a T0 or T1 limit?
+    reads: [elements.agent.tools]
+    decided_by: tool
+    rule: Every tool with reversible false, or effect financial, destructive or external-communication, has approval human-approved or forbidden, or tier T0 or T1.
+    severity: blocker
+    sources: [operating-model, imda-agentic, aws-agentic-lens]
+  - id: AGT-ACT-03
+    area: ACT
+    question: Are T0 and T1 limits enforced outside anything the agent can edit?
+    why: The agent-native rule is that an agent cannot change its own limits.
+    reads: [elements.agent.guardrails]
+    decided_by: tool
+    rule: Every guardrail with tier T0 or T1 has enforced outside-agent.
+    severity: blocker
+    sources: [operating-model, principles]
+  - id: AGT-ACT-04
+    area: ACT
+    question: Is code the agent generates or runs executed in a sandbox with no standing credentials?
+    reads: [elements.agent.tools.effect, elements.trust_zone]
+    decided_by: both
+    rule: A tool with effect code-execution exists only when its element or connector is in a trust zone named for isolation, and a reviewer confirms the sandbox.
+    applies_to: any tool has effect code-execution
+    severity: blocker
+    sources: [owasp-asi05, aws-agentic-lens]
+
+  - id: AGT-INJ-01
+    area: INJ
+    question: Does any single agent session combine untrusted input, access to sensitive data and the ability to change state or communicate externally?
+    why: The lethal trifecta, and Meta's Agents Rule of Two. All three together cannot be made safe by prompting; one must be removed, or a human or an independent check put in the path.
+    reads: [elements.agent.tools, elements.ai.input_trust, elements.ai.grounding, data.classification]
+    decided_by: tool
+    rule: >-
+      For each agent: untrusted is true when input_trust is mixed or untrusted or any tool reads_untrusted; sensitive is true when any grounding source or tool reaches confidential, restricted or personal data; consequential is true when any tool's effect is write, external-communication, financial, destructive or code-execution and its approval is autonomous. All three true is not met.
+    severity: blocker
+    sources: [rule-of-two, lethal-trifecta]
+  - id: AGT-INJ-02
+    area: INJ
+    question: Does the design use a pattern that limits what injected instructions can do, rather than relying on the model to refuse them?
+    reads: [elements.agent.injection_defence]
+    decided_by: both
+    rule: Every agent whose input_trust is mixed or untrusted declares an injection_defence other than none or classifier alone.
+    severity: major
+    sources: [design-patterns-injection, camel, google-secure-agents]
+  - id: AGT-INJ-03
+    area: INJ
+    question: Is the agent's goal fixed by its principal and protected from being rewritten by content it reads?
+    reads: [elements.agent, decisions]
+    decided_by: reviewer
+    severity: major
+    sources: [owasp-asi01]
+
+  - id: AGT-ID-01
+    area: ID
+    question: Does the agent have its own workload identity, and is it clear whether it acts as itself or on behalf of a user?
+    reads: [elements.agent.identity]
+    decided_by: tool
+    rule: identity.scheme is not none, identity.acts_as is not shared-service-account, and workload_identity is set.
+    severity: blocker
+    sources: [owasp-asi03, nccoe-agent-identity, wimse-aims]
+  - id: AGT-ID-02
+    area: ID
+    question: Is every tool credential scoped to the task, and never broader than the user it acts for?
+    reads: [elements.agent.tools.scope]
+    decided_by: both
+    rule: Every tool has scope.
+    severity: major
+    sources: [owasp-asi03, mcp-auth, atlas-m0026]
+  - id: AGT-ID-03
+    area: ID
+    question: Do MCP and other tool servers validate token audience and refuse to pass tokens through?
+    reads: [connectors.protocol, connectors.authorisation]
+    decided_by: reviewer
+    applies_to: any connector protocol is MCP
+    severity: major
+    sources: [mcp-auth]
+
+  - id: AGT-MEM-01
+    area: MEM
+    question: Can untrusted content be written to long-term memory, and if so, is it validated and attributed?
+    reads: [elements.agent.memory]
+    decided_by: both
+    rule: Every agent with long_term_store states written_from_untrusted; when it is true, a guardrail or decision addresses memory poisoning.
+    severity: major
+    sources: [owasp-asi06, atlas-t0080]
+  - id: AGT-MEM-02
+    area: MEM
+    question: Is memory isolated per user or tenant, with stated retention?
+    reads: [elements.agent.memory.isolation, elements.agent.memory.retention]
+    decided_by: tool
+    rule: Every agent with long_term_store has isolation other than shared, and retention.
+    severity: major
+    sources: [owasp-asi06, imda-agentic]
+
+  - id: AGT-MAS-01
+    area: MAS
+    question: Is every agent-to-agent interaction authenticated, with the peer's trust stated?
+    reads: [elements.agent.peers, connectors.style]
+    decided_by: tool
+    rule: Every peer has authenticated true and trust set; every agent-to-agent connector has authentication other than none.
+    severity: blocker
+    sources: [owasp-asi07, a2a]
+  - id: AGT-MAS-02
+    area: MAS
+    question: Is a failure or compromise in one agent contained, so it cannot cascade through the others?
+    reads: [elements.agent.peers, scenarios.type]
+    decided_by: both
+    rule: When any agent has peers, a scenario of type failure or misuse exercises a peer failing or being compromised.
+    severity: major
+    sources: [owasp-asi08, mast, imda-agentic]
+  - id: AGT-MAS-03
+    area: MAS
+    question: Are tools, MCP servers, agent cards and protocol versions pinned and from trusted sources?
+    reads: [connectors.protocol, elements.agent.tools]
+    decided_by: both
+    rule: Every tool-call and agent-to-agent connector names a protocol with its version.
+    severity: major
+    sources: [owasp-asi04, mcp-spec, a2a]
+
+  - id: AGT-CTL-01
+    area: CTL
+    question: Are step, cost and time limits set, and is there a kill switch that works without the agent's cooperation?
+    reads: [elements.agent.limits]
+    decided_by: tool
+    rule: limits has max_steps, max_cost and timeout, and kill_switch is true.
+    severity: blocker
+    sources: [aws-agentic-lens, atlas-t0034, owasp-asi10]
+  - id: AGT-CTL-02
+    area: CTL
+    question: Is every plan, tool call and output recorded with provenance, so an action can be traced to the input that caused it?
+    reads: [elements.agent.trajectory_logging, operations.observability.audit_trail]
+    decided_by: tool
+    rule: Every agent facet has trajectory_logging true, and operations.observability.audit_trail is true.
+    severity: major
+    sources: [provenance, google-secure-agents, otel-genai-agents]
+  - id: AGT-CTL-03
+    area: CTL
+    question: Is human approval protected from manipulation and from automation bias?
+    why: An approval prompt written by the agent can be the attack; a reviewer who approves everything is no control.
+    reads: [elements.agent.tools.approval, decisions]
+    decided_by: reviewer
+    applies_to: any tool has approval human-approved
+    severity: major
+    sources: [owasp-asi09, imda-agentic, aws-agentic-lens]
+  - id: AGT-CTL-04
+    area: CTL
+    question: Is drift between what the agent did and what policy intended reconciled continuously, and is a rogue agent detectable?
+    reads: [operations, elements.agent]
+    decided_by: reviewer
+    severity: major
+    sources: [reconciliation, owasp-asi10]
+
+  - id: AGT-EVAL-01
+    area: EVAL
+    question: Is the agent evaluated on its trajectory, not only its final output?
+    reads: [elements.ai.evals.kind]
+    decided_by: tool
+    rule: Every element with an agent facet has an eval of kind trajectory.
+    severity: major
+    sources: [aws-agentic-lens, tau-bench]
+  - id: AGT-EVAL-02
+    area: EVAL
+    question: Is reliability measured over repeated runs, and is the agent tested against injection and hijacking?
+    reads: [elements.ai.evals, evidence.type]
+    decided_by: both
+    rule: An eval's metric names repeated trials (for example pass^k), and an eval of kind red-team exists.
+    severity: major
+    sources: [tau-bench, agentdojo, caisi-hijacking]
+
+sources:
+  runtime-agent: This bundle, /architecture runtime-agent
+  operating-model: This bundle, standards/agent-native/operating-model.md, guardrail tiers T0 to T3
+  principles: This bundle, standards/agent-native/principles.md
+  provenance: This bundle, standards/agent-native/provenance.md
+  reconciliation: This bundle, standards/agent-native/reconciliation.md
+  owasp-asi01: OWASP Top 10 for Agentic Applications 2026, ASI01 Agent Goal Hijack
+  owasp-asi03: OWASP Top 10 for Agentic Applications 2026, ASI03 Identity and Privilege Abuse
+  owasp-asi04: OWASP Top 10 for Agentic Applications 2026, ASI04 Agentic Supply Chain Vulnerabilities
+  owasp-asi05: OWASP Top 10 for Agentic Applications 2026, ASI05 Unexpected Code Execution
+  owasp-asi06: OWASP Top 10 for Agentic Applications 2026, ASI06 Memory and Context Poisoning
+  owasp-asi07: OWASP Top 10 for Agentic Applications 2026, ASI07 Insecure Inter-Agent Communication
+  owasp-asi08: OWASP Top 10 for Agentic Applications 2026, ASI08 Cascading Failures
+  owasp-asi09: OWASP Top 10 for Agentic Applications 2026, ASI09 Human-Agent Trust Exploitation
+  owasp-asi10: OWASP Top 10 for Agentic Applications 2026, ASI10 Rogue Agents
+  aws-agentic-lens: AWS Well-Architected Agentic AI Lens (2026)
+  imda-agentic: IMDA Singapore, Model AI Governance Framework for Agentic AI, v1.5 (2026)
+  knight-levels: Feng, McDonald and Zhang, Levels of Autonomy for AI Agents (2025)
+  rule-of-two: Meta, Agents Rule of Two (2025)
+  lethal-trifecta: Simon Willison, The lethal trifecta (2025)
+  design-patterns-injection: Beurer-Kellner et al., Design Patterns for Securing LLM Agents against Prompt Injections (2025)
+  camel: Debenedetti et al., Defeating Prompt Injections by Design, CaMeL (2025)
+  google-secure-agents: Díaz, Kern and Olive, Google's Approach for Secure AI Agents (2025)
+  anthropic-agents: Anthropic, Building effective agents (2024)
+  openai-agents: OpenAI, A practical guide to building agents (2025)
+  azure-orchestration: Microsoft, Azure Architecture Center, AI agent orchestration patterns
+  gcp-agent-patterns: Google Cloud, Choose a design pattern for your agentic AI system
+  mcp-spec: Model Context Protocol, specification 2026-07-28
+  mcp-auth: Model Context Protocol, authorization, 2026-07-28
+  a2a: Agent2Agent Protocol 1.0
+  wimse-aims: IETF draft-ietf-wimse-aims, AI Identity Management System
+  nccoe-agent-identity: NIST NCCoE, Software and AI Agent Identity and Authorization, concept paper (2026)
+  atlas-m0026: MITRE ATLAS AML.M0026, Privileged AI Agent Permissions Configuration
+  atlas-t0080: MITRE ATLAS AML.T0080, AI Agent Context Poisoning
+  atlas-t0034: MITRE ATLAS AML.T0034.002, Agentic Resource Consumption
+  mast: Cemri et al., Why Do Multi-Agent LLM Systems Fail? (2025)
+  tau-bench: Yao et al., tau-bench, and the pass^k reliability measure (2024)
+  agentdojo: Debenedetti et al., AgentDojo (2024)
+  caisi-hijacking: NIST CAISI, agent hijacking evaluations and red-teaming competition (2025, 2026)
+  otel-genai-agents: OpenTelemetry GenAI agent spans (Development status)

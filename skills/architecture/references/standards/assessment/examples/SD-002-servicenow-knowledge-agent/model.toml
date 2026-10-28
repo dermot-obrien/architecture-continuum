@@ -1,0 +1,31 @@
+# Binds the pattern skill's diagram tools to this worked example only: the tables of the
+# solution design template, catalogue identifiers SBB-NNN and DN-NNN, and local numbers.
+bindingsVersion = "1.0"
+
+[model]
+node_id_attrs = ["sbb_id"]
+edge_id_attr  = "iface_id"
+group_attr    = "pattern"
+local_pattern = '[0-9]{2}'
+
+[[markdown.tables]]
+section    = "Building Blocks"
+entity     = "node"
+id_pattern = "(SBB|DN)-[0-9]{3}"
+columns    = { id = "Building Block", label = "Building Block", group = "Source" }
+
+[[markdown.tables]]
+section    = "Interfaces"
+entity     = "edge"
+id_pattern = "IF-[0-9]{2}"
+columns    = { id = "Interface", source = "Provider", target = "Consumer", label = "Purpose" }
+
+[markdown.scenarios]
+section         = "Scenarios"
+heading_pattern = '^(S[0-9]+)\b[\s:.-]*(.*)$'
+columns         = { step = "Step", actor = "Actor", action = "Action", edge = "Interface", target = "Target" }
+
+[suite.pattern.types.solution-design]
+label    = "Solution design"
+idSeries = "SD"
+physical = "most"

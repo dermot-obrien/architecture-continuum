@@ -1,0 +1,149 @@
+# TR-005: triage of SD-002 version 0.1.0 before its design review (trigger new-design, a design
+# review before acceptance), made by an independent assessing agent that did not write the design or
+# its specification. It reads SD-002-servicenow-knowledge-agent.design.yaml, which the specify flow
+# translated from ./index.md, a solution design written from the pattern skill's template.
+#
+# It supersedes TR-004, which triaged the same subject from an earlier specification of the same
+# design (element ids sbb-kb-connection, entra, node-pp-prod, svc-kb-agent). This specification was
+# written again from the fuller template document; its element ids differ, so the target-state
+# positions are recorded again here against the new ids, from the responsible architect's attestation
+# as given for this run.
+#
+# The specification is ai-raw (design.provenance.review_state): the specify flow wrote it, and the
+# author has not yet confirmed it (specify flow, step 2). Neither the triage flow nor the triage schema
+# says how an unconfirmed specification is treated, so this record says so in `by` and in the
+# subject's description, and every answer derived from the specification carries that caveat: if the
+# author corrects the translation, the derivation is checked again.
+#
+# Where each answer comes from:
+#   subject_kind, uses_model: elements.knowledge-agent has an ai facet and no agent facet (the
+#     document's Model-Backed Components section: "The agent has no tools").
+#   reach: elements.knowledge-agent.ai.grounding (sources ds-02, retrieval hybrid, access_control
+#     caller-permission-trimmed), no tools. An indexed enterprise source retrieved per user is read,
+#     not knowledge (triage flow, step 5).
+#   agency: no tools, so none.
+#   untrusted_content: connectors.if-03.carries_untrusted_content true ("article text is written by
+#     many contributors"), elements.knowledge-agent.ai.input_trust mixed; no tool writes or reaches
+#     outside, so read-only.
+#   data_classification: data[].classification, highest confidential (ds-01, ds-02, ds-03).
+#   personal_data: data.ds-03.personal true (staff questions and transcripts);
+#     drivers.obligations.obl-gdpr, processing as employer. Staff, not customers.
+#   exposure: design.exposure staff. The document's "From where" cell is blank (gaps list, question 8).
+#   effect_on_people: drivers.obligations.obl-ai-transparency (limited risk, Article 50 duty only);
+#     drivers.non_goals rule out any action, and nothing decides about people.
+#   novelty: target_state below (servicenowkb3 not-target; graph-index used beyond its permitted use);
+#     teams, entra-id, graph-index and servicenowkb3 have no ref; no element has assessed_by.
+#   reversibility: decisions[].reversibility, all two-way-door.
+schema: triage/0.1.0
+
+triage:
+  id: TR-005
+  subject:
+    name: ServiceNow knowledge agent in Teams
+    design: SD-002
+    description: >-
+      A Copilot Studio agent in Microsoft Teams that answers staff questions from ServiceNow knowledge articles, which the servicenowkb3 Copilot connector connection copies into the Microsoft Graph semantic index with their ServiceNow read permissions. It has no tools. Triaged at design version 0.1.0 for a design review before acceptance, from a specification the specify flow wrote from the solution design document (./index.md) and that the author has not yet confirmed (review_state ai-raw).
+    owner: Digital workplace team
+  date: "2026-10-28"
+  by: >-
+    Architecture agent (Claude Opus 5.5, role agent, independent: did not write the design or its specification), from the specification SD-002-servicenow-knowledge-agent.design.yaml (ai-raw, not yet confirmed by the author); target-state positions attested by Dermot O'Brien, responsible architect for the target architecture of this test case, on 2026-10-28
+  supersedes: TR-004
+
+answers:
+  subject_kind: ai-solution
+  uses_model: true
+  reach: read
+  agency: none
+  untrusted_content: read-only
+  data_classification: confidential
+  personal_data: staff
+  exposure: staff
+  effect_on_people: none-or-transparency
+  novelty: new-to-landscape
+  reversibility: two-way-door
+
+target_state:
+  - element: copilot-studio
+    ref: SBB-044
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+  - element: teams
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Attested target. The element has no catalogue ref; the document's Catalogue Mapping says Microsoft Teams has no catalogue entry yet.
+  - element: entra-id
+    position: target
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Attested target. The element has no catalogue ref; the document's Catalogue Mapping says Microsoft Entra ID has no catalogue entry yet.
+  - element: pp-production-env
+    ref: DN-009
+    position: target
+    permitted_use: Limited to what is needed to run Copilot Studio agents
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: Whether the design's use stays within the permitted use is a reviewer's judgement under CORE-TGT-01, made in the assessment, not here.
+  - element: graph-index
+    position: target
+    permitted_use: Content that originates in the Microsoft 365 ecosystem; not items from outside it
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: >-
+      In the architect's words: "We are using M365 Copilot, so I guess we could say it is in use today, but what's not in the target state is adding to the graph items that originate from outside the Microsoft ecosystem." The architect named no successor for this element. The design writes ServiceNow articles into the index as external items (connectors.if-05, data.ds-02), which the assessment judges against the permitted use. The element has no catalogue ref.
+  - element: servicenowkb3
+    position: not-target
+    successor: The target state's separate enterprise knowledge store, which uses a mixture of semantic and graph RAG (i.e., vector and graph RAG)
+    attested_by: { name: Dermot O'Brien, role: Responsible architect for the target architecture of this test case }
+    date: "2026-10-28"
+    note: >-
+      The architect is not inclined to seek an exception. An exception for a not-target block needs escalation to, and approval by, the organisation's exception authority, not the responsible architect alone (CORE-TGT-05). The successor is not an element of the specification and has no catalogue entry, so it is recorded only in the architect's words. The design describes servicenowkb3 as an existing connection (drivers.constraints.con-servicenowkb3), while the schema defines not-target as neither in the landscape today nor planned; reconciling the two is for the architect and the owner, and the position is applied as attested.
+
+result:
+  type: ai-solution
+  tier: AT3
+  drivers:
+    - driver: reach-and-agency
+      tier: AT2
+      note: Reach read, agency none (section 3.1), from elements.knowledge-agent.ai.grounding and the absence of an agent facet. input_trust is mixed, not untrusted, and no tool has reads_untrusted, so the external row does not apply.
+    - driver: data
+      tier: AT2
+      note: Highest data[].classification is confidential. Personal data is staff questions and answers in ds-03, not customers' or special-category data.
+    - driver: exposure
+      tier: AT1
+      note: design.exposure is staff. The document does not say from where staff reach it (devices, networks); an answer could not raise exposure above staff, so it does not change the tier.
+    - driver: untrusted-content
+      tier: AT2
+      note: Present (connectors.if-03.carries_untrusted_content true, input_trust mixed) in a session with no tool that writes or reaches outside.
+    - driver: effect-on-people
+      tier: AT1
+      note: Limited risk with the Article 50 transparency duty only (drivers.obligations.obl-ai-transparency); the agent makes and supports no decision about people.
+    - driver: novelty
+      tier: AT3
+      note: >-
+        servicenowkb3 is attested not-target, which section 3.4 reads as new to the landscape and outside the plan: AT3 on that alone. graph-index is target but limited to content from the Microsoft 365 ecosystem, and the design adds ServiceNow articles to it, a departure that gives AT2 on its own. Separately, four elements of kind sbb or technology have no ref (teams, entra-id, graph-index, servicenowkb3), which the derivation rule also reads as new to the landscape; for teams, entra-id and graph-index this conflicts with their target attestation and is reported, but does not change the tier. Only copilot-studio (SBB-044) and pp-production-env (DN-009) are catalogued. No element names an admitting assessment in assessed_by, so Copilot Studio counts as a platform not yet assessed and the subject inherits no controls from it.
+    - driver: reversibility
+      tier: AT1
+      note: All three decisions are recorded as two-way doors (decisions[].reversibility).
+  plan:
+    depth: review
+    lenses: [core, ai-solution]
+    independent_assessor: true
+    approver: The architecture board or its delegate, with the service owner (Digital workplace team)
+    evidence:
+      - "Prerequisite, recorded as a condition rather than a stop: servicenowkb3 is a component new to the landscape (not-target), which section 7 would send to an onboarding assessment first. For a not-target block the standard's routes are a design on the target state or an exception approved by the exception authority after escalation (section 3.3, CORE-TGT-05); the design review proceeds and reports the gap."
+      - "Due at this design review: a threat model for design version 0.1.0 (CORE-SEC-04)"
+      - "Due at this design review: a cost model, with a unit cost (CORE-CST-01)"
+      - "Due at this design review: for servicenowkb3 (not-target), either a design that grounds the agent on the target state's enterprise knowledge store instead, or an accepted decision whose departure records the escalation and its approval by the organisation's exception authority (CORE-TGT-05)"
+      - "Due at this design review: for graph-index, a design that keeps it within its permitted use (content from the Microsoft 365 ecosystem only), or an accepted decision with a departure for using it for ServiceNow content (CORE-TGT-01)"
+      - "Due at this design review: catalogue entries, or onboarding assessments, for teams, entra-id and graph-index, and for servicenowkb3 if it is kept"
+      - "Due at this design review, judged as plans: the gating evals, an injection test of article content, a red-team exercise, and a load test against scenario q3"
+      - "Due at production entry: eval reports for every gating eval, run against the version being released"
+      - "Due at production entry: injection test results for untrusted article content, and the red-team results"
+      - "Due at production entry: a load test against scenario q3"
+      - "Due at production entry: the outcomes of the full security assessment and the privacy impact assessment"
+    handovers: [cybersecurity, privacy]
+    staged_rollout: false
+    reassess: >-
+      Every six months and on a change (AT3). A change to the grounding path, the connection's scope or query string, the knowledge bases in scope (HR bases above all), the model, the audience, or a first tool is triaged again before it is made. What would move the tier: grounding the agent on the enterprise knowledge store instead of servicenowkb3 and the Graph index, with that store catalogued at target and teams, entra-id and graph-index given catalogue refs, would bring novelty to AT1 and the tier to AT2 (reach, data and untrusted content each give AT2). An approved exception for servicenowkb3 would not lower novelty: the block would still be new to the landscape, and the tier would stay AT3. An assessment of Copilot Studio as a platform, named in assessed_by, would let the subject inherit controls but would not lower the tier. Adding any tool would raise reach and agency. If the architect re-attests servicenowkb3 as baseline or retiring, because it already exists, novelty would derive AT2 and the tier would derive AT2 once every sbb and technology element has a catalogue ref.
