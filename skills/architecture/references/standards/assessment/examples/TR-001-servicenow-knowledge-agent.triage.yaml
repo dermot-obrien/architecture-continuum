@@ -1,0 +1,64 @@
+# The triage of SD-002 before its assessment. It answers the triage questions, records the tier
+# each driver gives, and takes the highest. Once the specification is complete the check derives
+# the tier again from it (reach from the absence of tools and the permission-trimmed grounding,
+# data from data.classification, exposure from design.exposure), and the derived tier wins.
+schema: triage/0.1.0
+
+triage:
+  id: TR-001
+  subject:
+    name: ServiceNow knowledge agent in Teams
+    design: SD-002
+    description: A Copilot Studio agent in Teams answering staff questions from ServiceNow knowledge articles indexed by the servicenowkb3 Copilot connector connection.
+    owner: Digital workplace team
+  date: 2026-10-28
+  by: Workplace architect
+
+answers:
+  subject_kind: ai-solution
+  uses_model: true
+  reach: read
+  agency: none
+  untrusted_content: read-only
+  data_classification: confidential
+  personal_data: staff
+  exposure: staff
+  effect_on_people: none-or-transparency
+  novelty: catalogued-target
+  reversibility: two-way-door
+  platform:
+    name: Copilot Studio, Power Platform production environment
+    within_envelope: true
+
+result:
+  type: ai-solution
+  tier: AT2
+  drivers:
+    - driver: reach-and-agency
+      tier: AT2
+      note: Retrieval from a live index trimmed to the caller, with no tools. Read reach, although vendors call it an agent.
+    - driver: data
+      tier: AT2
+      note: Confidential knowledge bases may be in scope; HR bases are a consideration.
+    - driver: exposure
+      tier: AT1
+    - driver: untrusted-content
+      tier: AT2
+      note: Articles are editable by many contributors, in a read-only session.
+    - driver: effect-on-people
+      tier: AT1
+      note: Transparency only, checked by AIS-HUM-02.
+    - driver: novelty
+      tier: AT1
+      note: Assumes Copilot Studio is onboarded as a platform. If it is not, this driver is AT3 and so is the tier.
+    - driver: reversibility
+      tier: AT1
+  plan:
+    depth: review
+    lenses: [core, ai-solution, production]
+    independent_assessor: true
+    approver: Architecture lead
+    evidence: [threat model, eval reports for every gating eval, results of the checks on servicenowkb3]
+    handovers: [cybersecurity, privacy]
+    staged_rollout: false
+    reassess: Yearly, and on any change to the connection's scope, the model or the audience

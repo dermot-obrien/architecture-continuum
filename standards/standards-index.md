@@ -52,6 +52,12 @@ For **agent-native** workspaces (AI-majority engineering), also load:
 - `standards/agent-native/operating-model.md`
 - `standards/agent-native/provenance.md`
 
+For reviewing a design (draft, not yet read by any skill):
+- `standards/assessment/standard-architecture-assessment.md` *(depths, lenses, findings and verdict; the line with cybersecurity assessment)*
+- `standards/assessment/standard-assessment-triage.md` *(assessment types and risk tiers AT1 to AT4, chosen before an assessment starts; agent reach and agency; platform inheritance; component onboarding)*
+- `standards/assessment/schemas/` *(design specification, lens, triage and assessment record schemas)*
+- `standards/assessment/lenses/` *(the core, ai-solution, ai-agent and production lenses)*
+
 ## Scope Routing
 
 - For business outcomes and use cases, apply `standard-strategy.md` via `/architecture strategy`.

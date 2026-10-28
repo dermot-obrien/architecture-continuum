@@ -1,0 +1,36 @@
+# Assess
+
+An architecture assessment of one version of one design: what is read, against which lenses, at what depth, and where each finding goes. The method is the [Architecture Assessment Standard](../standards/assessment/standard-architecture-assessment.md); the depth, assessors and evidence come from the subject's triage ([triage flow](triage.md)). This flow is how a person or an agent carries it out and writes the record. The [report flow](report.md) turns the record into the report and readout people read.
+
+It never edits the design. It writes an assessment record, and it proposes; a person confirms the outcome.
+
+## What it needs
+
+No bindings are required. It reads, from `references/standards/assessment/` (a workspace copy wins):
+
+- `standard-architecture-assessment.md` and `standard-assessment-triage.md`;
+- the lenses in `lenses/`, each with its version;
+- the schemas in `schemas/`, with `envelope.schema.json` from `references/standards/schemas/v1.1.0/`;
+- `examples/` for the shape of a design specification, a triage record and an assessment record.
+
+And from the subject: the design specification (YAML), its source document if `design.source` names one, its triage record, and the evidence it cites.
+
+## Steps
+
+1. **Triage first.** If the subject has no triage record, run the triage flow. Read the plan: type, tier, depth, lenses, assessors, evidence. Derive the tier again from the specification; if it is higher than the record's, stop and report that the assessment must restart at the derived tier.
+2. **Prepare.** Fix the subject: `design.id`, `design.version`, the file's path and its `sha256` digest. If the specification's `provenance.review_state` is `ai-raw`, its author has not confirmed it: proceed, record that in the record's out-of-scope notes, and make the author's confirmation a condition (section 5 of the standard). Record the trigger, the stage gate if any, the depth from the plan, the assessors (an agent records itself with role `agent`, and is independent only if it did not write or deliver the design), and what is out of scope. From AT2 the independent assessor must include a person; an agent working alone says in its record that an independent person must review its findings before they are relied on.
+3. **Select lenses.** `core` always. Derive profiles from the facets (an `ai` facet brings `ai-solution`, an `agent` facet `ai-agent`) and compare them with `profiles`; report a mismatch. Add `production` when the trigger is `production-entry`. Record each lens id and version.
+4. **Check.** Validate the specification against `design.schema.json`. If it fails, stop: the outcome is `deferred` and the finding is the validation errors. Otherwise apply every criterion with `decided_by: tool` by its `rule`, and the presence half of every `both`, exactly as written. Record a result for every one, `met` included: a tool run records every criterion. A rule with several clauses is `met` when all hold, `partly-met` when some do and `not-met` when none does; a criterion whose `applies_to` is false is `not-applicable`, never `met`. For a `both` criterion, put the presence half in `tool_result`. `CORE-TGT-01` reads the target-state positions the responsible architect attested in the triage record (or a catalogue `lifecycle_state` an architect maintains); never infer a position, and record any element without one as a missing attestation and a condition. Missing evidence is not a reason to stop: it is a finding against the criterion that asks for it. At a design review, evidence that can exist only once the solution is built is judged by its plan.
+5. **Review.** Answer the reviewer criteria, and the judgement half of each `both` in `result` (never better than its `tool_result`; a present answer you cannot judge is `not-assessed`), reading the specification, its source document and its evidence. At tier AT1 only blocker criteria need a reviewer answer. Each result cites what it rests on, as specification paths (`elements.svc-x.ai.evals`) or evidence ids. `not-assessed` is a result and says why. Do not judge whether controls are implemented or effective; that is handed over (section 9 of the standard).
+6. **Evaluate, at evaluation depth only.** Draft the utility tree from the specification's quality scenarios, and mark it as a draft for the stakeholders' workshop. An agent cannot hold the workshop.
+7. **Dispose.** Give every `partly-met` and `not-met` finding its type (`gap`, `risk`, `non-risk`, `sensitivity-point`, `trade-off-point`, `observation`), the criterion's default severity unless a reason in the statement moves it, a recommendation, and a disposition from section 6 of the standard: `fix-design`, `raise-consideration`, `record-decision`, `accept-as-debt`, `accept-risk` (never for a blocker) or `hand-over`. Group related risks into risk themes, each naming the goals or outcomes it threatens.
+8. **Decide, as a proposal.** Apply the outcome rules of section 7 in order, and stop at the first that applies: `deferred` if the assessment cannot be carried out (an invalid specification, a derived tier above the triage's, or no fixed version and digest); `not-endorsed` if any blocker is open, or any open major is a design fix with no due date; `endorsed-with-conditions` if any open major remains; otherwise `endorsed`. Due dates are the owner's to set; an assessor proposes them, and says so. Record the conformance level against the target state only if the catalogue is available; otherwise leave it out and say why. Set `provenance.review_state` to `ai-raw` or `ai-verified`: an agent proposes the outcome, and a person confirms it.
+9. **Record.** Write `AS-NNN-<slug>.assessment.yaml` beside the design, valid against `assessment.schema.json`, citing the triage in `assessment.triage`. Open the hand-overs the design needs.
+10. **Hand on.** Run the [report flow](report.md) on the record, or leave it to whoever reports; the record is complete without the report.
+
+## Rules
+
+- Never edit the design, its evidence or its triage. Report what to change.
+- Every finding cites the specification or evidence it rests on. A finding with no citation is an opinion, and is left out.
+- Apply a tool criterion's rule as written, even when the result seems harsh, and say so in the statement if the rule seems wrong for the case; propose a change to the lens separately.
+- An agent may assess. It does not approve, and it does not accept risk.

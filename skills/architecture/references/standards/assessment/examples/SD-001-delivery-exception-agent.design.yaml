@@ -1,0 +1,443 @@
+# A worked example: the delivery-exception agent the /architecture runtime-agent skill uses as
+# its own example, written as a design specification. It has deliberate gaps, so that the
+# assessment beside it (AS-001) has something to find.
+schema: design/0.1.0
+
+design:
+  id: SD-001
+  title: Delivery exception agent
+  type: solution-design
+  scope: problem
+  version: 0.1.0
+  status: proposed
+  lifecycle_state: target
+  owner: Fulfilment platform team
+  authors: [Fulfilment architect]
+  implements: [RA-004]
+  provenance:
+    origin: ai-assisted
+    review_state: human-reviewed
+
+context:
+  platform: PL-003
+  bounded_contexts: [BC-007, BC-009]
+  outcomes: [OC-002]
+  realises: [CAP-021]
+  flows: [handle-delivery-exception]
+  serves: [UC-014]
+  products: [PRD-005]
+
+drivers:
+  goals:
+    - Resolve a failed or late delivery without a person in most cases, within fifteen minutes of the carrier event.
+    - Tell the customer what will happen next, in plain words, before they ask.
+  non_goals:
+    - Refunds and compensation, which stay with the customer service team.
+    - Changing carrier contracts or rates.
+  stakeholders:
+    - role: Customer
+      concerns: [being told promptly and truthfully, a new delivery slot that suits them]
+    - role: Customer service lead
+      concerns: [fewer contacts, no wrong promises made in the company's name]
+    - role: Fulfilment operations
+      concerns: [reschedules that the depots can honour, no duplicate bookings]
+    - role: Information security
+      concerns: [no customer data leaving through the agent, no action the agent was not meant to take]
+  constraints:
+    - id: con-carrier-api
+      statement: Carriers expose rescheduling only through their partner APIs, rate limited per account.
+      source: Carrier partner agreements
+  assumptions:
+    - id: asm-volume
+      statement: About 1,200 exceptions a day, peaking at 300 an hour in December.
+  obligations:
+    - id: obl-ai-transparency
+      source: EU AI Act, Article 50
+      classification: Limited risk; customers interact with an AI system and receive generated text.
+      statement: Customers must be told the message was written by an AI system.
+    - id: obl-privacy
+      source: GDPR
+      classification: Processing of personal data under contract.
+
+profiles: [ai-solution, ai-agent]
+
+trust_zones:
+  - id: zone-internal
+    name: Fulfilment workloads
+    trust: trusted
+  - id: zone-carrier
+    name: Carrier partner APIs
+    trust: partially-trusted
+  - id: zone-public
+    name: Customers and the internet
+    trust: untrusted
+
+data:
+  - id: data-orders
+    name: Orders and delivery addresses
+    classification: confidential
+    personal: true
+    owner: svc-orders
+    residency: EU
+    retention: Seven years for orders; addresses as orders
+    lineage: Written by checkout; read by fulfilment.
+    used_for_ai: prompt-context
+  - id: data-carrier-events
+    name: Carrier tracking events
+    classification: internal
+    owner: svc-carrier-gateway
+    used_for_ai: prompt-context
+  - id: data-policy
+    name: Delivery exception policy
+    classification: internal
+    owner: svc-exception-agent
+    lineage: Written by fulfilment operations, versioned in the policy repository.
+    used_for_ai: grounding
+  - id: data-agent-memory
+    name: Case notes per exception
+    classification: confidential
+    personal: true
+    owner: st-case-notes
+    used_for_ai: memory
+
+elements:
+  - id: customer
+    name: Customer
+    kind: actor
+  - id: carrier
+    name: Carrier partner API
+    kind: external-system
+    trust_zone: zone-carrier
+  - id: svc-carrier-gateway
+    name: Carrier gateway
+    kind: service
+    ref: carrier-gateway
+    part_of: BC-009
+    trust_zone: zone-internal
+    owner: Carrier integration team
+    deployed_to: [node-run]
+    realises: [sbb-integration]
+  - id: svc-orders
+    name: Orders service
+    kind: service
+    ref: orders
+    part_of: BC-007
+    trust_zone: zone-internal
+    owner: Orders team
+    deployed_to: [node-run]
+    realises: [sbb-integration]
+  - id: svc-exception-agent
+    name: Delivery exception agent
+    kind: service
+    ref: delivery-exception-agent
+    part_of: BC-007
+    trust_zone: zone-internal
+    owner: Fulfilment platform team
+    deployed_to: [node-run]
+    realises: [sbb-agent-runtime]
+    responsibilities:
+      - Read a carrier exception and the order it affects.
+      - Choose a new slot within policy and book it with the carrier.
+      - Write and send the customer an explanation.
+    ai:
+      role: generative
+      model:
+        provider: Anthropic
+        name: Claude
+        version: pinned-in-config
+        version_pinned: true
+        hosting: vendor-api
+        card: https://example.invalid/model-card
+      grounding:
+        sources: [data-policy]
+        retrieval: keyword
+        access_control: index-level
+        freshness: Reloaded on every policy release.
+      input_trust: mixed
+      output_handling:
+        constrained: true
+        validated: true
+        rendered_as: tool arguments and customer email
+      evals:
+        - id: eval-resolution
+          kind: offline
+          dataset: 400 historical exceptions with the operations team's resolution
+          metric: Share of cases where the chosen action matches the reference resolution
+          threshold: At least 92 percent
+          gating: true
+        - id: eval-tone
+          kind: llm-judge
+          dataset: 200 generated customer emails
+          metric: Clarity and accuracy against the booked slot
+          threshold: At least 4 of 5 on average
+          gating: false
+          judge_calibrated: false
+      drift_monitoring: Weekly comparison of actions against operations overrides.
+      human_oversight: on-the-loop
+      disclosure: Each email ends with a line saying it was written by an AI assistant, with a link to a person.
+      limits:
+        max_tokens: 4000
+        budget: 0.04 USD per exception
+        timeout: 60 s
+    agent:
+      profile: agents/delivery-exception-agent/profile.yaml
+      autonomy_level: approver
+      control_flow: single-agent
+      injection_defence: [plan-then-execute]
+      tools:
+        - name: get_order
+          via: c-agent-orders
+          effect: read
+          reversible: true
+          tier: T3
+          approval: autonomous
+          scope: Orders named in the triggering event only
+        - name: reschedule_delivery
+          via: c-agent-carrier
+          effect: write
+          reversible: true
+          tier: T2
+          approval: autonomous
+          scope: Bookings for the order in hand, within the policy's date window
+          reads_untrusted: true
+        - name: email_customer
+          via: c-agent-email
+          effect: external-communication
+          reversible: false
+          tier: T2
+          approval: autonomous
+          scope: The order's customer address only
+      memory:
+        short_term: The current exception only.
+        long_term_store: st-case-notes
+        written_from_untrusted: true
+        retention: 90 days
+        isolation: per-user
+      identity:
+        scheme: spiffe
+        workload_identity: spiffe://fulfilment/delivery-exception-agent
+        acts_as: itself
+      guardrails:
+        - id: GR-001
+          tier: T1
+          enforced: outside-agent
+          invariant: No more than two reschedules per order.
+        - id: GR-002
+          tier: T2
+          enforced: inside-agent
+          invariant: New slot within the policy's window.
+      limits:
+        max_steps: 12
+        timeout: 120 s
+        kill_switch: true
+      trajectory_logging: true
+  - id: st-case-notes
+    name: Case notes store
+    kind: store
+    part_of: BC-007
+    trust_zone: zone-internal
+    owner: Fulfilment platform team
+  - id: email-provider
+    name: Email delivery provider
+    kind: external-system
+    trust_zone: zone-public
+  - id: sbb-integration
+    name: Integration runtime
+    kind: sbb
+    ref: SBB-012
+    part_of: BC-009
+    trust_zone: zone-internal
+    owner: Platform team
+  - id: sbb-agent-runtime
+    name: Agent runtime
+    kind: sbb
+    ref: SBB-031
+    part_of: BC-007
+    trust_zone: zone-internal
+    owner: Platform team
+  - id: node-run
+    name: EU container runtime
+    kind: deployment-node
+    ref: DN-002
+    trust_zone: zone-internal
+    owner: Platform team
+
+connectors:
+  - id: c-carrier-events
+    from: carrier
+    to: svc-carrier-gateway
+    style: event
+    protocol: https webhook
+    contract: EV-031
+    authentication: HMAC signature
+    authorisation: Per-carrier account
+    carries_untrusted_content: true
+  - id: c-gateway-agent
+    from: svc-carrier-gateway
+    to: svc-exception-agent
+    style: event
+    protocol: amqp
+    contract: EV-032
+    context_relationship: customer-supplier
+    authentication: mTLS
+    authorisation: Topic ACL
+    carries_untrusted_content: true
+    description: Carrier free-text remarks pass through to the agent.
+  - id: c-agent-orders
+    from: svc-exception-agent
+    to: svc-orders
+    style: tool-call
+    protocol: mcp/2026-07-28
+    contract: API-021
+    authentication: OAuth 2.1, audience-bound token
+    authorisation: Scope orders.read
+    data: [data-orders]
+  - id: c-agent-carrier
+    from: svc-exception-agent
+    to: svc-carrier-gateway
+    style: tool-call
+    protocol: mcp/2026-07-28
+    contract: API-030
+    context_relationship: customer-supplier
+    authentication: OAuth 2.1, audience-bound token
+    authorisation: Scope bookings.write
+    carries_untrusted_content: true
+  - id: c-agent-email
+    from: svc-exception-agent
+    to: email-provider
+    style: tool-call
+    protocol: https
+    authentication: API key
+    authorisation: Sending domain only
+  - id: c-agent-notes
+    from: svc-exception-agent
+    to: st-case-notes
+    style: data-access
+    data: [data-agent-memory]
+
+scenarios:
+  - id: sc-late-parcel
+    type: functional
+    name: A parcel is late and the agent books the next slot
+    use_case: UC-014
+    steps:
+      - via: c-carrier-events
+        action: Carrier reports a missed delivery.
+      - via: c-gateway-agent
+        action: The gateway forwards the normalised event.
+      - via: c-agent-orders
+        action: The agent reads the order.
+      - via: c-agent-carrier
+        action: The agent books the next slot in the window.
+      - via: c-agent-email
+        action: The agent tells the customer.
+  - id: sc-latency
+    type: quality
+    name: Customers are told quickly
+    quality_attribute: performance-efficiency
+    source: Carrier
+    stimulus: An exception event arrives at peak load.
+    environment: December peak, 300 events an hour
+    artefact: Delivery exception agent
+    response: The customer is emailed with the new slot.
+    response_measure: 95 percent within 15 minutes of the event
+    importance: high
+    difficulty: medium
+  - id: sc-carrier-down
+    type: failure
+    name: The carrier API is unavailable
+    quality_attribute: reliability
+    source: Carrier
+    stimulus: Rescheduling calls fail for 30 minutes.
+    environment: Normal operation
+    artefact: Carrier gateway and agent
+    response: Exceptions queue; the customer is told a new slot is coming; nothing is double-booked.
+    response_measure: No duplicate bookings; all queued exceptions handled within 1 hour of recovery
+    importance: high
+    difficulty: high
+  - id: sc-injected-remark
+    type: misuse
+    name: A carrier remark carries instructions
+    quality_attribute: security
+    source: An attacker able to write carrier remarks
+    stimulus: A remark tells the agent to email the order history to an outside address.
+    environment: Normal operation
+    artefact: Delivery exception agent
+    response: The agent's plan is fixed before it reads the remark; the email tool can only address the order's customer.
+    response_measure: Zero successful exfiltrations in the red-team suite
+    importance: high
+    difficulty: high
+
+fitness_functions:
+  - id: ff-latency
+    characteristic: performance-efficiency
+    measure: 95th percentile time from carrier event to customer email
+    threshold: 15 minutes
+    automated: true
+    runs: continuous
+    scenarios: [sc-latency]
+
+decisions:
+  - id: DR-041
+    title: Use an agent rather than a rules engine for exception handling
+    status: accepted
+    chosen: A single agent with three tools and a fixed plan
+    alternatives: [Rules engine with templated emails, Human queue with AI drafting]
+    rationale: Exception remarks are free text and vary by carrier; the rules engine resolved 41 percent in the trial against 88 percent for the agent.
+    affects: [svc-exception-agent]
+    reversibility: costly
+  - id: d-email-autonomous
+    title: Send customer emails without approval
+    status: proposed
+    chosen: Autonomous sending, constrained to the order's address and a template frame
+    alternatives: [Approval for every email, Approval for emails that promise a date]
+    rationale: Approval would miss the fifteen-minute goal at peak.
+    affects: [svc-exception-agent]
+
+considerations:
+  - id: CN-019
+    question: Should the agent offer the customer a choice of slots rather than booking one?
+    options: [Book one, Offer three, Book one and offer to change]
+    status: open
+    affects: [svc-exception-agent]
+
+risks:
+  - id: rsk-wrong-promise
+    statement: The email promises a slot the depot cannot honour.
+    likelihood: medium
+    impact: medium
+    mitigation: The email states the slot the carrier confirmed, never one the model proposes.
+    owner: Fulfilment platform team
+
+operations:
+  slos:
+    - name: Exception handled
+      objective: 95 percent of exceptions handled within 15 minutes, monthly
+  observability:
+    logs: true
+    metrics: true
+    traces: true
+    conventions: OpenTelemetry, with the GenAI semantic conventions
+    audit_trail: true
+  deployment:
+    strategy: Canary by carrier
+    rollback: Feature flag returns every exception to the human queue
+  recovery:
+    rto: 1 h
+    rpo: 0, events are durable in the queue
+    degraded_mode: Human queue
+  cost:
+    unit_cost: 0.04 USD per exception
+    budget: 1,500 USD a month
+
+evidence:
+  - id: ev-trial
+    type: experiment
+    ref: docs/trials/delivery-exception-trial-2026-09.md
+    date: 2026-09-30
+    covers: [eval-resolution, sc-late-parcel]
+  - id: ev-threat-model
+    type: threat-model
+    ref: docs/security/delivery-exception-threat-model.md
+    date: 2026-10-12
+    covers: [sc-injected-remark]

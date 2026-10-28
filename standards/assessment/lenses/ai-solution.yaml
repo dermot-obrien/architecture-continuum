@@ -1,0 +1,303 @@
+schema: lens/0.1.0
+lens:
+  id: ai-solution
+  prefix: AIS
+  title: AI solution lens
+  version: 0.3.0
+  applies_when:
+    profile: ai-solution
+  description: >-
+    The criteria a design adds when any of its elements uses a model to produce its output: a generative or predictive model, a retrieval pipeline, a judge, a guard. They do not replace the core lens; they ask what changes when part of the design is non-deterministic, learned from data, priced per call and supplied by someone else. Each criterion reads the ai facet of the elements that carry one.
+
+areas:
+  - id: FIT
+    title: Fitness for AI
+    question: Is a model the right tool, and is its role in the design bounded?
+  - id: MOD
+    title: Model and value chain
+    question: Is the model a pinned, documented, replaceable dependency?
+  - id: EVAL
+    title: Evaluation as evidence
+    question: Do evals prove the design meets its quality scenarios, with each kind of error costed and measured on enough cases, and do they gate release?
+  - id: DATA
+    title: Grounding and data
+    question: Is the data the model sees owned, permissioned, current and traceable?
+  - id: IO
+    title: Inputs and outputs
+    question: Is untrusted input contained and model output validated before it does anything?
+  - id: OPS
+    title: Running AI
+    question: Is the model observed, bounded in cost and latency, and able to fail safely?
+  - id: HUM
+    title: People and obligations
+    question: Is human oversight designed, users told, and the regulatory class known?
+
+criteria:
+  - id: AIS-FIT-01
+    area: FIT
+    question: Does the design say why a model is needed, and what a deterministic alternative would cost?
+    why: The simplest design that works is the one to assess first; a model adds non-determinism, cost and a supplier.
+    reads: [decisions, elements.ai.role]
+    decided_by: reviewer
+    severity: major
+    sources: [anthropic-agents, azure-ai]
+  - id: AIS-FIT-02
+    area: FIT
+    question: Is the model's role in each element stated, and limited to that role?
+    reads: [elements.ai.role, elements.responsibilities]
+    decided_by: both
+    rule: Every element with an ai facet has role and at least one responsibility.
+    severity: minor
+    sources: [iso25059, azure-ai]
+
+  - id: AIS-MOD-01
+    area: MOD
+    question: Is every model version pinned, with a documented route to change it?
+    why: An unpinned model changes behaviour without a release; the evals that justified the design no longer apply.
+    reads: [elements.ai.model.version_pinned, elements.ai.model.version]
+    decided_by: tool
+    rule: >-
+      Every ai facet has model.version_pinned true and model.version set. Where model.hosting is managed-platform and the platform does not let the team pin the model, a decision affecting the element that accepts the platform-managed model, with gating evals rerun on any platform model change as its condition, meets this criterion instead.
+    severity: major
+    sources: [nist-600-1, owasp-llm03]
+  - id: AIS-MOD-02
+    area: MOD
+    question: Is there a model card or system card for every model, and an AI bill of materials for the design?
+    reads: [elements.ai.model.card, evidence]
+    decided_by: both
+    rule: Every ai facet has model.card.
+    severity: minor
+    sources: [cyclonedx, eu-aiact-annex4]
+  - id: AIS-MOD-03
+    area: MOD
+    question: Can the model or its provider be replaced, and is there a fallback model or path?
+    reads: [elements.ai.model.fallback_model, elements.ai.fallback]
+    decided_by: both
+    rule: Every generative ai facet has fallback.
+    severity: major
+    sources: [nist-600-1, wa-aws-genai]
+
+  - id: AIS-EVAL-01
+    area: EVAL
+    question: Does every model-backed element have evals with a metric and a threshold?
+    why: For a non-deterministic component, the eval suite is the test suite and the acceptance criterion.
+    reads: [elements.ai.evals]
+    decided_by: tool
+    rule: Every ai facet has at least one eval.
+    severity: blocker
+    sources: [azure-ai, eu-aiact-annex4, nist-ai-rmf]
+  - id: AIS-EVAL-02
+    area: EVAL
+    question: Does at least one offline eval gate release?
+    reads: [elements.ai.evals.gating, elements.ai.evals.kind]
+    decided_by: tool
+    rule: Every ai facet has an eval of kind offline with gating true.
+    severity: major
+    sources: [azure-ai, mlops-google]
+  - id: AIS-EVAL-03
+    area: EVAL
+    question: Do the evals cover the design's quality scenarios, its risk scenarios and the populations it serves?
+    reads: [elements.ai.evals, scenarios]
+    decided_by: reviewer
+    severity: major
+    sources: [eu-aiact-annex4, nist-600-1]
+  - id: AIS-EVAL-04
+    area: EVAL
+    question: Is every LLM-as-judge eval calibrated against human labels?
+    why: Judges show position, verbosity and self-preference bias; an uncalibrated judge is not evidence.
+    reads: [elements.ai.evals.kind, elements.ai.evals.judge_calibrated]
+    decided_by: tool
+    rule: Every eval of kind llm-judge has judge_calibrated true.
+    severity: major
+    sources: [llm-judge-surveys]
+  - id: AIS-EVAL-05
+    area: EVAL
+    question: Has the design been red-teamed against the OWASP LLM risks that apply to it?
+    reads: [elements.ai.evals.kind, evidence.type]
+    decided_by: both
+    rule: An eval of kind red-team or evidence of type red-team-report exists when any ai facet has input_trust mixed or untrusted.
+    severity: major
+    sources: [owasp-llm, atlas]
+  - id: AIS-EVAL-06
+    area: EVAL
+    question: Does each eval that classifies (retrieval, answer or abstain, routing, a guard) name its positive class and set a separate threshold on false positives and on false negatives, weighted by what each error costs, rather than relying on F1 or accuracy alone?
+    why: >-
+      F1 weighs a false positive and a false negative equally, and accuracy hides both behind the majority class. In most designs the two errors cost very differently: an agent that answers confidently from the wrong source does more harm than one that says it does not know. A better F1 bought by trading precision for recall can make a design worse.
+    reads: [elements.ai.evals.positive_class, elements.ai.evals.errors]
+    decided_by: both
+    rule: >-
+      Every eval whose metric names F1, F-beta, accuracy, precision or recall has positive_class, and errors with both false_positive and false_negative, each with meaning and max_rate. A reviewer checks that the rates reflect the costs, and that any F-beta's beta leans the way the costs do.
+    severity: major
+    sources: [f-measure, nist-600-1, cs-eval]
+  - id: AIS-EVAL-07
+    area: EVAL
+    question: Is abstention evaluated, with questions the sources cannot answer in the test set, and the rate of answering them bounded?
+    why: >-
+      A test set made only of answerable questions cannot measure the costliest error of a grounded assistant, which is answering when it should decline. Without unanswerable and out-of-scope questions, precision is inflated by construction.
+    reads: [elements.ai.evals, elements.ai.grounding]
+    decided_by: both
+    rule: >-
+      Every generative ai facet with grounding has an eval whose positive_class is answering and whose errors.false_positive is answering a question the grounding cannot support. A reviewer checks that the test set holds enough unanswerable and out-of-scope questions to measure that rate.
+    severity: major
+    sources: [nist-600-1, cs-eval, owasp-llm]
+  - id: AIS-EVAL-08
+    area: EVAL
+    question: Is permission trimming tested as people with different access, with zero tolerance for content a user may not read?
+    why: >-
+      A leak of restricted content is not a quality trade-off to balance against recall. It is a security failure, so it gets its own eval, run as test users whose access differs, and a single leak fails it.
+    reads: [elements.ai.grounding.access_control, elements.ai.evals.zero_tolerance, elements.ai.evals.gating]
+    decided_by: tool
+    rule: Every ai facet whose grounding access_control is document-level or caller-permission-trimmed has an eval with zero_tolerance true and gating true.
+    severity: major
+    sources: [owasp-llm02, owasp-llm08, ai-data-security]
+  - id: AIS-EVAL-09
+    area: EVAL
+    question: Is each threshold backed by enough test cases to tell a pass from chance, with the interval reported?
+    why: >-
+      Ninety per cent on a hundred cases is anywhere from about 83 to 95 per cent at 95 per cent confidence. Zero failures in n trials bounds the true failure rate only at about 3 in n (the rule of three), so claiming a leak rate below one per cent needs around three hundred clean probes, and showing a false-answer rate below two per cent needs about one hundred and fifty negatives with none failing by the rule of three, nearer one hundred and ninety by the Wilson interval, and more if any may fail. Size the negatives, not only the whole set.
+    reads: [elements.ai.evals.sample_size, elements.ai.evals.threshold]
+    decided_by: reviewer
+    severity: minor
+    sources: [wilson-interval, rule-of-three]
+
+  - id: AIS-DATA-01
+    area: DATA
+    question: Is every grounding source a named, owned and classified data set?
+    reads: [elements.ai.grounding.sources, data]
+    decided_by: tool
+    rule: Every grounding source resolves to a data set, and that data set has used_for_ai grounding.
+    severity: major
+    sources: [azure-ai, ai-data-security]
+  - id: AIS-DATA-02
+    area: DATA
+    question: Is retrieval trimmed to what the caller may see?
+    why: A shared index without per-caller access control discloses across users and tenants.
+    reads: [elements.ai.grounding.access_control, data.classification]
+    decided_by: tool
+    rule: When any grounding source is confidential, restricted or personal, access_control is document-level or caller-permission-trimmed.
+    severity: blocker
+    sources: [owasp-llm08, owasp-llm02]
+  - id: AIS-DATA-03
+    area: DATA
+    question: Are data provenance, freshness and drift monitored?
+    reads: [elements.ai.grounding.freshness, elements.ai.drift_monitoring, data.lineage]
+    decided_by: both
+    rule: Every ai facet has drift_monitoring; every grounding facet has freshness.
+    severity: minor
+    sources: [ai-data-security, mlops-google]
+  - id: AIS-DATA-04
+    area: DATA
+    question: Is data used for training, fine-tuning or evaluation licensed and permitted for that use?
+    reads: [data.used_for_ai, drivers.obligations]
+    decided_by: reviewer
+    severity: major
+    sources: [nist-600-1, eu-gpai-code]
+
+  - id: AIS-IO-01
+    area: IO
+    question: Is every model that receives untrusted input identified, with its untrusted inputs named?
+    reads: [elements.ai.input_trust, connectors.carries_untrusted_content]
+    decided_by: tool
+    rule: Every ai facet has input_trust; an element receiving a connector that carries untrusted content does not declare input_trust trusted.
+    severity: major
+    sources: [owasp-llm01]
+  - id: AIS-IO-02
+    area: IO
+    question: Is model output constrained and validated before it reaches a tool, a store, a query, code or a user?
+    reads: [elements.ai.output_handling]
+    decided_by: tool
+    rule: Every ai facet whose output_handling.rendered_as is anything other than displayed text has validated true.
+    severity: blocker
+    sources: [owasp-llm05]
+  - id: AIS-IO-03
+    area: IO
+    question: Does the design avoid relying on the system prompt for security, or on keeping it secret?
+    reads: [decisions, elements.ai]
+    decided_by: reviewer
+    severity: major
+    sources: [owasp-llm07]
+
+  - id: AIS-OPS-01
+    area: OPS
+    question: Are token, rate, cost and time limits set on every model call?
+    reads: [elements.ai.limits]
+    decided_by: tool
+    rule: >-
+      Every ai facet has limits with budget and timeout. Where model.hosting is managed-platform and the platform sets call limits the team cannot, limits.budget and a decision accepting the platform's limits meet this criterion instead.
+    severity: major
+    sources: [owasp-llm10, wa-aws-genai]
+  - id: AIS-OPS-02
+    area: OPS
+    question: Are model calls traced with prompts, outputs, tokens and cost, to the GenAI conventions?
+    reads: [operations.observability.conventions, operations.observability.traces]
+    decided_by: both
+    rule: >-
+      operations.observability.traces is true and conventions names the GenAI conventions and their version. Where model.hosting is managed-platform, conventions may instead name the platform's telemetry, provided it records prompts, outputs and cost per call, and a decision records the gap from the GenAI conventions.
+    severity: minor
+    sources: [otel-genai]
+  - id: AIS-OPS-03
+    area: OPS
+    question: Is there a latency and quality budget per scenario, with a degraded mode when it is missed?
+    reads: [scenarios, operations.recovery.degraded_mode, elements.ai.fallback]
+    decided_by: reviewer
+    severity: minor
+    sources: [wa-google-ai, azure-ai]
+
+  - id: AIS-HUM-01
+    area: HUM
+    question: Is the level of human oversight stated for each model-backed decision, and proportionate to its impact?
+    reads: [elements.ai.human_oversight]
+    decided_by: both
+    rule: Every ai facet has human_oversight.
+    severity: major
+    sources: [iso25059, nist-600-1, au-guidance]
+  - id: AIS-HUM-02
+    area: HUM
+    question: Are users told when they deal with AI or receive generated content?
+    reads: [elements.ai.disclosure]
+    decided_by: both
+    rule: Every generative ai facet whose output reaches an actor has disclosure.
+    severity: major
+    sources: [eu-aiact-art50]
+  - id: AIS-HUM-03
+    area: HUM
+    question: Is the design's class under the AI regulations that apply to it recorded, with the impact assessment it requires?
+    reads: [drivers.obligations, evidence.type]
+    decided_by: both
+    rule: drivers.obligations has an entry whose source names an AI instrument; evidence has an ai-impact-assessment unless the obligation records why none is needed.
+    severity: major
+    sources: [eu-aiact, iso42005, iso42001]
+
+sources:
+  iso25059: ISO/IEC 25059:2023, Quality model for AI systems
+  iso42001: ISO/IEC 42001:2023, AI management system
+  iso42005: ISO/IEC 42005:2025, AI system impact assessment
+  nist-ai-rmf: NIST AI 100-1, AI Risk Management Framework 1.0 (2023)
+  nist-600-1: NIST AI 600-1, Generative AI Profile (2024)
+  eu-aiact: Regulation (EU) 2024/1689, the AI Act, as amended by the Digital Omnibus
+  eu-aiact-art50: Regulation (EU) 2024/1689, Article 50, transparency
+  eu-aiact-annex4: Regulation (EU) 2024/1689, Annex IV, technical documentation
+  eu-gpai-code: European Commission, General-Purpose AI Code of Practice (2025)
+  au-guidance: Australian Government, Guidance for AI Adoption (2025)
+  owasp-llm: OWASP Top 10 for LLM Applications 2025
+  owasp-llm01: OWASP LLM01 Prompt Injection
+  owasp-llm02: OWASP LLM02 Sensitive Information Disclosure
+  owasp-llm03: OWASP LLM03 Supply Chain
+  owasp-llm05: OWASP LLM05 Improper Output Handling
+  owasp-llm07: OWASP LLM07 System Prompt Leakage
+  owasp-llm08: OWASP LLM08 Vector and Embedding Weaknesses
+  owasp-llm10: OWASP LLM10 Unbounded Consumption
+  atlas: MITRE ATLAS
+  ai-data-security: NSA, CISA, FBI and partners, AI Data Security (2025)
+  azure-ai: Microsoft, Azure Well-Architected Framework, AI workloads
+  wa-aws-genai: AWS Well-Architected Generative AI Lens
+  wa-google-ai: Google Cloud Well-Architected Framework, AI and ML perspective
+  mlops-google: Google Cloud, MLOps continuous delivery and automation pipelines
+  otel-genai: OpenTelemetry GenAI semantic conventions (Development status)
+  cyclonedx: CycloneDX 1.7, ECMA-424, machine-learning BOM and model cards
+  llm-judge-surveys: Surveys of LLM-as-a-judge, arXiv 2411.15594 and 2412.05579
+  f-measure: C. J. van Rijsbergen, Information Retrieval, 2nd edition (1979), the effectiveness measure from which F1 and F-beta come
+  wilson-interval: E. B. Wilson, Probable inference, the law of succession, and statistical inference, JASA (1927)
+  rule-of-three: Hanley and Lippman-Hand, If nothing goes wrong, is everything all right?, JAMA (1983)
+  cs-eval: Microsoft, Copilot Studio agent evaluation and its test methods (2026)
+  anthropic-agents: Anthropic, Building effective agents (2024)
