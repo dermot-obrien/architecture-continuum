@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ServiceNow Agent Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root { color-scheme: light; --bg: #E9EBEF; --ink: #2C3038; --muted: #5E6B7F; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: Carlito, Calibri, Arial, sans-serif; }
+header { max-width: 1200px; margin: 0 auto; padding: 24px 16px 8px; }
+header h1 { margin: 0; font-size: 28px; }
+header p { margin: 4px 0 0; color: var(--muted); }
+main { max-width: 1200px; margin: 0 auto; padding: 8px 16px 48px; display: grid; gap: 28px; }
+.slide { margin: 0; }
+.frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.18); background: #fff; }
+.canvas { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.canvas > section { position: relative; width: 1920px; height: 1080px; box-sizing: border-box; overflow: hidden; }
+.canvas * { box-sizing: border-box; margin: 0; }
+.canvas ul, .canvas ol { padding-left: 1.2em; }
+.canvas table { border-collapse: collapse; width: 100%; }
+.canvas th, .canvas td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #D5D7DF; vertical-align: top; }
+x-shape { display: block; }
+x-shape[kind="ellipse"] { border-radius: 50%; }
+x-shape[kind="rounded"] { border-radius: 16px; }
+x-shape[kind="arrow-right"] { clip-path: polygon(0 30%, 70% 30%, 70% 0, 100% 50%, 70% 100%, 70% 70%, 0 70%); }
+figcaption { display: flex; gap: 16px; padding: 8px 2px 0; font-size: 14px; color: var(--muted); line-height: 1.45; }
+figcaption .num { flex: none; font-weight: 700; }
+</style>
+</head>
+<body>
+<header><h1>ServiceNow Agent Review</h1><p>The recommended outcome of the design review · How much scrutiny it got and how the review was done · What it found, and what that puts at risk · What must happen, and what a person must decide</p></header>
+<main>
+<figure class="slide" id="cover">
+<div class="frame"><div class="canvas">
+<section id="cover" data-transition="fade" style="background:#1A1A2E;color:#E9E9F0;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E8738F">Architecture review of a design</p>
+<h1 style="font-size:104px;font-weight:700;line-height:1.05;color:#F7F7FA">ServiceNow knowledge assistant in Teams</h1>
+<p style="font-size:36px;line-height:1.35;color:#C9CBD6">An AI assistant that answers staff questions in Microsoft Teams from ServiceNow knowledge articles, with links to the article. It answers; it never acts.</p>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#2A2B44;padding:36px;border-radius:12px;border-top:6px solid #E8738F">
+<p style="font-size:28px;color:#C9CBD6">Recommendation</p>
+<p style="font-size:48px;font-weight:700;color:#F7F7FA;line-height:1.1">Do not approve as designed</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#2A2B44;padding:36px;border-radius:12px;border-top:6px solid #8C99D8">
+<p style="font-size:28px;color:#C9CBD6">Level of scrutiny</p>
+<p style="font-size:48px;font-weight:700;color:#F7F7FA;line-height:1.1">Standard: 2 of 4</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#2A2B44;padding:36px;border-radius:12px;border-top:6px solid #E09A79">
+<p style="font-size:28px;color:#C9CBD6">Problems found</p>
+<p style="font-size:48px;font-weight:700;color:#F7F7FA;line-height:1.1">1 blocking; 22 important</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#9EA1B2">Reviewed by an AI reviewer on 28 October 2026, from the design document. A person makes the decision.</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#9EA1B2">1 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">1 / 12</span><span class="notes">Record AS-005 of design SD-002 version 0.1.0, written from the pattern skill's solution design template and translated by the specify flow. Triage TR-006 (tier AT2) supersedes TR-005 (AT3): the connection was re-attested contained, and attested parts with no catalogue entry no longer count as new. The review itself ran at TR-005's depth and lenses, which cover AT2. Proposed outcome not-endorsed by rule 2 of section 7: open blocker CORE-TGT-05, and open majors that are design fixes with no due date. 29 open findings: 1 blocker, 22 majors, 6 minors. Provenance ai-raw. AS-002 to AS-004 were made on earlier inputs.</span></figcaption>
+</figure>
+<figure class="slide" id="triage">
+<div class="frame"><div class="canvas">
+<section id="triage" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">How much scrutiny, and why</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">The assistant fits our target; where its knowledge comes from does not</h2>
+</div>
+<table style="font-family:'Carlito', Arial, sans-serif;font-size:26px;color:#2C3038">
+<tr style="background:#E7E8EE"><th style="width:50%">Part of the design</th><th style="width:50%">Where it stands in our target architecture</th></tr>
+<tr><td>The assistant, Copilot Studio, Teams, Entra ID sign-in</td><td>Where we are heading</td></tr>
+<tr><td>The Power Platform environment it runs in</td><td>Where we are heading, only for running Copilot Studio agents</td></tr>
+<tr><td>The Microsoft Graph index behind Microsoft 365 search and Copilot</td><td>Where we are heading, but only for content that starts in Microsoft 365</td></tr>
+<tr><td>The connection copying ServiceNow articles into that index</td><td>Kept for the uses it has today, not extended to new ones</td></tr>
+</table>
+<p style="font-size:30px;line-height:1.4;color:#4A4F5C">This design would be a new use, so it needs an exception approved through escalation, or a move to the enterprise knowledge store our target keeps for knowledge from outside Microsoft.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">A standard review, 2 of 4. Target positions given by Dermot O'Brien, responsible architect</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">2 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">2 / 12</span><span class="notes">TR-006, tier AT2, type ai-solution. Drivers: reach read and agency none AT2, data AT2, untrusted content AT2, novelty AT2, exposure AT1, effect on people AT1, reversibility AT1. Positions: servicenowkb3 contained (re-attested from not-target), successor the enterprise knowledge store using vector and graph retrieval; graph-index target, permitted use Microsoft 365 content only, so this use is beyond it; Copilot Studio (SBB-044), Teams and Entra ID target; the Power Platform environment (DN-009) target, limited to running Copilot Studio agents. Teams, Entra ID and the index have no catalogue entry: conditions, not novelty. Plan: review, one independent assessor who is a person, approved by the architecture lead, reassessed yearly.</span></figcaption>
+</figure>
+<figure class="slide" id="path">
+<div class="frame"><div class="canvas">
+<section id="path" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">How the review was done</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">The design document, checked against 78 standard questions</h2>
+</div>
+<div style="display:flex;gap:48px">
+<ol style="flex:1.4;font-size:30px;line-height:1.45;color:#2C3038">
+<li>Translated the design document into a structured specification</li>
+<li>Fixed the exact version of the design reviewed</li>
+<li>Chose two sets of questions: core architecture, and AI</li>
+<li>Ran every check that can be decided automatically</li>
+<li>Answered the rest by reading the design and judging</li>
+<li>Proposed what happens next, and the outcome</li>
+</ol>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;padding:40px;border:1px solid #D5D7DF;border-radius:12px">
+<h3 style="font-size:30px;font-weight:700;color:#1A1A2E">Taken as given</h3>
+<p style="font-size:26px;line-height:1.4;color:#4A4F5C">Where each part stands against the target: the responsible architect's call</p>
+<p style="font-size:26px;line-height:1.4;color:#4A4F5C">The translation, which the author has not yet confirmed</p>
+<p style="font-size:26px;line-height:1.4;color:#4A4F5C">Nothing is built yet, so planned tests were judged by their plan</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">An AI reviewer worked alone; an independent architect still reviews its work</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">3 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">3 / 12</span><span class="notes">Source index.md, written from the solution design template; the specify flow wrote the specification and 49 questions for the author (review state ai-raw). Lenses core 0.4.0 (51 criteria) and ai-solution 0.3.0 (27); ai-agent not applicable (no tools); production not applicable (a design review). Review depth. Specification valid, fixed by version 0.1.0 and its sha256 digest.</span></figcaption>
+</figure>
+<figure class="slide" id="results">
+<div class="frame"><div class="canvas">
+<section id="results" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">How the checks came out</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Most checks passed, but one finding stops the design</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;padding:32px;border:1px solid #D5D7DF;border-radius:12px;border-top:6px solid #17803D">
+<p style="font-size:64px;font-weight:700;color:#1A1A2E">46</p>
+<p style="font-size:28px;color:#4A4F5C">passed</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;padding:32px;border:1px solid #D5D7DF;border-radius:12px;border-top:6px solid #9A6B00">
+<p style="font-size:64px;font-weight:700;color:#1A1A2E">16</p>
+<p style="font-size:28px;color:#4A4F5C">incomplete</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;padding:32px;border:1px solid #D5D7DF;border-radius:12px;border-top:6px solid #C2303A">
+<p style="font-size:64px;font-weight:700;color:#1A1A2E">13</p>
+<p style="font-size:28px;color:#4A4F5C">missing</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;padding:32px;border:1px solid #D5D7DF;border-radius:12px;border-top:6px solid #8D8D97">
+<p style="font-size:64px;font-weight:700;color:#1A1A2E">3</p>
+<p style="font-size:28px;color:#4A4F5C">not applicable or not checked</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#2C3038">The 29 that are incomplete or missing are 1 that stops the design, 22 important gaps and 6 minor ones.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">78 checks in all; the next five slides group the problems by what they put at risk</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">4 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">4 / 12</span><span class="notes">Core 0.4.0: met 30, partly-met 10, not-met 8, other 3 (51). AI solution 0.3.0: met 16, partly-met 6, not-met 5 (27). Other: 1 not-applicable (CORE-OPS-04), 2 not-assessed (CORE-STR-07, CORE-CST-02). Against AS-004, from an earlier specification of the same design: passed 50 then 46, important gaps 19 then 22. The fuller document closed none of the earlier gaps and showed new ones.</span></figcaption>
+</figure>
+<figure class="slide" id="theme-target">
+<div class="frame"><div class="canvas">
+<section id="theme-target" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#C2303A">Risk 1 of 5 · stops the design</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Its knowledge comes from outside our target state</h2>
+</div>
+<p style="font-size:34px;line-height:1.4;color:#2C3038">The design copies ServiceNow articles into the Microsoft Graph index, through a connection our target keeps only for the uses it has today. The index is for Microsoft 365 content; outside knowledge belongs in the enterprise knowledge store.</p>
+<ul style="font-size:30px;line-height:1.45;color:#4A4F5C">
+<li>Neither step away from the target is recorded, and no exception has been sought</li>
+<li>The design never considers the enterprise knowledge store</li>
+</ul>
+<p style="font-size:32px;font-weight:700;color:#1A1A2E">The fix: ground the assistant on the enterprise knowledge store</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">The only other route is an exception, escalated to and approved by the exception authority</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">5 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">5 / 12</span><span class="notes">Blocker CORE-TGT-05 (F-012): a new use of servicenowkb3, now attested contained (TR-006), with no exception approved through escalation; AS-005 recorded it against the earlier not-target position, and the finding holds under either. Majors CORE-TGT-01 (F-008: two departures with no decisions), CORE-TGT-02 (F-009), CORE-TGT-03 (F-010: the knowledge store not considered). Minors CORE-TGT-04 (F-011), CORE-EVO-02 (F-048).</span></figcaption>
+</figure>
+<figure class="slide" id="theme-evals">
+<div class="frame"><div class="canvas">
+<section id="theme-evals" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Risk 2 of 5</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Wrong answers aren't yet shown to be rare</h2>
+</div>
+<p style="font-size:34px;line-height:1.4;color:#2C3038">A wrong answer with a convincing link to an article is the costliest mistake this assistant can make.</p>
+<ul style="font-size:30px;line-height:1.45;color:#4A4F5C">
+<li>Microsoft can change the AI model without a release, and nothing reruns the tests when it does</li>
+<li>The automated marker of correct answers isn't checked against people</li>
+<li>No test tries to trick it through text planted in an article</li>
+<li>The limit of 2 per cent wrong answers is worked out three different ways</li>
+<li>The citation test doesn't say what its mistakes cost</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">What works: the tests already cost wrong answers and refusals separately</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">6 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">6 / 12</span><span class="notes">Majors: AIS-MOD-01 (F-054, model unpinned, no decision accepting the platform-managed model), AIS-EVAL-03 (F-059, no injection test through articles), AIS-EVAL-04 (F-060, judge uncalibrated), AIS-EVAL-06 (F-062, the 2 per cent ceiling has three bases across q1, q2 and EVAL-01; EVAL-03 errors have no cost). Minor: AIS-EVAL-09 (F-065, sample size).</span></figcaption>
+</figure>
+<figure class="slide" id="theme-permission">
+<div class="frame"><div class="canvas">
+<section id="theme-permission" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Risk 3 of 5</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Permissions aren't yet shown to survive the copy</h2>
+</div>
+<ul style="font-size:30px;line-height:1.45;color:#4A4F5C">
+<li>No security threat analysis for this version</li>
+<li>The connection's own identity towards Entra ID isn't stated</li>
+<li>Staff are matched to ServiceNow by email: a wrong match gives the wrong access</li>
+<li>Text anyone can edit isn't marked where it enters</li>
+<li>No plan to have the assistant attacked on purpose before release</li>
+<li>The monitoring data that holds staff questions isn't named or protected</li>
+</ul>
+<p style="font-size:30px;line-height:1.4;color:#17803D;font-weight:700">What works: it fetches articles as the person asking, and a zero-leak test must pass before release</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">The security and privacy teams test the built system; their results are needed before go-live</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">7 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">7 / 12</span><span class="notes">Majors: CORE-INT-01 (F-030, no interface names a contract), CORE-DAT-01 (F-033, telemetry and audit records not named as data sets), CORE-SEC-03 (F-038, untrusted content not stated on six interfaces), CORE-SEC-04 (F-039, no threat model), CORE-SEC-05 (F-040, IF-07 with no authentication or authorisation, and the email identity mapping), AIS-EVAL-05 (F-061, no red-team plan). Hand-overs: cybersecurity, privacy.</span></figcaption>
+</figure>
+<figure class="slide" id="theme-platform">
+<div class="frame"><div class="canvas">
+<section id="theme-platform" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Risk 4 of 5</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Its value and cost are asserted, not shown</h2>
+</div>
+<ul style="font-size:30px;line-height:1.45;color:#4A4F5C">
+<li>A 600 US dollar monthly cap, but no cost model behind it</li>
+<li>No comparison with simply bringing portal search into Teams</li>
+<li>No decision on the platform's limits on how long and how often it calls the AI model</li>
+<li>Monitoring isn't shown to capture the cost of each answer</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">If ignored: the service costs more than planned, or stops part-way through a month</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">8 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">8 / 12</span><span class="notes">Majors: CORE-CST-01 (F-045, no cost model), AIS-FIT-01 (F-052, no comparison with improving search), AIS-OPS-01 (F-073, no decision accepting the platform's limits). Minor: AIS-OPS-02 (F-074).</span></figcaption>
+</figure>
+<figure class="slide" id="theme-change">
+<div class="frame"><div class="canvas">
+<section id="theme-change" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">Risk 5 of 5</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Change and failure aren't fully designed</h2>
+</div>
+<ul style="font-size:30px;line-height:1.45;color:#4A4F5C">
+<li>The flow that copies articles into the index serves no named use</li>
+<li>Only one failure is described; the platform, the AI model and search going down are not</li>
+<li>Nothing describes what it costs to run or how easily it can change</li>
+<li>A permission change can take a day to reach the assistant, and no decision accepts that</li>
+<li>Three open questions aren't listed, among them whether sign-in returns the articles at all</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#6B7080">If ignored: outages and permission changes are handled as they happen, not as designed</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">9 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">9 / 12</span><span class="notes">Majors: CORE-TRC-04 (F-007, scenario s2 names no use case), CORE-QA-02 (F-021, no cost or maintainability scenario), CORE-QA-04 (F-023, one failure scenario only), CORE-QA-05 (F-024, the permission lag is a trade-off with no decision), CORE-DEC-02 (F-026, three open questions not listed as considerations, including DEC-03's own check that Graph connector results return under Authenticate with Microsoft).</span></figcaption>
+</figure>
+<figure class="slide" id="conditions">
+<div class="frame"><div class="canvas">
+<section id="conditions" data-transition="fade" style="background:#F7F7F9;color:#2C3038;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#B83A5C">What must happen</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#1A1A2E">Redesign, then review again</h2>
+</div>
+<table style="font-family:'Carlito', Arial, sans-serif;font-size:28px;color:#2C3038">
+<tr style="background:#E7E8EE"><th style="width:60%">What</th><th style="width:40%">Who</th></tr>
+<tr><td>Ground the assistant on the enterprise knowledge store instead of the Microsoft Graph index</td><td>Digital workplace team, with the responsible architect</td></tr>
+<tr><td>List the three missing open questions, with who answers each and by when</td><td>Digital workplace team</td></tr>
+<tr><td>Close the 22 important gaps in the new version</td><td>Digital workplace team</td></tr>
+<tr><td>Add Teams, Entra ID, the Graph index and the knowledge store to the technology catalogue</td><td>Not yet named</td></tr>
+<tr><td>Confirm the translation of the design document</td><td>The design's author</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#4A4F5C">Dates are the design owner's to set. The redesigned version gets a fresh design review at the standard level, triaged again first.</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#6B7080">10 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">10 / 12</span><span class="notes">Conditions in AS-005. Next assessment: a design review of the changed version, re-triaged first. TR-006 sets AT2; grounding on a catalogued target store would remove both target-state departures and leave the tier at AT2, from reach, data and untrusted content.</span></figcaption>
+</figure>
+<figure class="slide" id="decide">
+<div class="frame"><div class="canvas">
+<section id="decide" data-transition="fade" style="background:#B83A5C;color:#FBF4F6;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#FBE3EA">For you to decide</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#FFFAFB">This design can't be approved as it stands</h2>
+</div>
+<p style="font-size:34px;line-height:1.4;color:#FBF4F6">While it gives the ServiceNow connection a new use, copying articles into the Microsoft Graph index, there are only two ways forward:</p>
+<ol style="font-size:34px;line-height:1.45;color:#FBF4F6">
+<li><b>Redesign</b> onto the enterprise knowledge store. Recommended.</li>
+<li><b>An exception</b>, escalated to and approved by the exception authority, with an end date and a plan to move.</li>
+</ol>
+<p style="font-size:30px;line-height:1.4;color:#FBE3EA">The responsible architect is not inclined to seek an exception. Confirming the outcome is a person's decision, after an independent architect has checked the findings.</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#FBE3EA">11 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">11 / 12</span><span class="notes">CORE-TGT-05 is met for a contained block only by an accepted decision whose departure records the escalation and its approval by the exception authority, not by the responsible architect alone. Nothing has been escalated or approved. TR-006 re-attested the connection from not-target to contained: it exists and keeps its current uses, which settles the earlier question of the design calling it existing.</span></figcaption>
+</figure>
+<figure class="slide" id="limits">
+<div class="frame"><div class="canvas">
+<section id="limits" data-transition="fade" style="background:#1A1A2E;color:#E9E9F0;font-family:'Carlito', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#E8738F">What this review did not do</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.15;color:#F7F7FA">Read this before relying on it</h2>
+</div>
+<ul style="font-size:32px;line-height:1.5;color:#D3D5DF">
+<li>It didn't check whether security controls are built or work; that's the security team's job</li>
+<li>It didn't assess the enterprise knowledge store, which isn't in the design yet</li>
+<li>It worked from a translation of the design the author hasn't confirmed yet</li>
+<li>It couldn't compare the design with the full technology catalogue</li>
+<li>An AI reviewer worked alone: it cannot confirm the outcome, accept a risk or approve an exception</li>
+<li>Links in the report go to a placeholder catalogue address for now</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:1400px;font-size:24px;color:#9EA1B2">The design, its specification, the review and the full report sit together in one folder</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;text-align:right;color:#9EA1B2">12 / 12</p>
+
+</section>
+</div></div>
+<figcaption><span class="num">12 / 12</span><span class="notes">AS-005, provenance ai-raw; specification review state ai-raw. Conformance not recorded: the catalogue is not available. Catalogue links use the placeholder prefix https://catalogue.example.com/items/. Folder: standards/assessment/examples/SD-002-servicenow-knowledge-agent in architecture-continuum.</span></figcaption>
+</figure>
+</main>
+<script>
+function fit() { document.querySelectorAll(".frame").forEach(f => { f.firstElementChild.style.transform = "scale(" + (f.clientWidth / 1920) + ")"; }); }
+window.addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>

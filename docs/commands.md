@@ -223,6 +223,14 @@ In this repository the same three are `npm run validate`, `npm run consolidate` 
 
 ## Maintainer scripts
 
+### generate-criteria-pages.mjs
+
+```text
+node scripts/generate-criteria-pages.mjs [--check]
+```
+
+Writes `docs/assessment-criteria/` from the lenses in `standards/assessment/lenses/`: a register of every criterion (`index.md`), a page per lens, and a page per criterion named by its id in lower case (`core-tgt-05.md`), so a Docusaurus site serves each criterion at a stable URL. The lens files, valid against `lens.schema.json`, stay the register; the pages are never edited by hand. `--check` fails on a missing, stale or orphaned page, as CI does.
+
 For working on this repository. Run from its root.
 
 | Command | Does |

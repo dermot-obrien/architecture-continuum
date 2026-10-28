@@ -1,0 +1,464 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Assessment Viewpoints</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: a field manual. One panel per role, each one infographic, all hung on the definition ladder's rail. Palette and type from the bundle's visual design standard (Charcoal 1.1, Cerise 1.2, Indigo 2.1, Sky 2.2, Terracotta 2.3, Wisteria 2.4, Storm 2.6; Calibri). */
+:root {
+  --bg: #F0F2F5;          /* 3.4 Frost */
+  --panel: #FFFFFF;       /* 1.3 */
+  --ink: #2C3038;         /* 3.1 Obsidian */
+  --ink-2: #5E6B7F;       /* 2.6 Storm, secondary text */
+  --rule: #BFC5CC;        /* 3.3 Ash */
+  --head: #1A1A2E;        /* 1.1 Charcoal */
+  --accent: #B83A5C;      /* 1.2 Cerise, deepened for text contrast */
+  --accent-soft: #F6DBE2; /* 1.2.3 */
+  --tool: #4B5BAA;        /* 2.1 Indigo */
+  --both: #4A90D9;        /* 2.2 Sky */
+  --reviewer: #C4724E;    /* 2.3 Terracotta */
+  --ai: #9B72CF;          /* 2.4 Wisteria */
+  --soft-1: #DBDEEE;      /* 2.1.3 */
+  --soft-2: #DAE9F7;      /* 2.2.3 */
+  --soft-3: #F3E3DC;      /* 2.3.3 */
+  --soft-4: #EBE3F5;      /* 2.4.3 */
+  --block: #C2303A;       /* 4.3 deepened */
+  --ok: #17803D;          /* 4.1 deepened */
+  --warn: #9A6B00;        /* 4.2 deepened */
+  --on-dark: #FFFFFF;
+  --band: #1A1A2E;
+  --f-body: Calibri, Carlito, "Segoe UI", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+    --accent: #E8738F; --accent-soft: #3A2030; --tool: #8C99D8; --both: #7DB3EA; --reviewer: #E09A79; --ai: #BBA0E2;
+    --soft-1: #262B4A; --soft-2: #1E3048; --soft-3: #3A2A22; --soft-4: #2E2542; --block: #F07A80; --ok: #5CCB86; --warn: #E3B341;
+    --on-dark: #12121F; --band: #E8738F; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12121F; --panel: #1C1C2E; --ink: #E3E5EA; --ink-2: #AFB5BF; --rule: #3A3D52; --head: #F4F4F8;
+  --accent: #E8738F; --accent-soft: #3A2030; --tool: #8C99D8; --both: #7DB3EA; --reviewer: #E09A79; --ai: #BBA0E2;
+  --soft-1: #262B4A; --soft-2: #1E3048; --soft-3: #3A2A22; --soft-4: #2E2542; --block: #F07A80; --ok: #5CCB86; --warn: #E3B341;
+  --on-dark: #12121F; --band: #E8738F; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { color: var(--head); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 68ch; }
+.mono { font-family: var(--f-mono); font-size: 0.82em; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--ink-2); }
+
+header.top { display: grid; gap: 12px; }
+header.top p { font-size: 1.1rem; }
+nav.roles { display: flex; flex-wrap: wrap; gap: 8px; }
+nav.roles a { text-decoration: none; color: var(--ink); border: 1px solid var(--rule); background: var(--panel); padding: 6px 12px; border-radius: 999px; font-size: 0.92rem; }
+nav.roles a:hover, nav.roles a:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+section.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 3vw, 32px); display: grid; gap: 22px; scroll-margin-top: 16px; }
+.panel-head { display: grid; gap: 6px; border-left: 4px solid var(--accent); padding-left: 14px; }
+.question { font-size: 1.15rem; color: var(--ink); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+.grid-2 > * { min-width: 0; }
+.figure { overflow-x: auto; }
+.figure svg { display: block; width: 100%; height: auto; min-width: 560px; }
+.figure.narrow svg { min-width: 0; }
+svg text { font-family: var(--f-body); fill: var(--ink); }
+svg .mono-t { font-family: var(--f-mono); }
+
+/* Ladder */
+.ladder svg { min-width: 760px; }
+
+/* Step strip */
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; counter-reset: s; }
+ol.steps li { counter-increment: s; background: var(--bg); border-radius: 4px; padding: 12px 12px 12px 44px; position: relative; min-width: 0; }
+ol.steps li::before { content: counter(s); position: absolute; left: 12px; top: 11px; width: 22px; height: 22px; border-radius: 50%; background: var(--head); color: var(--panel); font-family: var(--f-mono); font-size: 0.75rem; display: grid; place-items: center; font-weight: 600; }
+ol.steps b { display: block; color: var(--head); }
+ol.steps span { font-size: 0.92rem; color: var(--ink-2); }
+
+/* Tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tile { border: 1px solid var(--rule); border-radius: 4px; padding: 10px; display: grid; gap: 2px; align-content: start; min-width: 0; }
+.tile .k { font-family: var(--f-mono); font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.tile .v { font-size: 0.9rem; color: var(--ink-2); }
+.tile.blk { border-color: var(--block); }
+.tile.blk .k { color: var(--block); }
+
+.callout { background: var(--accent-soft); border-radius: 4px; padding: 14px 16px; display: grid; gap: 4px; }
+.callout strong { color: var(--head); }
+
+table.t { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.t th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.tablewrap { overflow-x: auto; }
+
+.pill { display: inline-block; font-family: var(--f-mono); font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+.p-ok { background: var(--ok); color: var(--panel); }
+.p-warn { background: var(--warn); color: var(--panel); }
+.p-block { background: var(--block); color: var(--panel); }
+.p-grey { background: var(--rule); color: var(--ink); }
+
+ul.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+ul.ticks li { padding-left: 26px; position: relative; }
+ul.ticks li::before { content: ""; position: absolute; left: 4px; top: 7px; width: 10px; height: 10px; border-radius: 2px; background: var(--tool); }
+ul.ticks.out li::before { background: var(--reviewer); border-radius: 50%; }
+ul.ticks.ai li::before { background: var(--ai); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.88rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+footer { font-size: 0.88rem; color: var(--ink-2); display: grid; gap: 6px; }
+@media (prefers-reduced-motion: no-preference) { nav.roles a { transition: border-color .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Architecture continuum · draft assessment standard 0.7.0</span>
+    <h1>Assessment viewpoints</h1>
+    <p>One assessment method, read from six seats. Each panel answers the question that role brings to an architecture assessment: where it sits, what to prepare, how to run it, what to approve, where the line with other assessments falls, and what changes for AI.</p>
+    <nav class="roles" aria-label="Viewpoints">
+      <a href="#leadership">Architecture leadership</a>
+      <a href="#author">Design author</a>
+      <a href="#assessor">Assessor</a>
+      <a href="#owner">Service owner</a>
+      <a href="#specialists">Security, privacy and compliance</a>
+      <a href="#ai">AI and agent teams</a>
+    </nav>
+  </header>
+
+  <!-- 1. Leadership -->
+  <section class="panel" id="leadership">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 1 · Architecture leadership</span>
+      <h2>Where assessment sits on the continuum</h2>
+      <p class="question">Assessment gates movement up the definition ladder. It never replaces the ladder's own mechanical checks.</p>
+    </div>
+    <div class="figure ladder">
+      <svg viewBox="0 0 1000 300" role="img" aria-labelledby="lad-t">
+        <title id="lad-t">Definition stages R0 to R6 with the assessment gates between them</title>
+        <!-- reach bands -->
+        <rect x="20" y="20" width="660" height="26" rx="3" fill="var(--soft-1)"/>
+        <text x="30" y="38" font-size="13" font-weight="700">Architecture authors the artefacts (R0 to R4)</text>
+        <rect x="690" y="20" width="290" height="26" rx="3" fill="var(--soft-3)"/>
+        <text x="700" y="38" font-size="13" font-weight="700">Implementation evidence, received (R5, R6)</text>
+        <!-- rail -->
+        <line x1="70" y1="130" x2="930" y2="130" stroke="var(--rule)" stroke-width="4"/>
+        <g font-size="13">
+          <g><circle cx="70" cy="130" r="22" fill="var(--panel)" stroke="var(--ink-2)" stroke-width="2"/><text x="70" y="135" text-anchor="middle" class="mono-t" font-weight="600">R0</text><text x="70" y="175" text-anchor="middle">Unrecognised</text></g>
+          <g><circle cx="213" cy="130" r="22" fill="var(--panel)" stroke="var(--ink-2)" stroke-width="2"/><text x="213" y="135" text-anchor="middle" class="mono-t" font-weight="600">R1</text><text x="213" y="175" text-anchor="middle">Named</text></g>
+          <g><circle cx="356" cy="130" r="22" fill="var(--panel)" stroke="var(--ink-2)" stroke-width="2"/><text x="356" y="135" text-anchor="middle" class="mono-t" font-weight="600">R2</text><text x="356" y="175" text-anchor="middle">Bounded</text></g>
+          <g><circle cx="499" cy="130" r="22" fill="var(--panel)" stroke="var(--head)" stroke-width="2"/><text x="499" y="135" text-anchor="middle" class="mono-t" font-weight="600">R3</text><text x="499" y="175" text-anchor="middle">Decided</text></g>
+          <g><circle cx="642" cy="130" r="22" fill="var(--panel)" stroke="var(--head)" stroke-width="2"/><text x="642" y="135" text-anchor="middle" class="mono-t" font-weight="600">R4</text><text x="642" y="175" text-anchor="middle">Buildable</text></g>
+          <g><circle cx="785" cy="130" r="22" fill="var(--panel)" stroke="var(--head)" stroke-width="2"/><text x="785" y="135" text-anchor="middle" class="mono-t" font-weight="600">R5</text><text x="785" y="175" text-anchor="middle">Proven</text></g>
+          <g><circle cx="928" cy="130" r="22" fill="var(--accent)" stroke="var(--accent)" stroke-width="2"/><text x="928" y="135" text-anchor="middle" class="mono-t" font-weight="600" style="fill:var(--panel)">R6</text><text x="928" y="175" text-anchor="middle" font-weight="700">In service</text></g>
+        </g>
+        <!-- gates -->
+        <g font-size="12.5">
+          <path d="M378 100 Q427 70 477 100" fill="none" stroke="var(--tool)" stroke-width="2.5"/>
+          <text x="427" y="66" text-anchor="middle" font-weight="700" style="fill:var(--tool)">Review</text>
+          <text x="427" y="210" text-anchor="middle">Logical pattern</text><text x="427" y="226" text-anchor="middle">and its decisions</text>
+          <path d="M521 100 Q570 70 620 100" fill="none" stroke="var(--tool)" stroke-width="2.5"/>
+          <text x="570" y="66" text-anchor="middle" font-weight="700" style="fill:var(--tool)">Review or evaluation</text>
+          <text x="570" y="210" text-anchor="middle">Reference architecture,</text><text x="570" y="226" text-anchor="middle">every box an SBB, cost model</text>
+          <path d="M664 100 Q713 70 763 100" fill="none" stroke="var(--reviewer)" stroke-width="2.5"/>
+          <text x="713" y="66" text-anchor="middle" font-weight="700" style="fill:var(--reviewer)">Review of evidence</text>
+          <text x="713" y="210" text-anchor="middle">Does the build exercise</text><text x="713" y="226" text-anchor="middle">the design end to end?</text>
+          <path d="M807 100 Q856 70 906 100" fill="none" stroke="var(--accent)" stroke-width="3.5"/>
+          <text x="856" y="66" text-anchor="middle" font-weight="700" style="fill:var(--accent)">Production entry</text>
+          <text x="856" y="210" text-anchor="middle">Formal: independent lead,</text><text x="856" y="226" text-anchor="middle">owner's approval recorded</text>
+        </g>
+        <!-- continuous -->
+        <rect x="20" y="252" width="960" height="34" rx="3" fill="var(--bg)" stroke="var(--rule)"/>
+        <text x="34" y="274" font-size="13"><tspan font-weight="700">Throughout:</tspan> a tool check on every change to a design · a review of the change when it is material · a periodic check against current lens versions · an incident assessment when something a criterion should have caught gets through</text>
+      </svg>
+    </div>
+    <div class="grid-2">
+      <div style="display:grid;gap:10px">
+        <h3>Three depths, chosen by what is at stake</h3>
+        <div class="tablewrap"><table class="t">
+          <thead><tr><th>Depth</th><th>Who</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td><b>Check</b><br><span class="muted">tool criteria only</span></td><td>A tool, in CI</td><td>Every change</td></tr>
+            <tr><td><b>Review</b><br><span class="muted">every criterion</span></td><td>Lead assessor, security architect across trust zones</td><td>Acceptance, R3, R4, production</td></tr>
+            <tr><td><b>Evaluation</b><br><span class="muted">review plus utility tree</span></td><td>Assessors, architect and stakeholders in a workshop</td><td>Costly to reverse, high-risk or contested</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div style="display:grid;gap:10px">
+        <h3>One judgement among several, kept apart</h3>
+        <div class="tablewrap"><table class="t">
+          <thead><tr><th>Judgement</th><th>Answered by</th></tr></thead>
+          <tbody>
+            <tr><td>How far is a capability defined?</td><td><span class="mono">/architecture stage</span></td></tr>
+            <tr><td>Does the catalogue follow the standards?</td><td><span class="mono">/architecture check</span></td></tr>
+            <tr><td><b>Is this design fit for purpose, and what does it trade?</b></td><td><b>Architecture assessment</b></td></tr>
+            <tr><td>Are controls effective, is residual risk acceptable?</td><td>Cybersecurity assessment, handed over</td></tr>
+            <tr><td>Does it meet a regulation?</td><td>Conformity assessment, handed over</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Author -->
+  <section class="panel" id="author">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 2 · Design author</span>
+      <h2>Getting a design ready to be assessed</h2>
+      <p class="question">The assessment reads what you wrote, and only that. A quality the design meets but does not state counts as a quality it does not meet.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Read the lenses</b><span>Each criterion names the fields it reads, so the lens is also your list of what to write.</span></li>
+      <li><b>Write the specification</b><span>The design as YAML against the schema. Cite catalogue ids, never copy them.</span></li>
+      <li><b>Run the check yourself</b><span>Validate, then walk the 53 tool criteria by their rules.</span></li>
+      <li><b>Clear the blockers</b><span>One open blocker ends in not endorsed, and it cannot be accepted as a risk.</span></li>
+      <li><b>Explain, don't defend</b><span>Point to where the specification says it. Say plainly where it doesn't.</span></li>
+      <li><b>Act on dispositions</b><span>Fix, raise a consideration, record a decision, take on debt, or have the owner accept the risk.</span></li>
+    </ol>
+    <div class="grid-2">
+      <div style="display:grid;gap:10px">
+        <h3>What the specification holds, and the blockers it answers</h3>
+        <div class="tiles">
+          <div class="tile blk"><span class="k">drivers</span><span class="v">Goals, non-goals, stakeholders with concerns · CORE-DEM-01</span></div>
+          <div class="tile"><span class="k">context</span><span class="v">Capabilities realised, platform, contexts, use cases</span></div>
+          <div class="tile"><span class="k">elements</span><span class="v">Every box typed by continuum kind, owned, placed</span></div>
+          <div class="tile blk"><span class="k">connectors</span><span class="v">Contract, auth across trust zones, untrusted content · CORE-SEC-02</span></div>
+          <div class="tile blk"><span class="k">scenarios</span><span class="v">Quality with a measurable response · CORE-QA-01</span></div>
+          <div class="tile"><span class="k">fitness_functions</span><span class="v">Measure, threshold, when it runs</span></div>
+          <div class="tile"><span class="k">decisions</span><span class="v">Alternatives, rationale, reversibility, departures from the target state</span></div>
+          <div class="tile"><span class="k">considerations</span><span class="v">Every open question, with options</span></div>
+          <div class="tile"><span class="k">risks</span><span class="v">Known risks with owner and mitigation</span></div>
+          <div class="tile"><span class="k">operations</span><span class="v">SLOs, observability, recovery, cost, support</span></div>
+          <div class="tile"><span class="k">evidence</span><span class="v">Threat model, cost model, tests, for this version</span></div>
+          <div class="tile blk"><span class="k">all references</span><span class="v">Every id resolves · CORE-STR-05</span></div>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <h3>Gaps reviewers find most often</h3>
+        <ul class="ticks out">
+          <li>"Fast" or "highly available" with no number attached</li>
+          <li>No failure scenario for a dependency the team does not control</li>
+          <li>A connector across a trust boundary with authentication set to none</li>
+          <li>A decision with no alternative, or a one-way door not marked as one</li>
+          <li>Open questions left in prose, where no tool can see them</li>
+          <li>Evidence produced for an earlier version of the design</li>
+        </ul>
+        <div class="callout"><strong>Write down the risks you know about.</strong><span>A risk you record with an owner is a finding the assessor doesn't have to make. A risk you had seen and left out reads worse than one nobody saw.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Assessor -->
+  <section class="panel" id="assessor">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 3 · Assessor</span>
+      <h2>Running an assessment</h2>
+      <p class="question">Follow the eight steps of ISO/IEC/IEEE 42020's evaluation process, leave every decidable criterion to the tool, and spend reviewer time on judgement.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Prepare</b><span>Fix the design id, version and digest, the depth and the assessors.</span></li>
+      <li><b>Select lenses</b><span>Derive profiles from the facets and compare with the declared ones.</span></li>
+      <li><b>Check</b><span>Validate, then run the tool criteria. If it doesn't validate, stop.</span></li>
+      <li><b>Review</b><span>Answer every remaining criterion. "Not assessed" must say why.</span></li>
+      <li><b>Evaluate</b><span>At evaluation depth: utility tree, sensitivity and trade-off points.</span></li>
+      <li><b>Dispose</b><span>Give every shortfall a severity and a home on the continuum.</span></li>
+      <li><b>Decide</b><span>Reach the outcome and the conformance level by the rules.</span></li>
+      <li><b>Record and hand over</b><span>Write the record beside the design and open the hand-overs.</span></li>
+    </ol>
+    <div class="grid-2">
+      <div class="figure narrow" style="display:grid;gap:10px">
+        <h3>Who decides each criterion, by lens (120 in all)</h3>
+        <svg viewBox="0 0 600 236" role="img" aria-labelledby="crit-t">
+          <title id="crit-t">Criteria per lens split by tool, both and reviewer. Core 23, 13, 15. AI solution 11, 11, 6. AI agent 9, 9, 5. Production 10, 6, 3.</title>
+          <!-- scale: 1 criterion = 9 px, bars start at x=120 -->
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="120" y1="12" x2="120" y2="196"/><line x1="210" y1="12" x2="210" y2="196" stroke-dasharray="2 4"/><line x1="300" y1="12" x2="300" y2="196" stroke-dasharray="2 4"/><line x1="390" y1="12" x2="390" y2="196" stroke-dasharray="2 4"/><line x1="480" y1="12" x2="480" y2="196" stroke-dasharray="2 4"/>
+          </g>
+          <g font-size="11" class="mono-t" style="fill:var(--ink-2)">
+            <text x="120" y="212" text-anchor="middle" style="fill:var(--ink-2)">0</text><text x="210" y="212" text-anchor="middle" style="fill:var(--ink-2)">10</text><text x="300" y="212" text-anchor="middle" style="fill:var(--ink-2)">20</text><text x="390" y="212" text-anchor="middle" style="fill:var(--ink-2)">30</text><text x="480" y="212" text-anchor="middle" style="fill:var(--ink-2)">40</text>
+          </g>
+          <g font-size="13">
+            <text x="110" y="40" text-anchor="end" font-weight="700">core</text>
+            <rect x="120" y="22" width="207" height="28" fill="var(--tool)"/><rect x="327" y="22" width="117" height="28" fill="var(--both)"/><rect x="444" y="22" width="135" height="28" fill="var(--reviewer)"/>
+            <text x="584" y="41" font-weight="700">51</text>
+            <text x="110" y="85" text-anchor="end" font-weight="700">ai-solution</text>
+            <rect x="120" y="67" width="99" height="28" fill="var(--tool)"/><rect x="219" y="67" width="99" height="28" fill="var(--both)"/><rect x="318" y="67" width="54" height="28" fill="var(--reviewer)"/>
+            <text x="380" y="86" font-weight="700">28</text>
+            <text x="110" y="130" text-anchor="end" font-weight="700">ai-agent</text>
+            <rect x="120" y="112" width="81" height="28" fill="var(--tool)"/><rect x="201" y="112" width="81" height="28" fill="var(--both)"/><rect x="282" y="112" width="45" height="28" fill="var(--reviewer)"/>
+            <text x="335" y="131" font-weight="700">23</text>
+            <text x="110" y="175" text-anchor="end" font-weight="700">production</text>
+            <rect x="120" y="157" width="90" height="28" fill="var(--tool)"/><rect x="210" y="157" width="54" height="28" fill="var(--both)"/><rect x="264" y="157" width="27" height="28" fill="var(--reviewer)"/>
+            <text x="299" y="176" font-weight="700">19</text>
+          </g>
+          <text x="120" y="232" font-size="11" style="fill:var(--ink-2)">criteria</text>
+        </svg>
+        <div class="legend"><span><i style="background:var(--tool)"></i>Tool decides (53)</span><span><i style="background:var(--both)"></i>Tool checks presence, reviewer judges (39)</span><span><i style="background:var(--reviewer)"></i>Reviewer decides (29)</span></div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>How the outcome is reached, first rule that applies</h3>
+        <div class="tablewrap"><table class="t">
+          <thead><tr><th>Outcome</th><th>Rule</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill p-grey">deferred</span></td><td>Can't be carried out: the specification doesn't validate, or derives a higher tier than its triage. Missing evidence is a finding, not a deferral</td></tr>
+            <tr><td><span class="pill p-block">not endorsed</span></td><td>Any open blocker, or an open major that is a design fix with no due date</td></tr>
+            <tr><td><span class="pill p-warn">with conditions</span></td><td>Open majors remain, each disposed of otherwise or carrying a due date</td></tr>
+            <tr><td><span class="pill p-ok">endorsed</span></td><td>No open blocker or major</td></tr>
+          </tbody>
+        </table></div>
+        <p class="muted" style="font-size:0.92rem">Finding types come from ATAM: gap, risk, non-risk, sensitivity point, trade-off point, observation. At least one assessor must not have written or delivered the design. An agent may assess, with provenance; from AT2 an independent person reviews its findings, and a person reaches the outcome.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Owner -->
+  <section class="panel" id="owner">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 4 · Service owner</span>
+      <h2>Approving a solution for production</h2>
+      <p class="question">The production entry assessment checks that what was built is the design that was assessed, and that it can be run. You approve or decline it, by name and date.</p>
+    </div>
+    <div class="grid-2">
+      <div style="display:grid;gap:10px">
+        <h3>The evidence on your desk, all for the version being released</h3>
+        <div class="tiles">
+          <div class="tile blk"><span class="k">Prior design review</span><span class="v">Endorsed, conditions closed · PRD-BLD-01</span></div>
+          <div class="tile blk"><span class="k">As-built record</span><span class="v">What was built, every departure · PRD-BLD-02</span></div>
+          <div class="tile blk"><span class="k">Hand-over outcomes</span><span class="v">Security, privacy, AI impact, conformity; none failed · PRD-HND-01</span></div>
+          <div class="tile blk"><span class="k">Rollback test</span><span class="v">Done, with the point of no return known · PRD-REL-01</span></div>
+          <div class="tile"><span class="k">Recovery test</span><span class="v">Against the stated RTO and RPO</span></div>
+          <div class="tile"><span class="k">Load and acceptance</span><span class="v">Peak load; every functional scenario end to end</span></div>
+          <div class="tile blk"><span class="k">Support team</span><span class="v">Hours, on-call, escalation · PRD-OPS-01</span></div>
+          <div class="tile"><span class="k">Readiness review</span><span class="v">Runbook, alerting on every SLO</span></div>
+          <div class="tile blk"><span class="k">Residual risk</span><span class="v">Owned by someone entitled to accept it · PRD-RSK-01</span></div>
+        </div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>As built against as designed</h3>
+        <div class="figure narrow">
+          <svg viewBox="0 0 460 200" role="img" aria-labelledby="ab-t">
+            <title id="ab-t">TOGAF conformance levels for the built solution; only fully conformant, or conformant with extras recorded as decisions, can be endorsed</title>
+            <g font-size="13">
+              <rect x="0" y="4" width="460" height="28" rx="3" fill="var(--soft-3)"/><text x="12" y="23">Irrelevant</text><text x="448" y="23" text-anchor="end" font-weight="700" style="fill:var(--block)">not endorsable</text>
+              <rect x="0" y="36" width="460" height="28" rx="3" fill="var(--soft-3)"/><text x="12" y="55">Consistent</text><text x="448" y="55" text-anchor="end" font-weight="700" style="fill:var(--block)">not endorsable</text>
+              <rect x="0" y="68" width="460" height="28" rx="3" fill="var(--soft-3)"/><text x="12" y="87">Compliant</text><text x="448" y="87" text-anchor="end" font-weight="700" style="fill:var(--block)">not endorsable</text>
+              <rect x="0" y="100" width="460" height="28" rx="3" fill="var(--soft-2)"/><text x="12" y="119">Conformant</text><text x="448" y="119" text-anchor="end" font-weight="700" style="fill:var(--warn)">if every extra is a decision</text>
+              <rect x="0" y="132" width="460" height="28" rx="3" fill="var(--soft-2)"/><text x="12" y="151" font-weight="700">Fully conformant</text><text x="448" y="151" text-anchor="end" font-weight="700" style="fill:var(--ok)">endorsable</text>
+              <rect x="0" y="164" width="460" height="28" rx="3" fill="var(--soft-3)"/><text x="12" y="183">Non-conformant</text><text x="448" y="183" text-anchor="end" font-weight="700" style="fill:var(--block)">not endorsable</text>
+            </g>
+          </svg>
+        </div>
+        <div class="callout"><strong>What you are accepting</strong><span>Every risk, debt item and accepted finding carried into production. Conditions need an owner and a due date, never sit on a blocker, and the record schedules the first periodic assessment. A solution that departs from its design needs a new, assessed version of the design. A condition won't cover it.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Specialists -->
+  <section class="panel" id="specialists">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 5 · Security, privacy and compliance</span>
+      <h2>Where architecture ends and your assessment begins</h2>
+      <p class="question">The two overlap on threat modelling and nowhere else. Your assessments are not lenses: they meet the architecture assessment twice, as a hand-over and as evidence.</p>
+    </div>
+    <div class="figure">
+      <svg viewBox="0 0 1000 250" role="img" aria-labelledby="line-t">
+        <title id="line-t">Architecture assessment and specialist assessments, overlapping on threat modelling, meeting at design review and production entry</title>
+        <rect x="20" y="20" width="520" height="150" rx="6" fill="var(--soft-1)"/>
+        <rect x="460" y="20" width="520" height="150" rx="6" fill="var(--soft-3)" fill-opacity="0.9"/>
+        <rect x="460" y="20" width="80" height="150" fill="var(--soft-4)"/>
+        <text x="40" y="50" font-size="16" font-weight="700">Architecture assessment reads the design</text>
+        <g font-size="13.5"><text x="40" y="78">Trust zones and what crosses them</text><text x="40" y="100">Authentication and authorisation on every crossing</text><text x="40" y="122">The identity each service and agent runs as</text><text x="40" y="144">Where untrusted content enters, where controls sit</text></g>
+        <text x="500" y="88" font-size="13" font-weight="700" text-anchor="middle">Threat</text><text x="500" y="106" font-size="13" font-weight="700" text-anchor="middle">model</text>
+        <text x="960" y="50" font-size="16" font-weight="700" text-anchor="end">Specialist assessments read the system</text>
+        <g font-size="13.5" text-anchor="end"><text x="960" y="78">Are controls implemented and effective?</text><text x="960" y="100">Is privacy impact acceptable? AI impact?</text><text x="960" y="122">Does it conform to the regulation?</text><text x="960" y="144">Is the residual risk accepted by its owner?</text></g>
+        <line x1="40" y1="212" x2="960" y2="212" stroke="var(--rule)" stroke-width="3"/>
+        <circle cx="300" cy="212" r="9" fill="var(--tool)"/><text x="300" y="242" font-size="13" text-anchor="middle"><tspan font-weight="700">Design review:</tspan> named and handed over</text>
+        <circle cx="720" cy="212" r="9" fill="var(--accent)"/><text x="720" y="242" font-size="13" text-anchor="middle"><tspan font-weight="700">Production entry:</tspan> outcome back as evidence</text>
+      </svg>
+    </div>
+    <div class="grid-2">
+      <div style="display:grid;gap:10px">
+        <h3>Why your assessment is not a lens</h3>
+        <div class="tablewrap"><table class="t">
+          <thead><tr><th></th><th>A lens</th><th>Your assessment</th></tr></thead>
+          <tbody>
+            <tr><td>Reads</td><td>The design specification</td><td>The running system, configuration, tests, logs</td></tr>
+            <tr><td>Method</td><td>This standard's</td><td>Its own: NIST SP 800-53A, ISO/IEC 27001 audit, ISO/IEC 42005</td></tr>
+            <tr><td>Assessor</td><td>Architects, no accreditation</td><td>Often accredited or legally accountable</td></tr>
+            <tr><td>Ends in</td><td>Findings and an outcome</td><td>An acceptance, authorisation or certificate only its owner can give</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>What you receive, and what you return</h3>
+        <ul class="ticks">
+          <li>At design review: a hand-over naming the scope and the findings that prompted it, plus the threat model for that version</li>
+          <li>Obligations already named, with how the design classes under each</li>
+          <li>Before production: your outcome for the version being released, recorded as evidence. A failed outcome is a blocker</li>
+          <li>The residual risks you report, which the production entry assessment checks are accepted by the person you name</li>
+        </ul>
+        <p class="muted" style="font-size:0.92rem">The design-facing part of privacy can be a lens. A privacy-by-design lens, brought in by a personal-data profile, is a candidate.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. AI -->
+  <section class="panel" id="ai">
+    <div class="panel-head">
+      <span class="eyebrow">Viewpoint 6 · AI and agent teams</span>
+      <h2>What changes when a design uses models or agents</h2>
+      <p class="question">A model is a technology or SBB with an <span class="mono">ai</span> facet; an agent is a service that also has an <span class="mono">agent</span> facet. The facets bring in the extra lenses, and the core lens still applies.</p>
+    </div>
+    <div class="grid-2">
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>AI solution lens · 28 criteria, 3 blockers</h3>
+        <ul class="ticks ai">
+          <li>Why a model at all, and what the deterministic alternative would cost</li>
+          <li>Model pinned, carded, replaceable, with a fallback</li>
+          <li><b>Evals with a metric and threshold</b>, gating release, calibrated judges <span class="mono" style="color:var(--block)">AIS-EVAL-01</span></li>
+          <li><b>Retrieval trimmed to what the caller may see</b> <span class="mono" style="color:var(--block)">AIS-DATA-02</span></li>
+          <li><b>Output constrained and validated</b> before it reaches a tool, store, query, code or user <span class="mono" style="color:var(--block)">AIS-IO-02</span></li>
+          <li>False positives and false negatives capped separately by cost, not F1 alone; abstention tested; zero-tolerance leakage eval</li>
+          <li>Token, rate, cost and time limits; tracing; human oversight; disclosure; regulatory class</li>
+        </ul>
+        <h3>At production entry</h3>
+        <ul class="ticks ai">
+          <li>Gating evals pass on the release candidate</li>
+          <li>Drift monitoring and an online eval switched on</li>
+          <li>For an agent, a control test shows its limits and kill switch work without its cooperation</li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>Agent lens · 23 criteria, 9 blockers. The one that decides most designs:</h3>
+        <div class="figure narrow">
+          <svg viewBox="0 0 460 300" role="img" aria-labelledby="tri-t">
+            <title id="tri-t">The lethal trifecta: no single agent session may combine untrusted input, sensitive data and consequential action</title>
+            <circle cx="165" cy="115" r="92" fill="var(--soft-4)" stroke="var(--ai)" stroke-width="2" fill-opacity="0.85"/>
+            <circle cx="295" cy="115" r="92" fill="var(--soft-2)" stroke="var(--both)" stroke-width="2" fill-opacity="0.75"/>
+            <circle cx="230" cy="205" r="92" fill="var(--soft-3)" stroke="var(--reviewer)" stroke-width="2" fill-opacity="0.75"/>
+            <text x="130" y="95" text-anchor="middle" font-size="14" font-weight="700">Untrusted</text><text x="130" y="113" text-anchor="middle" font-size="14" font-weight="700">input</text>
+            <text x="330" y="95" text-anchor="middle" font-size="14" font-weight="700">Sensitive</text><text x="330" y="113" text-anchor="middle" font-size="14" font-weight="700">data</text>
+            <text x="230" y="262" text-anchor="middle" font-size="14" font-weight="700">Changes state or</text><text x="230" y="280" text-anchor="middle" font-size="14" font-weight="700">talks to the outside</text>
+            <circle cx="230" cy="148" r="20" fill="var(--block)"/>
+            <text x="230" y="153" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--panel)">✕</text>
+          </svg>
+        </div>
+        <p style="font-size:0.95rem"><span class="mono" style="color:var(--block)">AGT-INJ-01</span> No session holds all three. If one must, it doesn't run unattended. The other blockers: every action listed with its reversibility; dangerous actions approved or behind a T0 or T1 limit; limits held outside the agent; sandboxed code; its own identity; authenticated agent-to-agent traffic; step, cost and time limits with a kill switch; autonomy proportionate to impact.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Source: the draft Architecture Assessment Standard 0.5.0 and its core, ai-solution, ai-agent and production lenses, in the architecture continuum bundle, 28 October 2026. Counts are read from the lens files.</span>
+    <span>The standard is a draft. Its tool criteria are specified but not yet implemented.</span>
+  </footer>
+</div>
+
+</body></html>

@@ -6,7 +6,7 @@ It never changes the document and never judges the design. It writes one specifi
 
 ## What it needs
 
-No bindings are required. It reads `design.schema.json` (with `envelope.schema.json` from `references/standards/schemas/v1.1.0/`) and the examples in `references/standards/assessment/examples/` for the shape a finished specification takes (SD-001, an agent with tools; SD-002, an AI solution with none). And from the requester: the design document (Markdown, Word, PDF, a wiki page, diagrams), and the catalogue identifiers of what it realises and runs on, where the document does not give them.
+No bindings are required. It reads `design.schema.json` (with `envelope.schema.json` from `references/standards/schemas/v1.1.0/`) and the examples in `references/standards/assessment/examples/` for the shape a finished specification takes (SD-001, an agent with tools). And from the requester: the design document (Markdown, Word, PDF, a wiki page, diagrams), and the catalogue identifiers of what it realises and runs on, where the document does not give them.
 
 ## Steps
 

@@ -88,6 +88,8 @@
       }
     },
 
+    "governance": { "enum": ["gate", "advice-process"], "description": "How the review was governed. gate: an independent assessor and an approver. advice-process, at AT1 or AT2 only: the decider sought advice from those the design affects and from those with the expertise, recorded it as findings, and is accountable for the decision." },
+    "metrics": { "type": "object", "additionalProperties": false, "description": "Optional measures of the practice itself.", "properties": { "days_to_verdict": { "type": "number", "description": "From the request to the proposed outcome." }, "recurring_findings": { "type": "array", "items": { "type": "string" }, "description": "Criteria failed again from an earlier assessment of the same subject." }, "incidents_traced": { "type": "integer", "description": "Incidents since the last assessment traced to a finding, or to a criterion that should have caught them." } } },
     "utility_tree": {
       "type": "array",
       "description": "Evaluation depth only: the scenarios the stakeholders prioritised, by quality attribute, with the design's own scenario ids where they exist.",

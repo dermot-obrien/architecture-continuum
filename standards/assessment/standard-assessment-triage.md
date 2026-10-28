@@ -54,7 +54,7 @@ What a vendor calls an agent is not always an agent here. A configured assistant
 
 ## 3. Risk drivers
 
-Each driver gives a tier. The subject's tier is the highest of them, the high-water mark used by FIPS 199 for security categorisation: a subject with one critical driver is critical however benign the rest. Points are never added up, because a sum lets several low answers hide one high one.
+Each driver gives a tier. The subject's tier is the highest of them, the high-water mark of FIPS 199 and FIPS 200 for security categorisation: a subject with one critical driver is critical however benign the rest. Points are never added up, because a sum lets several low answers hide one high one.
 
 ### 3.1 Reach and agency, for AI solutions and agents
 
