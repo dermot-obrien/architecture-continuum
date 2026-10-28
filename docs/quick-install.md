@@ -7,6 +7,7 @@ Install Architecture Continuum and every skill it works with into a repository, 
 | `architecture` | architecture-continuum | Authors and checks the architecture, one flow per level |
 | `workspace` | architecture-continuum | Sets the repository up: clears out old skill leftovers, installs the skills, wires a build that runs without them |
 | `pattern`, `use-case`, `cross-reference` | [architecture-pattern](https://github.com/dermot-obrien/architecture-pattern) | Pattern documents and use cases that are also the diagram and the deck; identifiers cited across catalogues |
+| `portfolio`, `draft`, `convert` (optional) | architecture-pattern | The patterns as a managed portfolio, drafts of placeholders from research, and existing diagrams and notes converted into patterns |
 | `model` | [diagram-model](https://github.com/dermot-obrien/diagram-model) | A diagram and a document as two views of one model |
 | `markdown-deck` | [markdown-deck](https://github.com/dermot-obrien/markdown-deck) | Slides and PDFs from tagged Markdown |
 
@@ -24,17 +25,35 @@ Run every command below from the root of the repository you are installing into.
 
 ## Install
 
+### In one command
+
+The install script does steps 1 to 3 below: it declares every skill at its latest release tag (`-WithPortfolio`, or `--with-portfolio`, adds `portfolio`, `draft` and `convert`), fetches the continuum at its latest release and runs `workspace init`. Then carry on at step 4.
+
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dermot-obrien/architecture-continuum/main/scripts/update-skills.ps1" -OutFile update-skills.ps1
+.\update-skills.ps1 -CheckOnly   # what it would declare, changing nothing
+.\update-skills.ps1
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dermot-obrien/architecture-continuum/main/scripts/update-skills.sh -o update-skills.sh
+bash update-skills.sh --check-only
+bash update-skills.sh
+```
+
+Steps 1 to 3 do the same by hand.
+
 ### 1. Fetch the continuum at a release
 
 Take the latest release from the [releases page](https://github.com/dermot-obrien/architecture-continuum/releases); the commands below name the one current when this page was written.
 
 ```powershell
-$Version = 'v0.7.0'  # x-release-please-version
+$Version = 'v0.8.0'  # x-release-please-version
 git clone --quiet --depth 1 --branch $Version https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
 ```bash
-VERSION=v0.7.0  # x-release-please-version
+VERSION=v0.8.0  # x-release-please-version
 git clone --quiet --depth 1 --branch "$VERSION" https://github.com/dermot-obrien/architecture-continuum.git ../architecture-continuum
 ```
 
@@ -42,7 +61,7 @@ The clone is only the means of running `workspace` before it is installed. After
 
 ### 2. Declare the skills
 
-`.agents/skills.json` names each skill and the release it comes from; commit it. The continuum is pinned to its release tag. The three other repositories have not tagged their current releases yet, so their skills are pinned to the commit of each release, which never moves: pattern 0.12.0, use-case 0.3.1 and cross-reference 0.3.1 at `363a743`, model 0.9.1 at `f098f06`, and markdown-deck 0.6.9 at `6e8e180`. When a repository tags a release (`pattern--v0.12.0`, `markdown-deck--v0.6.9`), pin the tag instead.
+`.agents/skills.json` names each skill and the release it comes from; commit it. The continuum is pinned to its release tag, and each other skill to its own release tag, `<skill>--vX.Y.Z`; the tags below were current when this page was written, and the install script always takes the latest. For `portfolio`, `draft` and `convert`, add a line like `pattern`'s for each, at `portfolio--v0.1.0`, `draft--v0.1.0` and `convert--v0.1.0`.
 
 ```powershell
 New-Item -ItemType Directory -Force .agents | Out-Null
@@ -50,11 +69,11 @@ New-Item -ItemType Directory -Force .agents | Out-Null
 {
   "sources": [
     { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "$Version" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/pattern", "name": "pattern" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/use-case", "name": "use-case" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/cross-reference", "name": "cross-reference" },
-    { "repo": "https://github.com/dermot-obrien/diagram-model.git", "ref": "f098f067b9a5ae859e4c56e84fcce7afd96fbdfd", "path": "skills/model", "name": "model" },
-    { "repo": "https://github.com/dermot-obrien/markdown-deck.git", "ref": "6e8e18049342b3f7581dff38090ae364868f6479", "path": "skills/markdown-deck", "name": "markdown-deck" }
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "pattern--v0.15.0", "path": "skills/pattern", "name": "pattern" },
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "use-case--v0.4.1", "path": "skills/use-case", "name": "use-case" },
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "cross-reference--v0.3.1", "path": "skills/cross-reference", "name": "cross-reference" },
+    { "repo": "https://github.com/dermot-obrien/diagram-model.git", "ref": "model--v0.9.2", "path": "skills/model", "name": "model" },
+    { "repo": "https://github.com/dermot-obrien/markdown-deck.git", "ref": "markdown-deck--v0.6.8", "path": "skills/markdown-deck", "name": "markdown-deck" }
   ]
 }
 "@ | Set-Content -Encoding ascii .agents/skills.json
@@ -66,11 +85,11 @@ cat > .agents/skills.json <<EOF
 {
   "sources": [
     { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "$VERSION" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/pattern", "name": "pattern" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/use-case", "name": "use-case" },
-    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "363a743a911ae2d5764401ce46b6a871eb354e76", "path": "skills/cross-reference", "name": "cross-reference" },
-    { "repo": "https://github.com/dermot-obrien/diagram-model.git", "ref": "f098f067b9a5ae859e4c56e84fcce7afd96fbdfd", "path": "skills/model", "name": "model" },
-    { "repo": "https://github.com/dermot-obrien/markdown-deck.git", "ref": "6e8e18049342b3f7581dff38090ae364868f6479", "path": "skills/markdown-deck", "name": "markdown-deck" }
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "pattern--v0.15.0", "path": "skills/pattern", "name": "pattern" },
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "use-case--v0.4.1", "path": "skills/use-case", "name": "use-case" },
+    { "repo": "https://github.com/dermot-obrien/architecture-pattern.git", "ref": "cross-reference--v0.3.1", "path": "skills/cross-reference", "name": "cross-reference" },
+    { "repo": "https://github.com/dermot-obrien/diagram-model.git", "ref": "model--v0.9.2", "path": "skills/model", "name": "model" },
+    { "repo": "https://github.com/dermot-obrien/markdown-deck.git", "ref": "markdown-deck--v0.6.8", "path": "skills/markdown-deck", "name": "markdown-deck" }
   ]
 }
 EOF
@@ -131,6 +150,8 @@ node scripts/architecture.mjs reinit   # the same, in a repository without a pac
 When the skills are not installed at all, as in a fresh clone, `reinit` installs them first and then runs. Run the checks in step 5 afterwards.
 
 ### To a newer release
+
+The install script does it in one run: in a repository with a `.agents/skills.json`, it moves the continuum and every skill it knows to its latest release tag, reinstalls with `reinit`, and runs `skills.mjs check`. `-CheckOnly` (`--check-only`) shows the moves first. By hand:
 
 1. Change the continuum's `ref` in `.agents/skills.json` to the new tag, and any other skill's `ref` you want to move.
 2. Reinstall: `npm run reinit`, or `node scripts/architecture.mjs reinit`. It sees that the lock no longer matches the declaration, installs the declared refs instead of the locked commits, and rewrites the lock.

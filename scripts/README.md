@@ -2,6 +2,10 @@
 
 The full reference for every script, with its options and exit codes, is [docs/commands.md](../docs/commands.md).
 
+## update-skills.ps1, update-skills.sh
+
+Install Architecture Continuum and the skills it works with into a repository, or update an installation to the latest releases, from that repository's root. With no `.agents/skills.json` it declares every skill at its latest release tag and runs `workspace init`; with one, it moves each source it knows to its latest release and reinstalls. `-CheckOnly` (`--check-only`) changes nothing; `-WithPortfolio` (`--with-portfolio`) adds `portfolio`, `draft` and `convert` to a fresh install. The [install quick start](../docs/quick-install.md) and [Commands](../docs/commands.md#update-skillsps1-update-skillssh) have the details.
+
 ## seed-foundation.mjs
 
 Seeds a workspace with foundation capabilities and building blocks from this repository's `foundation/`. The foundation is optional content that no skill needs. Zero-dependency Node, so it runs on every platform without `npm install`.
@@ -11,7 +15,7 @@ Seeds a workspace with foundation capabilities and building blocks from this rep
 Run it from the workspace root, or pass `--workspace`:
 
 ```bash
-node path/to/ai-assisted-architecture/scripts/seed-foundation.mjs --workspace . --profile foundation
+node path/to/architecture-continuum/scripts/seed-foundation.mjs --workspace . --profile foundation
 ```
 
 ### Options
