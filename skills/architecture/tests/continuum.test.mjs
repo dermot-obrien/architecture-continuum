@@ -54,7 +54,7 @@ function workspace() {
   row("solution/sbbs.csv", "SBB-001,Agent on Lambda,active,ABB-001,api,AWS Lambda,aws,managed,sbbs/SBB-001-agent-on-lambda/index.md");
   page("runtime/services/SV-001-api/index.md", `kind: service\nid: api\nnumeric_id: SV-001\ntitle: "SV-001 API"\n${common()}realises: [SBB-001]\npart_of: BC-001\nruntime_type: serverless\nrun_by: [PRD-001]\n`);
   row("runtime/services.csv", "SV-001,api,API,service,function,BC-001,,SBB-001,,,PRD-001,active,services/SV-001-api/index.md");
-  const drawio = "<mxfile><diagram name=\"Structure\"/></mxfile>";
+  const drawio = "<mxfile>\n  <diagram name=\"Structure\"/>\n</mxfile>\n";
   for (const [id, type, extra] of [["AP-001", "architecture-pattern", "implemented_by: [RA-001]\n"], ["RA-001", "reference-architecture", "implements: [AP-001]\n"]]) {
     const dir = `solution/patterns/${id}-example`;
     page(`${dir}/index.md`, `kind: pattern\nid: ${id}\ntitle: "${id} Example"\n${common()}pattern_type: ${type}\npattern_scope: platform\nrealises: [CAP-001]\nserves: [UC-001]\nmodel:\n  diagram: components.drawio\n${extra}`);
@@ -113,6 +113,16 @@ test("an empty scaffold passes with no pages", () => {
     assert.equal(r.summary.pages, 0);
     const again = scaffold({ root, namespace: "ex", name: "Example", workspace: ws });
     assert.deepEqual(again.written, [], "scaffold never overwrites");
+  } finally { rmSync(ws, { recursive: true, force: true }); }
+});
+
+test("a diagram checked out with CRLF line endings is not a stale view", () => {
+  const { ws, root } = workspace();
+  try {
+    const drawio = path.join(root, "solution/patterns/AP-001-example/components.drawio");
+    writeFileSync(drawio, readFileSync(drawio, "utf8").replace(/\r?\n/g, "\r\n"));
+    const r = run(ws);
+    assert.ok(!r.findings.some((f) => f.code === "MOD-002"), codes(r).join());
   } finally { rmSync(ws, { recursive: true, force: true }); }
 });
 
