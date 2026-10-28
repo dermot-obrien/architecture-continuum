@@ -3,7 +3,7 @@ lens:
   id: ai-solution
   prefix: AIS
   title: AI solution lens
-  version: 0.3.0
+  version: 0.4.0
   applies_when:
     profile: ai-solution
   description: >-
@@ -59,7 +59,7 @@ criteria:
     rule: >-
       Every ai facet has model.version_pinned true and model.version set. Where model.hosting is managed-platform and the platform does not let the team pin the model, a decision affecting the element that accepts the platform-managed model, with gating evals rerun on any platform model change as its condition, meets this criterion instead.
     severity: major
-    sources: [nist-600-1, owasp-llm03]
+    sources: [nist-600-1, owasp-llm04]
   - id: AIS-MOD-02
     area: MOD
     question: Is there a model card or system card for every model, and an AI bill of materials for the design?
@@ -105,9 +105,9 @@ criteria:
     area: EVAL
     question: Is every LLM-as-judge eval calibrated against human labels?
     why: Judges show position, verbosity and self-preference bias; an uncalibrated judge is not evidence.
-    reads: [elements.ai.evals.kind, elements.ai.evals.judge_calibrated]
+    reads: [elements.ai.evals.kind, elements.ai.evals.judge_calibration]
     decided_by: tool
-    rule: Every eval of kind llm-judge has judge_calibrated true.
+    rule: Every eval of kind llm-judge has judge_calibration with agreement at or above min_agreement, and its judge_model_version, when given, is the judge in use. judge_calibrated true alone does not meet the criterion.
     severity: major
     sources: [llm-judge-surveys]
   - id: AIS-EVAL-05
@@ -149,7 +149,7 @@ criteria:
     decided_by: tool
     rule: Every ai facet whose grounding access_control is document-level or caller-permission-trimmed has an eval with zero_tolerance true and gating true.
     severity: major
-    sources: [owasp-llm02, owasp-llm08, ai-data-security]
+    sources: [owasp-llm02, owasp-llm09, ai-data-security]
   - id: AIS-EVAL-09
     area: EVAL
     question: Is each threshold backed by enough test cases to tell a pass from chance, with the interval reported?
@@ -157,9 +157,19 @@ criteria:
       Ninety per cent on a hundred cases is anywhere from about 83 to 95 per cent at 95 per cent confidence. Zero failures in n trials bounds the true failure rate only at about 3 in n (the rule of three), so claiming a leak rate below one per cent needs around three hundred clean probes, and showing a false-answer rate below two per cent needs about one hundred and fifty negatives with none failing by the rule of three, nearer one hundred and ninety by the Wilson interval, and more if any may fail. Size the negatives, not only the whole set.
     reads: [elements.ai.evals.sample_size, elements.ai.evals.threshold]
     decided_by: reviewer
-    severity: minor
+    rule: A reviewer judges each threshold against its sample_size. A shortfall is major for an eval with gating true, which cannot show its gate was passed, and minor otherwise.
+    severity: major
     sources: [wilson-interval, rule-of-three]
 
+  - id: AIS-EVAL-10
+    area: EVAL
+    question: Are the evals repeatable evidence, run more than once on a versioned, held-out set?
+    why: A model that answers differently each time is judged on one draw unless each case is repeated, and an eval set used while tuning prompts measures memory, not quality.
+    reads: [elements.ai.evals.repeats, elements.ai.evals.dataset_version, elements.ai.evals.gating]
+    decided_by: tool
+    rule: Every eval with gating true has repeats of at least 3 and a dataset_version.
+    severity: major
+    sources: [nist-600-1, cs-eval]
   - id: AIS-DATA-01
     area: DATA
     question: Is every grounding source a named, owned and classified data set?
@@ -176,7 +186,7 @@ criteria:
     decided_by: tool
     rule: When any grounding source is confidential, restricted or personal, access_control is document-level or caller-permission-trimmed.
     severity: blocker
-    sources: [owasp-llm08, owasp-llm02]
+    sources: [owasp-llm09, owasp-llm02]
   - id: AIS-DATA-03
     area: DATA
     question: Are data provenance, freshness and drift monitored?
@@ -208,14 +218,14 @@ criteria:
     decided_by: tool
     rule: Every ai facet whose output_handling.rendered_as is anything other than displayed text has validated true.
     severity: blocker
-    sources: [owasp-llm05]
+    sources: [owasp-llm10]
   - id: AIS-IO-03
     area: IO
     question: Does the design avoid relying on the system prompt for security, or on keeping it secret?
     reads: [decisions, elements.ai]
     decided_by: reviewer
     severity: major
-    sources: [owasp-llm07]
+    sources: [owasp-llm08]
 
   - id: AIS-OPS-01
     area: OPS
@@ -225,7 +235,7 @@ criteria:
     rule: >-
       Every ai facet has limits with budget and timeout. Where model.hosting is managed-platform and the platform sets call limits the team cannot, limits.budget and a decision accepting the platform's limits meet this criterion instead.
     severity: major
-    sources: [owasp-llm10, wa-aws-genai]
+    sources: [owasp-llm06, wa-aws-genai]
   - id: AIS-OPS-02
     area: OPS
     question: Are model calls traced with prompts, outputs, tokens and cost, to the GenAI conventions?
@@ -262,9 +272,9 @@ criteria:
   - id: AIS-HUM-03
     area: HUM
     question: Is the design's class under the AI regulations that apply to it recorded, with the impact assessment it requires?
-    reads: [drivers.obligations, evidence.type]
+    reads: [drivers.obligations, drivers.obligations.role, evidence.type]
     decided_by: both
-    rule: drivers.obligations has an entry whose source names an AI instrument; evidence has an ai-impact-assessment unless the obligation records why none is needed.
+    rule: drivers.obligations has an entry whose source names an AI instrument, with the organisation's role under it and whether a substantial modification makes it the provider; evidence has an ai-impact-assessment unless the obligation records why none is needed. A reviewer checks the duties that role brings, such as a deployer's fundamental rights impact assessment under the EU AI Act Article 27 and AI literacy under Article 4.
     severity: major
     sources: [eu-aiact, iso42005, iso42001]
 
@@ -279,14 +289,14 @@ sources:
   eu-aiact-annex4: Regulation (EU) 2024/1689, Annex IV, technical documentation
   eu-gpai-code: European Commission, General-Purpose AI Code of Practice (2025)
   au-guidance: Australian Government, Guidance for AI Adoption (2025)
-  owasp-llm: OWASP Top 10 for LLM Applications 2025
-  owasp-llm01: OWASP LLM01 Prompt Injection
-  owasp-llm02: OWASP LLM02 Sensitive Information Disclosure
-  owasp-llm03: OWASP LLM03 Supply Chain
-  owasp-llm05: OWASP LLM05 Improper Output Handling
-  owasp-llm07: OWASP LLM07 System Prompt Leakage
-  owasp-llm08: OWASP LLM08 Vector and Embedding Weaknesses
-  owasp-llm10: OWASP LLM10 Unbounded Consumption
+  owasp-llm: OWASP Top 10 for LLM Applications 2026 (3 August 2026)
+  owasp-llm01: OWASP Top 10 for LLM Applications 2026, LLM01 Prompt Injection
+  owasp-llm02: OWASP Top 10 for LLM Applications 2026, LLM02 Sensitive Information Disclosure
+  owasp-llm04: OWASP Top 10 for LLM Applications 2026, LLM04 Supply Chain
+  owasp-llm06: OWASP Top 10 for LLM Applications 2026, LLM06 Unbounded Consumption
+  owasp-llm08: OWASP Top 10 for LLM Applications 2026, LLM08 Hidden Context Exposure
+  owasp-llm09: OWASP Top 10 for LLM Applications 2026, LLM09 Vector and Embedding Weaknesses
+  owasp-llm10: OWASP Top 10 for LLM Applications 2026, LLM10 Improper Output Handling
   atlas: MITRE ATLAS
   ai-data-security: NSA, CISA, FBI and partners, AI Data Security (2025)
   azure-ai: Microsoft, Azure Well-Architected Framework, AI workloads

@@ -3,7 +3,7 @@ lens:
   id: production
   prefix: PRD
   title: Production entry lens
-  version: 0.1.0
+  version: 0.1.1
   applies_when:
     trigger: production-entry
   description: >-
@@ -165,9 +165,9 @@ criteria:
     area: RSK
     question: Does every risk, debt item and accepted finding carried into production have an owner entitled to accept it, and a date?
     why: TOGAF has residual risk accepted through governance before it is monitored in Phase G; production is where acceptance stops being hypothetical.
-    reads: [risks.owner, decisions.technical_debt]
+    reads: [risks.owner, risks.residual, decisions.technical_debt]
     decided_by: both
-    rule: Every risk has owner and mitigation. A reviewer confirms each owner is entitled to accept it, and that each debt item has an owner and a repayment expectation.
+    rule: Every risk has owner, mitigation and residual; the owner accepts the residual level. A reviewer confirms each owner is entitled to accept it, and that each debt item has an owner and a repayment expectation.
     severity: blocker
     sources: [togaf-risk, standard]
   - id: PRD-RSK-02
@@ -217,7 +217,7 @@ sources:
   togaf-risk: The Open Group, TOGAF Standard 10th Edition, ADM Techniques, chapter 8, Risk Management
   g253: The Open Group, G253, Architecture Compliance Review Checklists (2025)
   orr: AWS, Operational Readiness Reviews (2022)
-  sre-prr: Google, Site Reliability Engineering, chapter 32, Production Readiness Review
+  sre-prr: Google, Site Reliability Engineering, chapter 32, The Evolving SRE Engagement Model (the Production Readiness Review)
   wa-aws: AWS Well-Architected Framework
   wa-aws-genai: AWS Well-Architected Generative AI Lens
   aws-agentic: AWS Well-Architected Agentic AI Lens (2026)
