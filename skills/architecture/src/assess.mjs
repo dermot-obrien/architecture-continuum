@@ -4,8 +4,8 @@
 /**
  * The assessment's check depth, as a tool: applies every criterion decided by `tool`, and the
  * presence half of every criterion decided by `both`, to a design specification, exactly as
- * the lenses write their rules (standards/assessment/lenses/). A criterion whose rule is not yet
- * automated here is reported as `manual`, never guessed. With a previous version of the
+ * the lenses write their rules (standards/assessment/lenses/). Every such criterion is automated; one
+ * added to a lens before it is automated here is reported as `manual`, never guessed. With a previous version of the
  * specification, it also lists the criteria a change must re-check: those whose `reads` touch a
  * field that changed.
  *
@@ -268,6 +268,114 @@ export const CHECKS = {
   "PRD-AI-02": (c) => !c.ai.length ? na("no ai facet") : tally(c.ai.map(e => [has(e.ai.drift_monitoring) && list(e.ai.evals).some(v => v.kind === "online"), `${e.id} lacks drift_monitoring or an online eval`])),
   "PRD-AI-03": (c) => !c.agents.length ? na("no agent facet") : tally(c.agents.map(e => [c.evidence.some(x => x.type === "control-test" && x.design_version === c.ver && x.outcome === "passed" && list(x.covers).includes(e.id)), `${e.id} has no passed control-test for this version`])),
 };
+
+// The remaining criteria, added once the first set was proven against the worked examples.
+const reachesActor = (c, id) => {
+  const seen = new Set([id]);
+  const queue = [id];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const k of list(c.spec.connectors)) {
+      const next = k.from === cur ? k.to : k.to === cur ? k.from : null;
+      if (!next || seen.has(next)) continue;
+      if (c.byId.get(next)?.kind === "actor") return true;
+      seen.add(next);
+      queue.push(next);
+    }
+  }
+  return false;
+};
+const sensitiveData = (c, ids) => list(c.spec.data).filter(d => ids.includes(d.id)).some(d => d.personal === true || ["confidential", "restricted"].includes(d.classification));
+
+Object.assign(CHECKS, {
+  "CORE-TRC-02": (c) => {
+    const a = abstraction(c);
+    if (a === "unknown") return na("no in-scope elements");
+    if (c.type === "architecture-pattern") return tally([[["conceptual", "logical"].includes(a), `an architecture pattern derives as ${a}; it must be conceptual or logical`]]);
+    if (solutionLike(c)) return tally([[a === "physical", `a ${c.type} derives as ${a}; it must be physical`]]);
+    return na("design.type has no abstraction rule");
+  },
+  "CORE-TGT-01": (c) => {
+    if (!c.triage) return { result: "not-assessed", notes: ["needs the triage record's target-state positions: pass --triage"] };
+    const blocks = c.els.filter(e => ["sbb", "technology", "deployment-node"].includes(e.kind));
+    const unattested = blocks.filter(e => !c.positions.has(e.id)).map(e => e.id);
+    const decs = list(c.spec.decisions);
+    const clauses = blocks.filter(e => c.positions.has(e.id)).map(e => {
+      const p = c.positions.get(e.id);
+      if (p.position === "retired") return [false, `${e.id} is retired`];
+      if (["baseline", "retiring", "contained", "not-target"].includes(p.position))
+        return [decs.some(d => d.departure && list(d.affects).includes(e.id)), `${e.id} is ${p.position} with no decision whose departure names it`];
+      return [true, ""];
+    });
+    const r = tally(clauses, "no attested building blocks");
+    const notes = [...r.notes];
+    if (unattested.length) notes.push(`no attested position for ${unattested.join(", ")}: a condition for the responsible architect`);
+    const limited = [...c.positions.values()].filter(p => p.permitted_use).map(p => p.element);
+    if (limited.length) notes.push(`a reviewer judges the use of ${limited.join(", ")} against its permitted use`);
+    return { result: unattested.length && r.result === "met" ? "partly-met" : r.result, notes };
+  },
+  "CORE-STR-03": (c) => {
+    if (!solutionLike(c)) return na("not a reference architecture or solution design");
+    if (abstraction(c) !== "physical") return na("the design does not derive as physical");
+    const find = v => c.byId.get(v) || c.els.find(e => e.ref === v);
+    return tally([
+      ...c.els.filter(e => e.kind === "service").map(e => [list(e.realises).map(find).filter(Boolean).some(x => ["sbb", "technology"].includes(x.kind)), `service ${e.id} realises no sbb or technology`]),
+      ...c.els.flatMap(e => list(e.realises).map(v => [Boolean(find(v)), `${e.id} realises ${v}, which is not an element of the design`])),
+    ]);
+  },
+  "CORE-DAT-01": (c) => tally([[list(c.spec.data).length > 0, "no data sets"], ...list(c.spec.data).map(d => [has(d.owner) && has(d.classification), `data set ${d.id} lacks owner or classification`])]),
+  "AIS-EVAL-07": (c) => tally(c.ai.filter(e => e.ai.role === "generative" && e.ai.grounding).map(e => [
+    list(e.ai.evals).some(v => /answer/i.test(String(v.positive_class || "")) && has(v.errors?.false_positive?.meaning)),
+    `${e.id} has no eval whose positive class is answering, with a false positive for unsupported answers`])),
+  "AIS-OPS-02": (c) => {
+    if (!c.ai.length) return na("no ai facet");
+    const o = c.spec.operations?.observability || {};
+    const conv = String(o.conventions || "");
+    const genai = /gen.?ai/i.test(conv) && /\d/.test(conv);
+    const managed = c.ai.every(e => e.ai.model?.hosting === "managed-platform") && has(o.conventions)
+      && list(c.spec.decisions).some(d => d.status === "accepted" && c.ai.some(e => list(d.affects).includes(e.id)));
+    return tally([[o.traces === true, "traces is not true"], [genai || managed, "conventions does not name the GenAI conventions and version (or, on a managed platform, the platform's telemetry with a decision recording the gap)"]]);
+  },
+  "AIS-HUM-02": (c) => tally(c.ai.filter(e => e.ai.role === "generative" && reachesActor(c, e.id)).map(e => [has(e.ai.disclosure), `${e.id}'s output reaches people with no disclosure`])),
+  "AGT-ACT-04": (c) => {
+    const coders = c.agents.filter(e => list(e.agent.tools).some(t => t.effect === "code-execution"));
+    if (!coders.length) return na("no tool executes code");
+    return tally(coders.map(e => {
+      const z = c.zones.get(e.trust_zone);
+      return [/isolat|sandbox/i.test(`${e.trust_zone} ${z?.name || ""}`), `${e.id} executes code outside a trust zone named for isolation (a reviewer confirms the sandbox)`];
+    }));
+  },
+  "AGT-INJ-01": (c) => tally(c.agents.map(e => {
+    const tools = list(e.agent.tools);
+    const untrusted = ["mixed", "untrusted"].includes(e.ai?.input_trust) || tools.some(t => t.reads_untrusted === true);
+    const sensitive = sensitiveData(c, list(e.ai?.grounding?.sources))
+      || tools.some(t => t.via && list(c.spec.connectors).some(k => k.id === t.via && sensitiveData(c, list(k.data))));
+    const consequential = tools.some(t => ["write", "external-communication", "financial", "destructive", "code-execution"].includes(t.effect) && t.approval === "autonomous");
+    return [!(untrusted && sensitive && consequential), `${e.id} holds the lethal trifecta: untrusted input, sensitive data and an autonomous consequential tool`];
+  })),
+  "AGT-MEM-01": (c) => tally(c.agents.filter(e => e.agent.memory?.long_term_store).flatMap(e => {
+    const m = e.agent.memory;
+    const addressed = list(e.agent.guardrails).some(g => /memory|poison/i.test(String(g.invariant || "")))
+      || list(c.spec.decisions).some(d => list(d.affects).includes(e.id) && /memory|poison/i.test(`${d.title} ${d.rationale || ""}`));
+    return [[typeof m.written_from_untrusted === "boolean", `${e.id}: long-term memory does not state written_from_untrusted`],
+      ...(m.written_from_untrusted === true ? [[addressed, `${e.id}: memory is written from untrusted content and no guardrail or decision addresses poisoning`]] : [])];
+  })),
+  "AGT-MAS-02": (c) => c.agents.some(e => list(e.agent.peers).length)
+    ? tally([[list(c.spec.scenarios).some(s => ["failure", "misuse"].includes(s.type) && /peer|agent/i.test(`${s.name} ${s.stimulus || ""}`)), "no failure or misuse scenario exercises a peer agent failing or being compromised"]])
+    : na("no agent has peers"),
+  "AGT-EVAL-02": (c) => !c.agents.length ? na("no agent facet")
+    : tally([[c.evals.some(v => /pass\^?k|repeated|trials/i.test(String(v.metric || ""))), "no eval measures repeated trials (pass^k)"], [c.evals.some(v => v.kind === "red-team"), "no red-team eval"]]),
+  "PRD-EVD-02": (c) => {
+    const fn = list(c.spec.scenarios).filter(s => s.type === "functional").map(s => s.id);
+    const ok = c.evidence.filter(x => x.type === "acceptance-test" && ["passed", "passed-with-conditions"].includes(x.outcome));
+    return tally(fn.map(id => [ok.some(x => list(x.covers).includes(id)), `functional scenario ${id} is covered by no passed acceptance test`]), "no functional scenarios");
+  },
+  "PRD-REL-03": (c) => {
+    const need = list(c.spec.scenarios).filter(s => s.type === "quality" && s.importance === "high" && ["performance-efficiency", "reliability"].includes(s.quality_attribute)).map(s => s.id);
+    const tests = c.evOf("load-test", true);
+    return tally(need.map(id => [tests.some(x => list(x.covers).includes(id)), `high-importance scenario ${id} is covered by no load test for this version`]), "no high-importance performance or reliability scenario");
+  },
+});
 
 /** Which lenses apply: core always; ai-solution and ai-agent by facet; production by trigger. */
 export function lensesFor(spec, trigger, lenses) {
