@@ -373,6 +373,14 @@ Object.assign(CHECKS, {
     const ok = c.evidence.filter(x => x.type === "acceptance-test" && ["passed", "passed-with-conditions"].includes(x.outcome));
     return tally(fn.map(id => [ok.some(x => list(x.covers).includes(id)), `functional scenario ${id} is covered by no passed acceptance test`]), "no functional scenarios");
   },
+  "PRV-SEC-02": (c) => {
+    const personal = new Set(list(c.spec.data).filter(d => d.personal === true).map(d => d.id));
+    const named = v => has(v) && !/^none$/i.test(String(v).trim());
+    return tally(list(c.spec.connectors).filter(k => list(k.data).some(d => personal.has(d))).flatMap(k => [
+      [named(k.authentication), `connector ${k.id} carries personal data with no authentication`],
+      [named(k.authorisation), `connector ${k.id} carries personal data with no authorisation`],
+    ]), "no connector carries personal data");
+  },
   "PRD-REL-03": (c) => {
     const need = list(c.spec.scenarios).filter(s => s.type === "quality" && s.importance === "high" && ["performance-efficiency", "reliability"].includes(s.quality_attribute)).map(s => s.id);
     const tests = c.evOf("load-test", true);
@@ -381,16 +389,17 @@ Object.assign(CHECKS, {
 });
 
 /** Which lenses apply: core always; ai-solution and ai-agent by facet; production by trigger. */
-/** The profiles a design has: those it declares, and those its facets imply (ai, agent). */
+/** The profiles a design has: those it declares, those its facets imply (ai, agent), and personal-data when a data set is personal. */
 export function profilesOf(spec) {
   const els = list(spec.elements);
   const out = new Set(list(spec.profiles));
   if (els.some(e => e.ai)) out.add("ai-solution");
   if (els.some(e => e.agent)) out.add("ai-agent");
+  if (list(spec.data).some(d => d.personal === true)) out.add("personal-data");
   return out;
 }
 
-const SHIPPED_ORDER = ["core", "ai-solution", "ai-agent", "production"];
+const SHIPPED_ORDER = ["core", "ai-solution", "ai-agent", "privacy", "production"];
 const group = l => l.lens.applies_when === "always" ? 0 : l.lens.applies_when.profile ? 1 : 2;
 
 /**

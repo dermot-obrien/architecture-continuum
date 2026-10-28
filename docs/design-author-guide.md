@@ -80,7 +80,7 @@ The agent-native standards hold the mechanisms the lens asks for: the guardrail 
 
 ## Check your own design first
 
-Write what your tier needs: the fields the tier's criteria read, no more (section 3.1 of the standard). At AT1 that is what the blockers and the tool check read. Run the check depth yourself before you ask for a review: `node .agents/skills/architecture/bin/assess.mjs check <your spec>` applies every automated tool rule and names what is missing. Where your organisation keeps its own criteria, the same command applies them too, through the `assessment` binding; any it reports as `manual` you apply by hand, by each one's `rule`, which is written to be applied without judgement. The 53 tool criteria and the presence half of the 39 marked `both` are things you can settle alone, and every one you settle is review time spent on judgement instead.
+Write what your tier needs: the fields the tier's criteria read, no more (section 3.1 of the standard). At AT1 that is what the blockers and the tool check read. Run the check depth yourself before you ask for a review: `node .agents/skills/architecture/bin/assess.mjs check <your spec>` applies every automated tool rule and names what is missing. Where your organisation keeps its own criteria, the same command applies them too, through the `assessment` binding; any it reports as `manual` you apply by hand, by each one's `rule`, which is written to be applied without judgement. The 57 tool criteria and the presence half of the 41 marked `both` are things you can settle alone, and every one you settle is review time spent on judgement instead.
 
 Then clear the blockers. A review with an open blocker ends `not-endorsed` whatever else is true, and a blocker cannot be accepted as a risk.
 

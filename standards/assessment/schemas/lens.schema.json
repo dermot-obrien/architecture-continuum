@@ -79,7 +79,7 @@
             "equals": { "type": ["string", "number", "boolean"] },
             "in": { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
             "not_in": { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
-            "matches": { "type": "string", "description": "A regular expression, case-insensitive." },
+            "matches": { "type": "string", "description": "A regular expression, case-insensitive. Over an object (such as the item itself, .), it matches the object's text." },
             "min_items": { "type": "integer", "minimum": 0 },
             "max_items": { "type": "integer", "minimum": 0 }
           }

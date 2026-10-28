@@ -1,0 +1,162 @@
+schema: lens/0.1.0
+lens:
+  id: privacy
+  prefix: PRV
+  title: Privacy by design
+  version: 0.1.0
+  applies_when:
+    profile: personal-data
+  description: >-
+    The design-facing part of privacy, applied to any design that holds personal information (a data set with personal true brings the personal-data profile in). It asks whether the design knows what personal data it holds, why, where, for how long and who can reach it, whether it can honour the rights of the people the data is about, and whether the privacy impact assessment has been handed over. It does not replace that assessment, a data protection impact assessment or a privacy officer's judgement: it reads their outcome (standard, section 9), and checks that the design gives them something to assess.
+
+areas:
+  - id: DAT
+    title: Personal data
+    question: Does the design say what personal data it holds, where, for how long and from where?
+  - id: MIN
+    title: Purpose and minimisation
+    question: Is every personal data set needed for a stated purpose, and no more of it than the purpose needs?
+  - id: SEC
+    title: Protection
+    question: Is personal data classified for what it is, and reachable only by callers who are authenticated and authorised?
+  - id: RGT
+    title: Rights of the people the data is about
+    question: Can the design find, correct, export and erase one person's data?
+  - id: AI
+    title: Personal data and models
+    question: Where a model learns from or remembers personal data, is that lawful and reversible?
+  - id: IMP
+    title: Impact and risk
+    question: Is the privacy impact assessed, and are the privacy risks owned?
+
+criteria:
+  - id: PRV-DAT-01
+    area: DAT
+    question: Does every personal data set state where it is kept, how long it is kept and where it comes from?
+    why: Residency decides which law and which transfer rules apply, retention is the storage limitation principle, and lineage is how anyone finds a person's data again. A design that cannot say these cannot be assessed for privacy at all.
+    reads: [data.personal, data.residency, data.retention, data.lineage]
+    decided_by: tool
+    rule: Every data set with personal true states residency, retention and lineage.
+    severity: major
+    sources: [gdpr-5, iso-29100]
+    check:
+      for_each: data
+      where: { personal: true }
+      require:
+        residency: { present: true }
+        retention: { present: true }
+        lineage: { present: true }
+      message: "personal data set {id} does not state {field}"
+
+  - id: PRV-SEC-01
+    area: SEC
+    question: Is every personal data set classified confidential or restricted?
+    why: Personal data classified internal or public is handled by controls written for data that does not identify anyone.
+    reads: [data.personal, data.classification]
+    decided_by: tool
+    rule: Every data set with personal true has classification confidential or restricted.
+    severity: minor
+    sources: [iso-27701, nist-pf]
+    check:
+      for_each: data
+      where: { personal: true }
+      require:
+        classification: [confidential, restricted]
+      message: "personal data set {id} is classified {classification}"
+
+  - id: PRV-SEC-02
+    area: SEC
+    question: Does every connector that carries personal data authenticate the caller and authorise the call?
+    why: A connector carrying personal data with no authentication or authorisation is an open door to it, however well the store is protected.
+    reads: [connectors.data, connectors.authentication, connectors.authorisation, data.personal]
+    decided_by: tool
+    rule: Every connector whose data names a data set with personal true states authentication and authorisation, neither of them none.
+    severity: major
+    sources: [gdpr-32, iso-27701]
+
+  - id: PRV-MIN-01
+    area: MIN
+    question: Is every personal data set needed for a goal the design states, and does the design hold no more of it, and for no longer, than that goal needs?
+    why: Data minimisation and purpose limitation are judged against the design's purpose; a tool can see the data sets but not whether each one is needed.
+    reads: [data, drivers.goals]
+    decided_by: reviewer
+    severity: major
+    sources: [gdpr-5, gdpr-25, edpb-25]
+
+  - id: PRV-RGT-01
+    area: RGT
+    question: Does a scenario show how one person's data is found, exported, corrected or erased, across every store that holds it?
+    why: A right of access or erasure the design cannot carry out is a breach waiting for its first request. A scenario makes the design say where the data is and how it is reached, including copies in caches, logs, indexes and model memory.
+    reads: [scenarios.name, scenarios.stimulus]
+    decided_by: both
+    rule: At least one scenario's name or stimulus speaks of access, export, rectification, erasure or deletion of a person's data; a reviewer judges whether it reaches every store.
+    severity: major
+    sources: [gdpr-15-20, iso-29100]
+    check:
+      - for_each: scenarios
+        where:
+          .: { matches: "eras|delet|subject access|export|rectif|right to be forgotten|data subject" }
+        count: { min: 1 }
+        message: no scenario shows how a person's data is found, exported, corrected or erased
+
+  - id: PRV-AI-01
+    area: AI
+    question: Where personal data trains, fine-tunes or is remembered by a model, is the lawful basis recorded, and can one person's data be taken out again?
+    why: Data a model has learnt from is hard to remove. Training or memory on personal data needs a recorded basis and a way to honour erasure, such as retraining, unlearning, or keeping the data out of the weights and in a store that can be purged.
+    reads: [data.personal, data.used_for_ai, decisions]
+    decided_by: reviewer
+    applies_to: A data set with personal true is used_for_ai training, fine-tuning or memory.
+    severity: blocker
+    sources: [gdpr-6, gdpr-17, edpb-ai]
+
+  - id: PRV-IMP-01
+    area: IMP
+    question: Is the privacy impact assessment, or the data protection impact assessment, handed over and cited as evidence?
+    why: This lens is the design-facing part of privacy; the impact assessment is a separate assessment with its own owner. The design review checks it has been handed over, and the production entry assessment reads its outcome.
+    reads: [evidence.type]
+    decided_by: tool
+    rule: The evidence includes at least one item of type privacy-impact-assessment, planned or done.
+    severity: major
+    sources: [gdpr-35, iso-29134]
+    check:
+      for_each: evidence
+      where: { type: privacy-impact-assessment }
+      count: { min: 1 }
+      message: no privacy impact assessment is cited as evidence
+
+  - id: PRV-IMP-02
+    area: IMP
+    question: Is at least one risk to the people the data is about recorded, with an owner?
+    why: A design that holds personal data and records no privacy risk has either no risk, which is rare, or has not looked.
+    reads: [risks.statement, risks.owner]
+    decided_by: both
+    rule: At least one risk's statement speaks of personal data, privacy, re-identification or data subjects, and every such risk has an owner; a reviewer judges whether they are the real ones.
+    severity: major
+    sources: [gdpr-35, nist-pf]
+    check:
+      - for_each: risks
+        where:
+          statement: { matches: "personal|privacy|re-?identif|data subject|customer data" }
+        count: { min: 1 }
+        message: no risk to the people the data is about is recorded
+      - for_each: risks
+        where:
+          statement: { matches: "personal|privacy|re-?identif|data subject|customer data" }
+        require:
+          owner: { present: true }
+        message: "privacy risk {id} has no owner"
+
+sources:
+  gdpr-5: Regulation (EU) 2016/679 (GDPR), Article 5, principles relating to processing of personal data.
+  gdpr-6: Regulation (EU) 2016/679 (GDPR), Article 6, lawfulness of processing.
+  gdpr-15-20: Regulation (EU) 2016/679 (GDPR), Articles 15 to 20, the rights of the data subject.
+  gdpr-17: Regulation (EU) 2016/679 (GDPR), Article 17, right to erasure.
+  gdpr-25: Regulation (EU) 2016/679 (GDPR), Article 25, data protection by design and by default.
+  gdpr-32: Regulation (EU) 2016/679 (GDPR), Article 32, security of processing.
+  gdpr-35: Regulation (EU) 2016/679 (GDPR), Article 35, data protection impact assessment.
+  edpb-25: European Data Protection Board, Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0 (2020).
+  edpb-ai: European Data Protection Board, Opinion 28/2024 on certain data protection aspects related to the processing of personal data in the context of AI models (2024).
+  iso-29100: ISO/IEC 29100, Information technology, Security techniques, Privacy framework.
+  iso-29134: ISO/IEC 29134, Information technology, Security techniques, Guidelines for privacy impact assessment.
+  iso-27701: ISO/IEC 27701, Privacy information management systems, requirements and guidance.
+  nist-pf: NIST Privacy Framework, version 1.0 (2020).

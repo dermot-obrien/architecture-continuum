@@ -161,7 +161,7 @@ function matches(values, m) {
   if ("equals" in m && !(vals.length && vals.every(v => v === m.equals))) return false;
   if ("in" in m && !(vals.length && vals.every(v => m.in.includes(v)))) return false;
   if ("not_in" in m && vals.some(v => m.not_in.includes(v))) return false;
-  if ("matches" in m && !(vals.length && vals.every(v => new RegExp(m.matches, "i").test(String(v))))) return false;
+  if ("matches" in m && !(vals.length && vals.every(v => new RegExp(m.matches, "i").test(typeof v === "object" ? JSON.stringify(v) : String(v))))) return false;
   if ("min_items" in m && vals.length < m.min_items) return false;
   if ("max_items" in m && vals.length > m.max_items) return false;
   return true;

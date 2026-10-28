@@ -14,7 +14,7 @@ Use template mode when the document's front matter has `pattern_type: solution-d
 - Rows with no identifier of their own take one in row order: constraints `con-01`, assumptions `asm-01`, obligations `obl-01`, open questions `cn-01`, risks `rsk-01`, evidence `ev-01`.
 - A name the schema has no field for (an eval's, a fitness function's, an evidence item's title, a functional scenario's sentence) goes in a YAML comment beside the item's id, so the author can find it.
 - A cell that holds a list (Alternatives rejected, Options, Concerns) is split at semicolons; a cell with no semicolon is one item.
-- `design.source` is written as if the specification sits beside the document: `index.md`. `profiles` follows from the facets: an `ai` facet brings `ai-solution`, an `agent` facet `ai-agent`.
+- `design.source` is written as if the specification sits beside the document: `index.md`. `profiles` follows from the facets: an `ai` facet brings `ai-solution`, an `agent` facet `ai-agent`, and a data set with `personal: true` brings `personal-data`.
 - Keep the document's own words in every prose field.
 
 ## The mapping

@@ -8,13 +8,14 @@ sidebar_position: 1
 
 # Assessment criteria
 
-Every criterion of the [Architecture Assessment Standard](../../standards/assessment/standard-architecture-assessment.md), 121 in 4 lenses, 26 of them blockers. Each has its own page, named by its id in lower case, so its URL is stable and a report can link straight to it. The lens files in `standards/assessment/lenses/` are the register, valid against `lens.schema.json`; these pages are generated from them.
+Every criterion of the [Architecture Assessment Standard](../../standards/assessment/standard-architecture-assessment.md), 129 in 5 lenses, 27 of them blockers. Each has its own page, named by its id in lower case, so its URL is stable and a report can link straight to it. The lens files in `standards/assessment/lenses/` are the register, valid against `lens.schema.json`; these pages are generated from them.
 
 | Lens | Version | Applies to | Criteria | Blockers |
 |---|---|---|---|---|
 | [Core architecture lens](core.md) | 0.6.0 | always | 51 | 5 |
 | [AI solution lens](ai-solution.md) | 0.4.0 | designs with the `ai-solution` profile | 28 | 3 |
 | [AI agent lens](ai-agent.md) | 0.1.0 | designs with the `ai-agent` profile | 23 | 9 |
+| [Privacy by design](privacy.md) | 0.1.0 | designs with the `personal-data` profile | 8 | 1 |
 | [Production entry lens](production.md) | 0.1.1 | the `production-entry` assessment | 19 | 9 |
 
 ## Every criterion
@@ -123,6 +124,14 @@ Every criterion of the [Architecture Assessment Standard](../../standards/assess
 | [AGT-CTL-04](agt-ctl-04.md) | Is drift between what the agent did and what policy intended reconciled continuously, and is a rogue agent detectable? | ai-agent | major | reviewer |
 | [AGT-EVAL-01](agt-eval-01.md) | Is the agent evaluated on its trajectory, not only its final output? | ai-agent | major | tool |
 | [AGT-EVAL-02](agt-eval-02.md) | Is reliability measured over repeated runs, and is the agent tested against injection and hijacking? | ai-agent | major | both |
+| [PRV-DAT-01](prv-dat-01.md) | Does every personal data set state where it is kept, how long it is kept and where it comes from? | privacy | major | tool |
+| [PRV-SEC-01](prv-sec-01.md) | Is every personal data set classified confidential or restricted? | privacy | minor | tool |
+| [PRV-SEC-02](prv-sec-02.md) | Does every connector that carries personal data authenticate the caller and authorise the call? | privacy | major | tool |
+| [PRV-MIN-01](prv-min-01.md) | Is every personal data set needed for a goal the design states, and does the design hold no more of it, and for no longer, than that goal needs? | privacy | major | reviewer |
+| [PRV-RGT-01](prv-rgt-01.md) | Does a scenario show how one person's data is found, exported, corrected or erased, across every store that holds it? | privacy | major | both |
+| [PRV-AI-01](prv-ai-01.md) | Where personal data trains, fine-tunes or is remembered by a model, is the lawful basis recorded, and can one person's data be taken out again? | privacy | blocker | reviewer |
+| [PRV-IMP-01](prv-imp-01.md) | Is the privacy impact assessment, or the data protection impact assessment, handed over and cited as evidence? | privacy | major | tool |
+| [PRV-IMP-02](prv-imp-02.md) | Is at least one risk to the people the data is about recorded, with an owner? | privacy | major | both |
 | [PRD-BLD-01](prd-bld-01.md) | Is the design a solution design, accepted, with no open consideration, and has this version had an endorsed design review whose conditions are closed? | production | blocker | tool |
 | [PRD-BLD-02](prd-bld-02.md) | Does an as-built record show the built solution matches this version of the design, with every departure either designed in a new version or recorded as a decision? | production | blocker | both |
 | [PRD-BLD-03](prd-bld-03.md) | Are the automated fitness functions running in the delivery pipeline or continuously, and passing on the release candidate? | production | major | both |

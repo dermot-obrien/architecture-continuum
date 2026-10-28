@@ -25,8 +25,11 @@ test("every check names a criterion a lens defines", { skip: !yaml }, () => {
 
 test("lenses follow the facets and the trigger", { skip: !yaml }, () => {
   const spec = sd001();
-  assert.deepEqual(lensesFor(spec, "new-design", lenses).map(l => l.lens.id), ["core", "ai-solution", "ai-agent"]);
-  assert.deepEqual(lensesFor(spec, "production-entry", lenses).map(l => l.lens.id), ["core", "ai-solution", "ai-agent", "production"]);
+  assert.deepEqual(lensesFor(spec, "new-design", lenses).map(l => l.lens.id), ["core", "ai-solution", "ai-agent", "privacy"]);
+  assert.deepEqual(lensesFor(spec, "production-entry", lenses).map(l => l.lens.id), ["core", "ai-solution", "ai-agent", "privacy", "production"]);
+  const anonymous = sd001();
+  for (const d of anonymous.data) d.personal = false;
+  assert.ok(!lensesFor(anonymous, "new-design", lenses).some(l => l.lens.id === "privacy"));
 });
 
 test("SD-001's irreversible email tool and missing cost limit are found", { skip: !yaml }, () => {
@@ -55,7 +58,7 @@ test("a change re-checks only the criteria that read what changed", { skip: !yam
 });
 
 test("every tool and shared criterion is automated", { skip: !yaml }, () => {
-  const missing = lenses.flatMap(l => l.criteria.filter(c => c.decided_by !== "reviewer" && !CHECKS[c.id]).map(c => c.id));
+  const missing = lenses.flatMap(l => l.criteria.filter(c => c.decided_by !== "reviewer" && !CHECKS[c.id] && !c.check).map(c => c.id));
   assert.deepEqual(missing, []);
 });
 
@@ -70,6 +73,24 @@ test("the lethal trifecta is caught, and lifting one leg clears it", { skip: !ya
   assert.equal(run(spec), "not-met");
   agent.agent.tools = agent.agent.tools.map(t => ({ ...t, approval: "human-approved" }));
   assert.equal(run(spec), "met");
+});
+
+test("the privacy lens: a connector carrying personal data must authenticate and authorise", { skip: !yaml }, () => {
+  const spec = sd001();
+  const run = () => check(spec, lensesFor(spec, "new-design", lenses));
+  const personal = spec.data.find(d => d.personal).id;
+  spec.connectors[0] = { ...spec.connectors[0], data: [personal], authentication: "none", authorisation: "role-based" };
+  const r = run().find(x => x.criterion === "PRV-SEC-02");
+  assert.notEqual(r.result, "met");
+  assert.ok(r.notes.some(n => n.includes("no authentication")));
+  spec.connectors[0].authentication = "OAuth 2.0 client credentials";
+  const anyPersonal = new Set(spec.data.filter(d => d.personal).map(d => d.id));
+  for (const k of spec.connectors.filter(k => (k.data || []).some(d => anyPersonal.has(d)))) { k.authentication = "mTLS"; k.authorisation = "scoped token"; }
+  assert.equal(run().find(x => x.criterion === "PRV-SEC-02").result, "met");
+  const rights = run().find(x => x.criterion === "PRV-RGT-01");
+  assert.ok(["met", "not-met"].includes(rights.result));
+  spec.scenarios.push({ id: "sc-erase", type: "functional", name: "A customer asks for their data to be erased" });
+  assert.equal(run().find(x => x.criterion === "PRV-RGT-01").result, "met");
 });
 
 test("target-state positions come from the triage record", { skip: !yaml }, () => {
