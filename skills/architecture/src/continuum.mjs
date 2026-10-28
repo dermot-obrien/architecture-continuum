@@ -225,6 +225,9 @@ function homeToRegExp(home, id) {
 }
 
 const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
+// A render record's fingerprint, as the model skill writes it: line endings normalised, so a checkout
+// that converts LF to CRLF does not look like an edit of the diagram.
+const fingerprint = (file) => sha256(Buffer.from(readFileSync(file).toString("latin1").replace(/\r\n/g, "\n"), "latin1"));
 const rel = (root, p) => path.relative(root, p).split(path.sep).join("/");
 const list = (v) => (Array.isArray(v) ? v : v === undefined || v === null || v === "" ? [] : [v]);
 
@@ -577,7 +580,7 @@ export function check(config, modules) {
       if (!entries.includes(image)) R.error("MOD-002", path.join(p.dir, n), `records a render of ${image}, which is not beside it`);
       const source = rec.source ? path.resolve(p.dir, rec.source) : null;
       if (!source || !existsSync(source)) { R.error("MOD-002", path.join(p.dir, n), `source ${rec.source ?? "(none)"} does not exist`); continue; }
-      if (rec.sha256 && sha256(readFileSync(source)) !== rec.sha256) R.error("MOD-002", path.join(p.dir, image), `stale: ${rec.source} changed since this view was rendered; export it again and stamp it (model stamp)`);
+      if (rec.sha256 && fingerprint(source) !== rec.sha256) R.error("MOD-002", path.join(p.dir, image), `stale: ${rec.source} changed since this view was rendered; export it again and stamp it (model stamp)`);
     }
     for (const n of entries.filter((n) => n.endsWith(".drawio"))) {
       const stem = n.slice(0, -".drawio".length);
