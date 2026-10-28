@@ -12,8 +12,6 @@ From 0.4.1 on, releases are made by Release Please from the pull requests merged
 
 ### Added
 
-* **scripts:** install or update the continuum and its skills in one command ([d58f917](https://github.com/dermot-obrien/architecture-continuum/commit/d58f91715ae4cb16424282ec7db34731629d86de))
-* **scripts:** install or update the continuum and its skills in one command ([ed1f974](https://github.com/dermot-obrien/architecture-continuum/commit/ed1f9746c0362a929c73d9ae1b15f92886ebf438))
 * **scripts:** install or update the continuum and its skills in one command ([04d403c](https://github.com/dermot-obrien/architecture-continuum/commit/04d403cd960d5df6e0860936464fa13d494c1cc1))
 
 ## [0.7.0](https://github.com/dermot-obrien/architecture-continuum/compare/v0.6.1...v0.7.0) (2026-10-28)
@@ -26,13 +24,11 @@ From 0.4.1 on, releases are made by Release Please from the pull requests merged
 
 ### Fixed
 
-* **architecture:** settle the specify template mode where the mapping left choices open ([091b8aa](https://github.com/dermot-obrien/architecture-continuum/commit/091b8aab86cb573b157a0e4be2c06c351441c475))
 * **architecture:** settle the specify template mode where the mapping left choices open ([8c51805](https://github.com/dermot-obrien/architecture-continuum/commit/8c518050f746bd6196cff04888467bd1d1d029ab))
 
 
 ### Documentation
 
-* move the branch and release rules to Git Flow with develop ([1b973e1](https://github.com/dermot-obrien/architecture-continuum/commit/1b973e1d8f65cb568d8d31118eb31a8408c54d21))
 * move the branch and release rules to Git Flow with develop ([a89ec12](https://github.com/dermot-obrien/architecture-continuum/commit/a89ec127092521b1410c023b471c36f45af3e3bd))
 
 ## [0.6.1](https://github.com/dermot-obrien/architecture-continuum/compare/v0.6.0...v0.6.1) (2026-10-17)
