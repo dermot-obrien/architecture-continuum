@@ -1,0 +1,188 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>OSCAL Model Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: OSCAL's three layers left to right, each model a frame inside its layer, shared metadata along the bottom. */
+:root {
+  --bg: #f6f7f9;
+  --band: #eceff4;
+  --surface: #ffffff;
+  --model: #fbfcfd;
+  --fg: #1d2330;
+  --muted: #5b6475;
+  --line: #8d96a8;
+  --edge: #4a5263;
+  --accent: #a2402b;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", "Arial Narrow", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --band: #1a1f29; --surface: #262d3b; --model: #1f2531; --fg: #e4e8f0; --muted: #a2abbd;
+    --line: #6c7689; --edge: #b6bfd0; --accent: #ee9a84;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --band: #1a1f29; --surface: #262d3b; --model: #1f2531; --fg: #e4e8f0; --muted: #a2abbd;
+  --line: #6c7689; --edge: #b6bfd0; --accent: #ee9a84;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1440px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 24px; }
+header { display: grid; gap: 6px; max-width: 78ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--cond); font-weight: 600; font-size: 30px; line-height: 1.15; margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); }
+figure { margin: 0; display: grid; gap: 10px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--band); border-radius: 6px; padding: 12px; }
+.scroll svg { display: block; width: 100%; min-width: 1100px; height: auto; color: var(--edge); }
+figcaption { font-size: 13.5px; color: var(--muted); max-width: 95ch; }
+figcaption code, li code { font-family: var(--mono); font-size: 12.5px; }
+svg .layer { fill: var(--band); }
+svg .ltitle { font: 600 13.5px var(--cond); fill: var(--fg); }
+svg .model { fill: var(--model); stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 3; }
+svg .mtitle { font: 600 12px var(--mono); fill: var(--accent); }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.3; }
+svg .t { font: 600 11.5px var(--mono); fill: var(--fg); text-anchor: middle; }
+svg .t.sm { font-size: 10.5px; }
+svg .s { font: 10.5px var(--sans); fill: var(--muted); text-anchor: middle; }
+svg .e { fill: none; stroke: var(--edge); stroke-width: 1.3; }
+svg .l { font: 11px var(--mono); fill: var(--muted); paint-order: stroke; stroke: var(--model); stroke-width: 4px; stroke-linejoin: round; }
+svg .l.onband { stroke: var(--band); }
+svg .l.onsurf { stroke: var(--surface); }
+svg .l.mid { text-anchor: middle; }
+svg .l.end { text-anchor: end; }
+svg .head { fill: var(--edge); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+.notes > div { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.notes h2 { font-family: var(--cond); font-weight: 600; font-size: 17px; margin: 0; }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 5px; font-size: 14px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">NIST OSCAL 1.2.3 · checked against the Metaschema sources and the generated JSON Schema</div>
+    <h1>OSCAL: from a control catalogue to a finding and a plan of action</h1>
+    <p>Seven of OSCAL's eight models in their three layers, the assemblies inside them that an assessment touches, and the fields that link them. Every name on the page is OSCAL's own. The eighth model, <code>mapping-collection</code>, maps controls between catalogues and is left out.</p>
+  </header>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1400 600" role="img" aria-label="OSCAL models and links. Control layer: a profile imports a catalog by href and modifies it; a catalog holds controls, each with statement and objective parts. Implementation layer: a component-definition's components have control-implementations whose source is a profile; a system-security-plan has import-profile, system-characteristics with the authorization boundary, and implemented-requirements that name a control by control-id and break down by-components to components by component-uuid, plus leveraged-authorizations. Assessment layer: an assessment-plan imports the system-security-plan and holds reviewed-controls and assessment-subjects; assessment-results imports the plan and holds results, each with observations, findings and risks; a finding has related-observations, related-risks and a target whose target-id names a control objective or statement; a risk has remediations; a plan-of-action-and-milestones holds poam-items with related-risks. An observation's relevant-evidence points to a back-matter resource, and every model's metadata holds parties and roles.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <!-- Layers -->
+        <rect class="layer" x="20" y="40" width="320" height="430" rx="6"/><text class="ltitle" x="20" y="30">Control layer</text>
+        <rect class="layer" x="360" y="40" width="345" height="430" rx="6"/><text class="ltitle" x="360" y="30">Implementation layer</text>
+        <rect class="layer" x="725" y="40" width="665" height="430" rx="6"/><text class="ltitle" x="725" y="30">Assessment layer</text>
+        <rect class="layer" x="20" y="505" width="1370" height="85" rx="6"/><text class="ltitle" x="30" y="525">In every model</text>
+
+        <!-- Control layer models -->
+        <rect class="model" x="30" y="70" width="300" height="105" rx="4"/><text class="mtitle" x="40" y="89">profile</text>
+        <rect class="model" x="30" y="195" width="300" height="265" rx="4"/><text class="mtitle" x="40" y="214">catalog</text>
+        <rect class="box" x="40" y="115" width="135" height="40" rx="4"/><text class="t" x="107" y="132">import</text><text class="s" x="107" y="146">href, include-controls</text>
+        <rect class="box" x="185" y="115" width="135" height="40" rx="4"/><text class="t" x="252" y="132">modify</text><text class="s" x="252" y="146">set-parameters, alters</text>
+        <rect class="box" x="95" y="235" width="140" height="40" rx="4"/><text class="t" x="165" y="252">control</text><text class="s" x="165" y="266">id, params, controls</text>
+        <rect class="box" x="40" y="345" width="135" height="40" rx="4"/><text class="t" x="107" y="362">part</text><text class="s" x="107" y="376">statement</text>
+        <rect class="box" x="185" y="345" width="135" height="40" rx="4"/><text class="t" x="252" y="362">part</text><text class="s" x="252" y="376">assessment-objective</text>
+        <path class="e" d="M107,155 V193" marker-end="url(#arr)"/><text class="l" x="113" y="179">href</text>
+        <path class="e" d="M140,275 L107,343" marker-end="url(#arr)"/>
+        <path class="e" d="M190,275 L252,343" marker-end="url(#arr)"/><text class="l mid" x="172" y="313">parts</text>
+
+        <!-- Implementation layer models -->
+        <rect class="model" x="370" y="70" width="325" height="105" rx="4"/><text class="mtitle" x="380" y="89">component-definition</text>
+        <rect class="model" x="370" y="195" width="325" height="265" rx="4"/><text class="mtitle" x="380" y="214">system-security-plan</text>
+        <rect class="box" x="380" y="115" width="150" height="40" rx="4"/><text class="t" x="455" y="132">defined-component</text><text class="s" x="455" y="146">control-implementations</text>
+        <rect class="box" x="380" y="230" width="150" height="40" rx="4"/><text class="t" x="455" y="247">import-profile</text><text class="s" x="455" y="261">href</text>
+        <rect class="box" x="538" y="230" width="150" height="40" rx="4"/><text class="t sm" x="613" y="247">system-characteristics</text><text class="s" x="613" y="261">authorization-boundary</text>
+        <rect class="box" x="380" y="305" width="150" height="40" rx="4"/><text class="t sm" x="455" y="322">implemented-requirement</text><text class="s" x="455" y="336">control-implementation</text>
+        <rect class="box" x="538" y="305" width="150" height="40" rx="4"/><text class="t" x="613" y="322">component</text><text class="s" x="613" y="336">system-implementation</text>
+        <rect class="box" x="380" y="380" width="150" height="40" rx="4"/><text class="t" x="455" y="397">by-component</text><text class="s" x="455" y="411">implementation-status</text>
+        <rect class="box" x="538" y="410" width="150" height="40" rx="4"/><text class="t sm" x="613" y="427">leveraged-authorization</text><text class="s" x="613" y="441">system-implementation</text>
+        <path class="e" d="M380,135 H332" marker-end="url(#arr)"/><text class="l onband mid" x="356" y="128">source</text>
+        <path class="e" d="M380,240 L332,168" marker-end="url(#arr)"/><text class="l onband mid" x="350" y="214">href</text>
+        <path class="e" d="M380,325 L237,262" marker-end="url(#arr)"/><text class="l mid" x="300" y="282">control-id</text>
+        <path class="e" d="M455,345 V378" marker-end="url(#arr)"/><text class="l" x="461" y="366">by-components</text>
+        <path class="e" d="M530,392 L580,347" marker-end="url(#arr)"/><text class="l" x="542" y="402">component-uuid</text>
+
+        <!-- Assessment layer models -->
+        <rect class="model" x="735" y="70" width="475" height="105" rx="4"/><text class="mtitle" x="745" y="89">assessment-plan</text>
+        <rect class="model" x="735" y="195" width="475" height="265" rx="4"/><text class="mtitle" x="745" y="214">assessment-results</text>
+        <rect class="model" x="1250" y="195" width="130" height="265" rx="4"/><text class="mtitle" x="1258" y="214">plan-of-action-</text><text class="mtitle" x="1258" y="228">and-milestones</text>
+        <rect class="box" x="745" y="115" width="140" height="40" rx="4"/><text class="t" x="815" y="132">import-ssp</text><text class="s" x="815" y="146">href</text>
+        <rect class="box" x="905" y="115" width="140" height="40" rx="4"/><text class="t" x="975" y="132">reviewed-controls</text><text class="s" x="975" y="146">control-selections</text>
+        <rect class="box" x="1060" y="115" width="140" height="40" rx="4"/><text class="t" x="1130" y="132">assessment-subject</text><text class="s" x="1130" y="146">subject-reference</text>
+        <rect class="box" x="745" y="230" width="140" height="40" rx="4"/><text class="t" x="815" y="247">import-ap</text><text class="s" x="815" y="261">href</text>
+        <rect class="box" x="905" y="230" width="140" height="40" rx="4"/><text class="t" x="975" y="247">result</text><text class="s" x="975" y="261">start, end, attestations</text>
+        <rect class="box" x="745" y="305" width="140" height="40" rx="4"/><text class="t" x="815" y="322">observation</text><text class="s" x="815" y="336">methods, subjects</text>
+        <rect class="box" x="905" y="305" width="140" height="40" rx="4"/><text class="t" x="975" y="322">finding</text><text class="s" x="975" y="336">origins</text>
+        <rect class="box" x="1060" y="305" width="140" height="40" rx="4"/><text class="t" x="1130" y="322">risk</text><text class="s" x="1130" y="336">threat-ids, status</text>
+        <rect class="box" x="905" y="395" width="140" height="40" rx="4"/><text class="t" x="975" y="412">target</text><text class="s" x="975" y="426">type, target-id, status</text>
+        <rect class="box" x="1060" y="395" width="140" height="40" rx="4"/><text class="t" x="1130" y="412">response</text><text class="s" x="1130" y="426">lifecycle</text>
+        <rect class="box" x="1258" y="395" width="114" height="40" rx="4"/><text class="t" x="1315" y="412">poam-item</text><text class="s" x="1315" y="426">related-findings</text>
+
+        <path class="e" d="M745,150 L697,238" marker-end="url(#arr)"/><text class="l onband mid" x="715" y="196">href</text>
+        <path class="e" d="M815,230 V177" marker-end="url(#arr)"/><text class="l" x="821" y="207">href</text>
+        <path class="e" d="M975,270 L815,303" marker-end="url(#arr)"/><text class="l mid" x="880" y="284">observations</text>
+        <path class="e" d="M975,270 V303" marker-end="url(#arr)"/><text class="l" x="981" y="291">findings</text>
+        <path class="e" d="M975,270 L1130,303" marker-end="url(#arr)"/><text class="l mid" x="1070" y="284">risks</text>
+        <path class="e" d="M940,345 V365 H815 V347" marker-end="url(#arr)"/><text class="l mid" x="877" y="361">related-observations</text>
+        <path class="e" d="M1010,345 V365 H1110 V347" marker-end="url(#arr)"/><text class="l mid" x="1060" y="361">related-risks</text>
+        <path class="e" d="M975,345 V393" marker-end="url(#arr)"/><text class="l" x="981" y="384">target</text>
+        <path class="e" d="M1150,345 V393" marker-end="url(#arr)"/><text class="l end" x="1144" y="384">remediations</text>
+        <path class="e" d="M1258,415 H1230 V325 H1202" marker-end="url(#arr)"/><text class="l" x="1236" y="372">related-risks</text>
+
+        <path class="e" d="M1202,338 H1218 V495 H500 V422" marker-end="url(#arr)"/><text class="l onsurf mid" x="1100" y="491">mitigating-factors</text><text class="l" x="506" y="464">implementation-uuid</text>
+
+        <!-- Shared assemblies -->
+        <rect class="box" x="380" y="535" width="150" height="40" rx="4"/><text class="t" x="455" y="552">party</text><text class="s" x="455" y="566">metadata</text>
+        <rect class="box" x="538" y="535" width="150" height="40" rx="4"/><text class="t" x="613" y="552">role</text><text class="s" x="613" y="566">responsible-parties</text>
+        <rect class="box" x="745" y="535" width="140" height="40" rx="4"/><text class="t" x="815" y="552">resource</text><text class="s" x="815" y="566">back-matter</text>
+
+        <!-- Cross-layer links that run below the layers -->
+        <path class="e" d="M975,435 V485 H252 V387" marker-end="url(#arr)"/><text class="l onsurf mid" x="600" y="481">target-id, with type objective-id or statement-id</text>
+        <path class="e" d="M780,345 V533" marker-end="url(#arr)"/><text class="l onsurf end" x="774" y="500">relevant-evidence</text>
+      </svg>
+    </div>
+    <figcaption>Dashed frames are OSCAL models; boxes are assemblies inside them, named as the JSON key where it differs from the assembly (the <code>target</code> box is the <code>finding-target</code> assembly; <code>defined-component</code> sits under the JSON key <code>components</code>); arrow labels are the OSCAL fields that hold the link. Most cross-model links are an <code>href</code> to the imported document or a UUID or id reference. Simplified: a <code>risk</code> also has <code>related-observations</code>, a <code>finding</code> has <code>implementation-statement-uuid</code> back to the security plan, and the POA&amp;M carries its own <code>observations</code>, <code>risks</code> and <code>findings</code> and imports the security plan.</figcaption>
+  </figure>
+
+  <div class="notes">
+    <div>
+      <h2>Reading it left to right</h2>
+      <ul>
+        <li>A <code>profile</code> selects and tailors controls from a <code>catalog</code>: a baseline.</li>
+        <li>A <code>system-security-plan</code> says how a system inside its <code>authorization-boundary</code> implements each control, component by component.</li>
+        <li>An <code>assessment-plan</code> says which controls and subjects will be assessed; <code>assessment-results</code> record what was observed, what was found and which risks remain.</li>
+        <li>The <code>plan-of-action-and-milestones</code> carries open risks forward with their remediation.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>The links that matter for assessment</h2>
+      <ul>
+        <li><code>target</code>: a finding is about one control objective or statement, with <code>status.state</code> of <code>satisfied</code> or <code>not-satisfied</code>.</li>
+        <li><code>related-observations</code>: the evidence a finding or risk rests on, kept apart from the judgement.</li>
+        <li><code>related-risks</code>: what a deficiency exposes, with its own status and remediations.</li>
+        <li><code>mitigating-factors</code>: the only control-to-risk link. It runs from the risk to an implementation in the security plan (<code>implementation-uuid</code>), not from a catalogue control, and it is optional.</li>
+        <li><code>threat-ids</code>: a risk names threats by an external identifier and source (<code>system</code>, <code>href</code>). OSCAL does not model threats, and a catalogue control names no risk or threat at all.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Checked against OSCAL 1.2.3</h2>
+      <ul>
+        <li>Every assembly and link on the page exists in the 1.2.3 Metaschema sources and the generated JSON Schema.</li>
+        <li>Catalogue parts are named <code>assessment-objective</code> and <code>assessment-method</code>; <code>objective</code> has been deprecated since 1.0.1. A finding's target still uses the type <code>objective-id</code>.</li>
+        <li>Values: finding state <code>satisfied</code>, <code>not-satisfied</code>; observation methods <code>EXAMINE</code>, <code>INTERVIEW</code>, <code>TEST</code>, <code>UNKNOWN</code>; risk status <code>open</code>, <code>investigating</code>, <code>remediating</code>, <code>deviation-requested</code>, <code>deviation-approved</code>, <code>closed</code>.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body></html>

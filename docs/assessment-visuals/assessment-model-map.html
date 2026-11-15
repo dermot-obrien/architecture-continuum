@@ -1,0 +1,242 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Assessment Model Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: one wide diagram as the page's centre of gravity, a legend above it, three short readings below. */
+:root {
+  --bg: #f6f7f9;
+  --band: #eceff4;
+  --surface: #ffffff;
+  --fg: #1d2330;
+  --muted: #5b6475;
+  --line: #8d96a8;
+  --edge: #4a5263;
+  --accent: #b4561c;
+  --ai: #e6eefb;
+  --ai-line: #5878b8;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", "Arial Narrow", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --band: #1a1f29; --surface: #212734; --fg: #e4e8f0; --muted: #a2abbd;
+    --line: #6c7689; --edge: #b6bfd0; --accent: #f0904f; --ai: #1f2c45; --ai-line: #8eaae6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --band: #1a1f29; --surface: #212734; --fg: #e4e8f0; --muted: #a2abbd;
+  --line: #6c7689; --edge: #b6bfd0; --accent: #f0904f; --ai: #1f2c45; --ai-line: #8eaae6;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+header { display: grid; gap: 6px; max-width: 72ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--cond); font-weight: 600; font-size: 30px; line-height: 1.15; margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 26px; height: 14px; border-radius: 2px; display: inline-block; }
+.sw.solid { background: var(--surface); border: 1.4px solid var(--line); }
+.sw.cat { background: var(--surface); border: 1.4px dashed var(--line); }
+.sw.ai { background: var(--ai); border: 1.4px solid var(--ai-line); }
+.sw.prop { background: var(--surface); border: 1.4px dashed var(--accent); }
+figure { margin: 0; display: grid; gap: 10px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--band); border-radius: 6px; padding: 12px; }
+.scroll svg { display: block; width: 100%; min-width: 980px; height: auto; color: var(--edge); }
+figcaption { font-size: 13.5px; color: var(--muted); max-width: 90ch; }
+svg .frame { fill: var(--band); }
+svg .ftitle { font: 600 13px var(--cond); fill: var(--fg); letter-spacing: 0.01em; }
+svg .fver { font: 11px var(--mono); fill: var(--muted); }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.3; }
+svg .box.cat { stroke-dasharray: 5 4; }
+svg .box.ai { fill: var(--ai); stroke: var(--ai-line); }
+svg .box.prop { stroke: var(--accent); stroke-dasharray: 5 4; }
+svg .t { font: 600 12.5px var(--sans); fill: var(--fg); text-anchor: middle; }
+svg .s { font: 10.5px var(--mono); fill: var(--muted); text-anchor: middle; }
+svg .e { fill: none; stroke: var(--edge); stroke-width: 1.3; }
+svg .e.prop { stroke: var(--accent); stroke-dasharray: 5 4; }
+svg .l { font: italic 11px var(--sans); fill: var(--muted); paint-order: stroke; stroke: var(--band); stroke-width: 4px; stroke-linejoin: round; }
+svg .l.out { stroke: var(--surface); }
+svg .l.prop { fill: var(--accent); }
+svg .l.mid { text-anchor: middle; }
+svg .head { fill: var(--edge); }
+svg .head.prop { fill: var(--accent); }
+.readings { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.readings section { min-width: 0; display: grid; gap: 6px; align-content: start; }
+.readings h2 { font-family: var(--cond); font-weight: 600; font-size: 17px; margin: 0; }
+.readings code, .proposed code { font-family: var(--mono); font-size: 12.5px; }
+.readings p, .readings ul { margin: 0; font-size: 14px; }
+.readings ul { padding-left: 18px; display: grid; gap: 3px; }
+.path { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.proposed { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: grid; gap: 4px; max-width: 90ch; }
+.proposed h2 { font-family: var(--cond); font-weight: 600; font-size: 17px; margin: 0; }
+.proposed ul { margin: 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">architecture-continuum · standards/assessment · draft 0.1.0</div>
+    <h1>The assessment model: what reads what, and where findings go</h1>
+    <p>Three schemas and the catalogue they cite. A design is assessed against lenses of criteria; each finding answers one criterion and ends up as a design change, a catalogue artefact or a hand-over.</p>
+  </header>
+
+  <div class="legend" aria-label="Legend">
+    <span><i class="sw solid"></i>In a schema today</span>
+    <span><i class="sw ai"></i>AI facet on an element</span>
+    <span><i class="sw cat"></i>Catalogue or ontology artefact, outside these files</span>
+    <span><i class="sw prop"></i>Proposed, not yet in a schema</span>
+  </div>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1290 575" role="img" aria-label="Concept map of the assessment model. The design specification holds drivers, operations, elements with AI and agent facets, trust zones, connectors, data sets, scenarios, fitness functions, evidence, decisions, considerations and risks. A lens groups areas that hold criteria, and each criterion reads paths of the design. An assessment assesses one design version, applies lenses, records findings that answer criteria, and ends in a verdict. Each finding goes to a disposition that raises a consideration, records a decision, accepts debt or risk, or hands over to a security assessment. In the catalogue, a guardrail is met by a control, a control mitigates a risk, a consideration is resolved by a decision record, and a decision record has technical debt as a consequence. Proposed: criteria test guardrails, and findings cite observations.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="arrp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head prop" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <!-- Frames -->
+        <rect class="frame" x="20" y="36" width="465" height="414" rx="6"/>
+        <text class="ftitle" x="20" y="26">Design specification</text>
+        <text class="fver" x="168" y="26">design/0.1.0</text>
+        <rect class="frame" x="545" y="36" width="280" height="249" rx="6"/>
+        <text class="ftitle" x="545" y="26">Lens</text>
+        <text class="fver" x="580" y="26">lens/0.1.0</text>
+        <rect class="frame" x="895" y="36" width="375" height="414" rx="6"/>
+        <text class="ftitle" x="895" y="26">Assessment record</text>
+        <text class="fver" x="1032" y="26">assessment/0.1.0</text>
+        <rect class="frame" x="545" y="315" width="280" height="245" rx="6"/>
+        <text class="ftitle" x="555" y="551">Catalogue and ontology</text>
+
+        <!-- Design specification boxes -->
+        <rect class="box" x="32" y="70" width="120" height="40" rx="4"/><text class="t" x="92" y="87">Drivers</text><text class="s" x="92" y="101">goals · obligations</text>
+        <rect class="box" x="192" y="70" width="120" height="40" rx="4"/><text class="t" x="252" y="87">Design</text><text class="s" x="252" y="101">AP · RA · SD</text>
+        <rect class="box" x="352" y="70" width="120" height="40" rx="4"/><text class="t" x="412" y="87">Operations</text><text class="s" x="412" y="101">SLOs · cost</text>
+        <rect class="box ai" x="32" y="150" width="120" height="40" rx="4"/><text class="t" x="92" y="167">ai facet</text><text class="s" x="92" y="181">model · evals</text>
+        <rect class="box" x="192" y="150" width="120" height="40" rx="4"/><text class="t" x="252" y="167">Element</text><text class="s" x="252" y="181">continuum kind</text>
+        <rect class="box" x="352" y="150" width="120" height="40" rx="4"/><text class="t" x="412" y="167">Trust zone</text><text class="s" x="412" y="181">trust level</text>
+        <rect class="box ai" x="32" y="230" width="120" height="40" rx="4"/><text class="t" x="92" y="247">agent facet</text><text class="s" x="92" y="261">tools · limits</text>
+        <rect class="box" x="192" y="230" width="120" height="40" rx="4"/><text class="t" x="252" y="247">Connector</text><text class="s" x="252" y="261">contract · auth</text>
+        <rect class="box" x="352" y="230" width="120" height="40" rx="4"/><text class="t" x="412" y="247">Data set</text><text class="s" x="412" y="261">owner · class</text>
+        <rect class="box" x="32" y="310" width="120" height="40" rx="4"/><text class="t" x="92" y="327">Fitness function</text><text class="s" x="92" y="341">measure · limit</text>
+        <rect class="box" x="192" y="310" width="120" height="40" rx="4"/><text class="t" x="252" y="327">Scenario</text><text class="s" x="252" y="341">functional · quality</text>
+        <rect class="box" x="352" y="310" width="120" height="40" rx="4"/><text class="t" x="412" y="327">Evidence</text><text class="s" x="412" y="341">evals · threat model</text>
+        <rect class="box" x="32" y="390" width="120" height="40" rx="4"/><text class="t" x="92" y="407">Decision</text><text class="s" x="92" y="421">DR or local</text>
+        <rect class="box" x="192" y="390" width="120" height="40" rx="4"/><text class="t" x="252" y="407">Consideration</text><text class="s" x="252" y="421">CN or local</text>
+        <rect class="box" x="352" y="390" width="120" height="40" rx="4"/><text class="t" x="412" y="407">Risk</text><text class="s" x="412" y="421">owner · mitigation</text>
+
+        <!-- Design specification edges -->
+        <path class="e" d="M192,90 H154" marker-end="url(#arr)"/><text class="l mid" x="172" y="83">has</text>
+        <path class="e" d="M312,90 H350" marker-end="url(#arr)"/><text class="l mid" x="332" y="83">has</text>
+        <path class="e" d="M252,110 V148" marker-end="url(#arr)"/><text class="l" x="258" y="134">contains</text>
+        <path class="e" d="M152,170 H190" marker-end="url(#arr)"/><text class="l mid" x="172" y="163">on</text>
+        <path class="e" d="M92,230 V192" marker-end="url(#arr)"/><text class="l" x="98" y="214">extends</text>
+        <path class="e" d="M312,170 H350" marker-end="url(#arr)"/><text class="l mid" x="332" y="163">in</text>
+        <path class="e" d="M252,230 V192" marker-end="url(#arr)"/><text class="l" x="258" y="214">from · to</text>
+        <path class="e" d="M312,250 H350" marker-end="url(#arr)"/><text class="l mid" x="332" y="243">carries</text>
+        <path class="e" d="M252,310 V272" marker-end="url(#arr)"/><text class="l" x="258" y="294">steps via</text>
+        <path class="e" d="M152,330 H190" marker-end="url(#arr)"/><text class="l mid" x="172" y="323">guards</text>
+        <path class="e" d="M352,330 H314" marker-end="url(#arr)"/><text class="l mid" x="332" y="323">covers</text>
+        <path class="e" d="M192,410 H154" marker-end="url(#arr)"/><text class="l mid" x="172" y="403">settled by</text>
+
+        <!-- Lens boxes and edges -->
+        <rect class="box" x="600" y="70" width="170" height="40" rx="4"/><text class="t" x="685" y="87">Lens</text><text class="s" x="685" y="101">always or by profile</text>
+        <rect class="box" x="600" y="150" width="170" height="40" rx="4"/><text class="t" x="685" y="167">Area</text><text class="s" x="685" y="181">DEM · QA · SEC · …</text>
+        <rect class="box" x="600" y="230" width="170" height="40" rx="4"/><text class="t" x="685" y="247">Criterion</text><text class="s" x="685" y="261">tool · reviewer · both</text>
+        <path class="e" d="M685,110 V148" marker-end="url(#arr)"/><text class="l" x="692" y="134">groups</text>
+        <path class="e" d="M685,190 V228" marker-end="url(#arr)"/><text class="l" x="692" y="214">holds</text>
+
+        <!-- Catalogue and ontology boxes and edges -->
+        <rect class="box cat" x="555" y="350" width="120" height="40" rx="4"/><text class="t" x="615" y="367">Guardrail</text><text class="s" x="615" y="381">Standard</text>
+        <rect class="box cat" x="695" y="350" width="120" height="40" rx="4"/><text class="t" x="755" y="367">Consideration</text><text class="s" x="755" y="381">CN-NNN</text>
+        <rect class="box cat" x="555" y="420" width="120" height="40" rx="4"/><text class="t" x="615" y="437">Control</text><text class="s" x="615" y="451">mechanism</text>
+        <rect class="box cat" x="695" y="420" width="120" height="40" rx="4"/><text class="t" x="755" y="437">Decision record</text><text class="s" x="755" y="451">DR-NNN</text>
+        <rect class="box cat" x="555" y="490" width="120" height="40" rx="4"/><text class="t" x="615" y="507">Risk</text><text class="s" x="615" y="521">register</text>
+        <rect class="box cat" x="695" y="490" width="120" height="40" rx="4"/><text class="t" x="755" y="507">Technical debt</text><text class="s" x="755" y="521">TD-NNN</text>
+        <path class="e" d="M615,390 V418" marker-end="url(#arr)"/><text class="l" x="622" y="409">met by</text>
+        <path class="e" d="M615,460 V488" marker-end="url(#arr)"/><text class="l" x="622" y="479">mitigates</text>
+        <path class="e" d="M755,390 V418" marker-end="url(#arr)"/><text class="l" x="762" y="409">resolved by</text>
+        <path class="e" d="M755,460 V488" marker-end="url(#arr)"/><text class="l" x="762" y="479">has as debt</text>
+
+        <!-- Assessment record boxes -->
+        <rect class="box" x="905" y="70" width="150" height="40" rx="4"/><text class="t" x="980" y="87">Assessment</text><text class="s" x="980" y="101">depth · assessors</text>
+        <rect class="box" x="1105" y="70" width="150" height="40" rx="4"/><text class="t" x="1180" y="87">Verdict</text><text class="s" x="1180" y="101">outcome · level</text>
+        <rect class="box" x="1105" y="150" width="150" height="40" rx="4"/><text class="t" x="1180" y="167">Utility tree</text><text class="s" x="1180" y="181">evaluation depth</text>
+        <rect class="box" x="905" y="230" width="150" height="40" rx="4"/><text class="t" x="980" y="247">Finding</text><text class="s" x="980" y="261">result · severity</text>
+        <rect class="box" x="1105" y="230" width="150" height="40" rx="4"/><text class="t" x="1180" y="247">Risk theme</text><text class="s" x="1180" y="261">threatens goals</text>
+        <rect class="box" x="905" y="310" width="150" height="40" rx="4"/><text class="t" x="980" y="327">Disposition</text><text class="s" x="980" y="341">action · ref · owner</text>
+        <rect class="box prop" x="1105" y="310" width="150" height="40" rx="4"/><text class="t" x="1180" y="327">Observation</text><text class="s" x="1180" y="341">method · evidence</text>
+        <rect class="box" x="1105" y="390" width="150" height="40" rx="4"/><text class="t" x="1180" y="407">Hand-over</text><text class="s" x="1180" y="421">security · privacy</text>
+        <rect class="box cat" x="1105" y="490" width="150" height="40" rx="4"/><text class="t" x="1180" y="507">Security assessment</text><text class="s" x="1180" y="521">e.g. OSCAL plan</text>
+
+        <!-- Assessment record edges -->
+        <path class="e" d="M1055,90 H1103" marker-end="url(#arr)"/><text class="l mid" x="1080" y="83">ends in</text>
+        <path class="e" d="M1055,104 L1103,160" marker-end="url(#arr)"/><text class="l" x="1084" y="122">builds</text>
+        <path class="e" d="M980,110 V228" marker-end="url(#arr)"/><text class="l" x="986" y="174">records</text>
+        <path class="e" d="M1105,250 H1057" marker-end="url(#arr)"/><text class="l mid" x="1080" y="243">groups</text>
+        <path class="e" d="M980,270 V308" marker-end="url(#arr)"/><text class="l" x="986" y="294">goes to</text>
+        <path class="e prop" d="M1055,262 L1103,316" marker-end="url(#arrp)"/><text class="l prop" x="1086" y="282">cites</text>
+        <path class="e" d="M1055,342 L1103,398" marker-end="url(#arr)"/><text class="l" x="1082" y="378">or</text>
+        <path class="e" d="M1180,430 V488" marker-end="url(#arr)"/><text class="l out" x="1186" y="472">opens</text>
+
+        <!-- Cross-schema edges -->
+        <path class="e" d="M980,70 V50 H252 V68" marker-end="url(#arr)"/><text class="l mid" x="412" y="54">assesses one version, by digest</text>
+        <path class="e" d="M905,90 H772" marker-end="url(#arr)"/><text class="l out mid" x="860" y="83">applies</text>
+        <path class="e" d="M905,250 H772" marker-end="url(#arr)"/><text class="l out mid" x="860" y="243">answers</text>
+        <path class="e" d="M600,250 H487" marker-end="url(#arr)"/><text class="l out mid" x="515" y="243">reads</text>
+        <path class="e prop" d="M615,270 V348" marker-end="url(#arrp)"/><text class="l out prop" x="622" y="303">tests</text>
+        <path class="e" d="M252,450 V520 H543" marker-end="url(#arr)"/><text class="l out" x="262" y="498">decisions, considerations</text><text class="l out" x="262" y="512">and risks are catalogued as</text>
+        <path class="e" d="M980,350 V520 H827" marker-end="url(#arr)"/><text class="l out mid" x="903" y="498">raise CN · record DR</text><text class="l out mid" x="903" y="512">accept as TD or risk</text>
+      </svg>
+    </div>
+    <figcaption>Everything inside the left frame lives in one design file; the design's <code>context</code> also names catalogued capabilities, use cases, outcomes, the platform and bounded contexts, and each element can <code>ref</code> a catalogued ABB, SBB, service, store or node. A runtime agent is an element of kind service carrying both facets. A disposition of <code>fix-design</code> goes back to a new version of the design rather than to the catalogue.</figcaption>
+  </figure>
+
+  <div class="readings">
+    <section>
+      <h2>Design specification</h2>
+      <div class="path">standards/assessment/schemas/design.schema.json</div>
+      <ul>
+        <li>One file per design, identified as <code>AP</code>, <code>RA</code> or <code>SD</code>.</li>
+        <li>Elements are continuum kinds; there is no model or agent kind.</li>
+        <li>Connectors carry contracts, authentication and whether content is untrusted.</li>
+        <li>Quality, failure and misuse scenarios need a measurable response.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Lens</h2>
+      <div class="path">standards/assessment/schemas/lens.schema.json</div>
+      <ul>
+        <li><code>core</code> always applies; <code>ai-solution</code> and <code>ai-agent</code> apply by profile.</li>
+        <li>A criterion names the design paths it reads and whether a tool or a reviewer decides it.</li>
+        <li>92 criteria in draft 0.1.0: 39 tool, 30 both, 23 reviewer. The lens atlas has the current count.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Assessment record</h2>
+      <div class="path">standards/assessment/schemas/assessment.schema.json</div>
+      <ul>
+        <li>Pins the design by version and digest, and the lenses by version.</li>
+        <li>Findings use ATAM's types: risk, non-risk, sensitivity point, trade-off point.</li>
+        <li>The verdict pairs an outcome with TOGAF's conformance level.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="proposed">
+    <h2>Proposed after draft 0.1.0, not yet in the schemas</h2>
+    <ul>
+      <li><code>tests</code> on a criterion, naming the guardrail or external control it checks, so untested guardrails can be reported.</li>
+      <li><code>observations</code> on the assessment record, after OSCAL, so evidence is kept apart from the findings that judge it.</li>
+      <li>OSCAL's risk status values on accepted risks, and an export of the record to OSCAL for the security hand-over.</li>
+    </ul>
+  </section>
+</div>
+
+</body></html>
