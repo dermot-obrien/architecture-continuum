@@ -255,7 +255,7 @@ The choices behind it, and the alternatives set aside:
 
 ## Pictures of the method
 
-[Assessment visuals](assessment-visuals/README.md) has the method read from six viewpoints, as a page and as slides, and an atlas of every lens and criterion.
+[Assessment visuals](assessment-visuals/README.md) has the method read from six viewpoints, as a page and as slides, an atlas of every lens and criterion, and three maps from the research: the draft schemas as concepts and relationships, a proposed core shared with cybersecurity assessment, and OSCAL's model in its own names.
 
 ## Testing the method
 

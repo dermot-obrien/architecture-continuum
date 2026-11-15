@@ -1,0 +1,224 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Assessment Core Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: the shared core as one diagram, the assurance-depth axis that splits the two practices, then the mapping table. */
+:root {
+  --bg: #f6f7f9;
+  --band: #eceff4;
+  --surface: #ffffff;
+  --fg: #1d2330;
+  --muted: #5b6475;
+  --line: #8d96a8;
+  --edge: #4a5263;
+  --arch: #2f6db5;
+  --arch-soft: #e4edf9;
+  --sec: #a2402b;
+  --sec-soft: #f8e7e2;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", "Arial Narrow", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --band: #1a1f29; --surface: #212734; --fg: #e4e8f0; --muted: #a2abbd;
+    --line: #6c7689; --edge: #b6bfd0; --arch: #8db4ec; --arch-soft: #1d2a40; --sec: #ee9a84; --sec-soft: #3a2420;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --band: #1a1f29; --surface: #212734; --fg: #e4e8f0; --muted: #a2abbd;
+  --line: #6c7689; --edge: #b6bfd0; --arch: #8db4ec; --arch-soft: #1d2a40; --sec: #ee9a84; --sec-soft: #3a2420;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 30px; }
+header { display: grid; gap: 6px; max-width: 74ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--cond); font-weight: 600; font-size: 30px; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--cond); font-weight: 600; font-size: 20px; margin: 0; text-wrap: balance; }
+header p, .lead { margin: 0; color: var(--muted); max-width: 80ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+figure { margin: 0; display: grid; gap: 10px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--band); border-radius: 6px; padding: 12px; }
+.scroll svg { display: block; width: 100%; min-width: 860px; height: auto; color: var(--edge); }
+figcaption { font-size: 13.5px; color: var(--muted); max-width: 90ch; }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.3; }
+svg .t { font: 600 12.5px var(--sans); fill: var(--fg); text-anchor: middle; }
+svg .s { font: 10.5px var(--mono); fill: var(--muted); text-anchor: middle; }
+svg .e { fill: none; stroke: var(--edge); stroke-width: 1.3; }
+svg .os { font: 500 10.5px var(--mono); fill: var(--sec); text-anchor: middle; }
+svg .os.none { fill: var(--muted); font-style: italic; }
+svg .l { font: italic 11px var(--sans); fill: var(--muted); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+svg .l.mid { text-anchor: middle; }
+svg .head { fill: var(--edge); }
+
+/* Assurance depth axis */
+.axis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.step { padding: 14px 14px 12px; border-top: 3px solid var(--line); display: grid; gap: 4px; align-content: start; min-width: 0; }
+.step .n { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.step h3 { font-family: var(--cond); font-weight: 600; font-size: 17px; margin: 0; }
+.step p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.step .ex { font-family: var(--mono); font-size: 12px; color: var(--fg); }
+.step.arch { border-top-color: var(--arch); background: var(--arch-soft); }
+.step.sec { border-top-color: var(--sec); background: var(--sec-soft); }
+.brackets { display: grid; grid-template-columns: 1fr 1fr; gap: 0; font-size: 13px; font-weight: 600; }
+.brackets div { padding: 6px 14px; }
+.brackets .a { color: var(--arch); }
+.brackets .b { color: var(--sec); text-align: right; }
+@media (max-width: 720px) {
+  .axis { grid-template-columns: 1fr 1fr; }
+}
+
+/* Mapping table */
+.tablewrap { overflow-x: auto; border: 1px solid var(--band); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 820px; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--band); }
+thead th { font-family: var(--cond); font-weight: 600; font-size: 14px; background: var(--band); }
+thead th.a { color: var(--arch); }
+thead th.b { color: var(--sec); }
+tbody th { font-weight: 600; white-space: nowrap; }
+td code, p code, li code { font-family: var(--mono); font-size: 12.5px; }
+td.o { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+.cols > div { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.cols h3 { font-family: var(--cond); font-weight: 600; font-size: 17px; margin: 0; }
+.cols ul, .cols ol { margin: 0; padding-left: 20px; display: grid; gap: 5px; font-size: 14px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">architecture-continuum · assessment · proposal</div>
+    <h1>One assessment core for architecture and cybersecurity</h1>
+    <p>Both practices compare evidence about a subject against criteria, judge each criterion, find risks and decide what to do about them. What differs is the subject, where the criteria come from, the methods, who may assess, and what the verdict permits. The shared part is the core below; the differences become two profiles.</p>
+  </header>
+
+  <section>
+    <h2>The shared core</h2>
+    <figure>
+      <div class="scroll">
+        <svg viewBox="0 0 1020 465" role="img" aria-label="The shared assessment core, with the OSCAL class for each concept. An assessment (OSCAL assessment plan and results) assesses one version of a subject (system security plan), applies criteria sets (catalog and profile), is performed by assessors (party) and may rely on other assessments (leveraged authorization). A criteria set contains criteria (control objective parts); each criterion tests a requirement (control statement), which a control meets in the system (implemented requirement). The assessment records observations (observation); a finding (finding) answers one criterion and cites observations; a finding identifies risks (risk), which controls mitigate; each risk is treated by a response (remediation and POA&amp;M item); the assessment concludes in a verdict, which OSCAL does not model, given by an accountable owner (party).">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+          </defs>
+
+          <rect class="box" x="230" y="60" width="160" height="56" rx="4"/><text class="t" x="310" y="78">Criteria set</text><text class="s" x="310" y="92">lens · catalogue · baseline</text><text class="os" x="310" y="107">catalog · profile</text>
+          <rect class="box" x="430" y="60" width="160" height="56" rx="4"/><text class="t" x="510" y="78">Subject</text><text class="s" x="510" y="92">a version, in a boundary</text><text class="os" x="510" y="107">system-security-plan</text>
+          <rect class="box" x="630" y="60" width="160" height="56" rx="4"/><text class="t" x="710" y="78">Other assessment</text><text class="s" x="710" y="92">results it relies on</text><text class="os" x="710" y="107">leveraged-authorization</text>
+
+          <rect class="box" x="30" y="170" width="160" height="56" rx="4"/><text class="t" x="110" y="188">Requirement</text><text class="s" x="110" y="202">guardrail · control spec</text><text class="os" x="110" y="217">control › statement</text>
+          <rect class="box" x="230" y="170" width="160" height="56" rx="4"/><text class="t" x="310" y="188">Criterion</text><text class="s" x="310" y="202">question · method · depth</text><text class="os" x="310" y="217">assessment-objective</text>
+          <rect class="box" x="430" y="170" width="160" height="56" rx="4"/><text class="t" x="510" y="188">Assessment</text><text class="s" x="510" y="202">plan and results</text><text class="os" x="510" y="217">assessment-plan, -results</text>
+          <rect class="box" x="630" y="170" width="160" height="56" rx="4"/><text class="t" x="710" y="188">Assessor</text><text class="s" x="710" y="202">independence · standing</text><text class="os" x="710" y="217">party · role</text>
+
+          <rect class="box" x="30" y="280" width="160" height="56" rx="4"/><text class="t" x="110" y="298">Control</text><text class="s" x="110" y="312">mechanism in the system</text><text class="os" x="110" y="327">implemented-requirement</text>
+          <rect class="box" x="230" y="280" width="160" height="56" rx="4"/><text class="t" x="310" y="298">Finding</text><text class="s" x="310" y="312">result on a scale</text><text class="os" x="310" y="327">finding</text>
+          <rect class="box" x="430" y="280" width="160" height="56" rx="4"/><text class="t" x="510" y="298">Observation</text><text class="s" x="510" y="312">method · evidence</text><text class="os" x="510" y="327">observation</text>
+          <rect class="box" x="630" y="280" width="160" height="56" rx="4"/><text class="t" x="710" y="298">Verdict</text><text class="s" x="710" y="312">endorse · authorise</text><text class="os none" x="710" y="327">not in OSCAL</text>
+          <rect class="box" x="830" y="280" width="160" height="56" rx="4"/><text class="t" x="910" y="298">Accountable owner</text><text class="s" x="910" y="312">accepts residual risk</text><text class="os" x="910" y="327">party · role</text>
+
+          <rect class="box" x="230" y="390" width="160" height="56" rx="4"/><text class="t" x="310" y="408">Risk</text><text class="s" x="310" y="422">likelihood · impact</text><text class="os" x="310" y="437">risk</text>
+          <rect class="box" x="430" y="390" width="160" height="56" rx="4"/><text class="t" x="510" y="408">Response</text><text class="s" x="510" y="422">fix · accept · hand over</text><text class="os" x="510" y="437">remediation · poam-item</text>
+
+          <path class="e" d="M510,170 V118" marker-end="url(#arr)"/><text class="l" x="516" y="148">assesses</text>
+          <path class="e" d="M430,176 L394,118" marker-end="url(#arr)"/><text class="l mid" x="408" y="152">applies</text>
+          <path class="e" d="M590,176 L648,118" marker-end="url(#arr)"/><text class="l mid" x="606" y="145">relies on</text>
+          <path class="e" d="M590,198 H628" marker-end="url(#arr)"/><text class="l mid" x="609" y="191">by</text>
+          <path class="e" d="M310,116 V168" marker-end="url(#arr)"/><text class="l" x="316" y="148">contains</text>
+          <path class="e" d="M230,198 H192" marker-end="url(#arr)"/><text class="l mid" x="211" y="191">tests</text>
+          <path class="e" d="M110,226 V278" marker-end="url(#arr)"/><text class="l" x="116" y="257">met by</text>
+          <path class="e" d="M310,280 V228" marker-end="url(#arr)"/><text class="l" x="316" y="257">answers</text>
+          <path class="e" d="M510,226 V278" marker-end="url(#arr)"/><text class="l" x="516" y="257">records</text>
+          <path class="e" d="M390,308 H428" marker-end="url(#arr)"/><text class="l mid" x="409" y="301">cites</text>
+          <path class="e" d="M590,214 L660,278" marker-end="url(#arr)"/><text class="l" x="640" y="244">concludes</text>
+          <path class="e" d="M790,308 H828" marker-end="url(#arr)"/><text class="l mid" x="809" y="301">by</text>
+          <path class="e" d="M310,336 V388" marker-end="url(#arr)"/><text class="l" x="316" y="367">identifies</text>
+          <path class="e" d="M110,336 V418 H228" marker-end="url(#arr)"/><text class="l mid" x="170" y="411">mitigates</text>
+          <path class="e" d="M390,418 H428" marker-end="url(#arr)"/><text class="l mid" x="409" y="411">treated by</text>
+          <path class="e" d="M590,418 H910 V338" marker-end="url(#arr)"/><text class="l mid" x="760" y="411">acceptance given by</text>
+        </svg>
+      </div>
+      <figcaption>The third line in each box, in red, is the OSCAL class that holds the concept: the requirement is a control's <code>statement</code> part and the criterion its <code>assessment-objective</code> part, and <code>assessment-plan</code> and <code>assessment-results</code> are separate OSCAL models. OSCAL has no class for the verdict; an authorisation decision is recorded outside it. Names checked against OSCAL 1.2.3. Every box exists in both practices under some name; the table below gives the names. The four that make the core work across both are the subject version, the criterion's depth, the observation kept apart from the finding, and reliance on another assessment's results.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>The axis that separates them: assurance depth</h2>
+    <p class="lead">A requirement can be assessed at four depths, and each depth needs different evidence. Architecture assessment works at the first two; cybersecurity assessment at the last two. The same requirement, such as "a T1 limit is enforced outside the agent", gets one criterion at each depth, so a single model holds both assessments without either taking over the other's question.</p>
+    <div>
+      <div class="brackets"><div class="a">Architecture assessment</div><div class="b">Cybersecurity assessment</div></div>
+      <div class="axis">
+        <div class="step arch"><span class="n">1</span><h3>Specified</h3><p>The requirement exists and applies to this subject.</p><span class="ex">guardrail in the catalogue</span></div>
+        <div class="step arch"><span class="n">2</span><h3>Designed</h3><p>The design places a control that meets it.</p><span class="ex">enforced: outside-agent</span></div>
+        <div class="step sec"><span class="n">3</span><h3>Implemented</h3><p>The control exists and is configured as designed, at a point in time.</p><span class="ex">SOC 2 Type 1 · control test</span></div>
+        <div class="step sec"><span class="n">4</span><h3>Operating effectively</h3><p>The control worked throughout a period.</p><span class="ex">SOC 2 Type 2 · continuous monitoring</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>One concept, two practices</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Core concept</th><th class="a">Architecture assessment</th><th class="b">Cybersecurity assessment</th><th>OSCAL name</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Subject</th><td>A design specification (<code>AP</code>, <code>RA</code>, <code>SD</code>) at a version and digest</td><td>A system inside an authorisation boundary, described by its security plan</td><td class="o">system-security-plan</td></tr>
+          <tr><th>Criteria set</th><td>A lens: <code>core</code>, <code>ai-solution</code>, <code>ai-agent</code></td><td>A control catalogue with a baseline: NIST SP 800-53 Moderate, the ISM, ISO/IEC 27001 Annex A</td><td class="o">catalog, profile</td></tr>
+          <tr><th>Applicability</th><td>Profiles derived from what the design contains</td><td>Categorisation and tailoring: FIPS 199 impact level, ISM classification</td><td class="o">profile</td></tr>
+          <tr><th>Criterion</th><td>A lens criterion, depth 1 or 2</td><td>A control's assessment objective, depth 3 or 4</td><td class="o">control, objective part</td></tr>
+          <tr><th>Requirement</th><td>A guardrail, a principle, a quality scenario</td><td>The control's requirement statement</td><td class="o">control statement</td></tr>
+          <tr><th>Method</th><td>Tool, reviewer, workshop</td><td>Examine, interview, test</td><td class="o">activity methods</td></tr>
+          <tr><th>Observation</th><td>Proposed: what was read, in which part of the design</td><td>Evidence: configurations, scans, logs, interviews</td><td class="o">observation</td></tr>
+          <tr><th>Finding</th><td>Met, partly met, not met, not applicable, not assessed</td><td>Satisfied or not satisfied</td><td class="o">finding</td></tr>
+          <tr><th>Risk</th><td>A design risk, grouped into risk themes</td><td>A risk with likelihood and impact, before and after controls</td><td class="o">risk</td></tr>
+          <tr><th>Response</th><td>Fix the design, raise a consideration, record a decision, accept as debt, accept the risk, hand over</td><td>Remediate on a plan of action and milestones, request a deviation, accept the risk</td><td class="o">poam-item, remediation</td></tr>
+          <tr><th>Verdict</th><td>Endorsed, with conditions, not endorsed, deferred; with a conformance level</td><td>An authorisation to operate, a certificate, an auditor's opinion</td><td class="o">outside the results model</td></tr>
+          <tr><th>Accountable owner</th><td>The design's owner</td><td>The authorising official or accreditation authority</td><td class="o">party, role</td></tr>
+          <tr><th>Assessor</th><td>Independent of the design; an agent may assess</td><td>Often accredited: a 3PAO, an IRAP assessor, a certification body</td><td class="o">party</td></tr>
+          <tr><th>Reliance</th><td>Cites a security assessment as evidence</td><td>Inherits controls and leverages other authorisations; cites the design's threat model</td><td class="o">leveraged-authorization</td></tr>
+          <tr><th>Cadence</th><td>At stage gates and on change</td><td>Periodic, and continuous monitoring</td><td class="o">none</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>What generalises</h3>
+      <ul>
+        <li>The assessment, its subject version, its criteria sets and its assessors.</li>
+        <li>Criterion, observation, finding and risk, with their links.</li>
+        <li>Responses and the owner who accepts residual risk.</li>
+        <li>Reliance: one assessment citing another's results.</li>
+        <li>The result scale, taking the architecture scale as the superset.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What stays specific</h3>
+      <ul>
+        <li>How the subject is described: a design specification, or a security plan.</li>
+        <li>Where criteria come from, and their content.</li>
+        <li>Which methods and evidence count.</li>
+        <li>Who may assess, and whether accreditation is required.</li>
+        <li>What a verdict permits: building a design, or operating a system.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>How to build it</h3>
+      <ol>
+        <li>Split the assessment schema into a core and an architecture profile.</li>
+        <li>Add an assurance depth and <code>tests</code> to every criterion.</li>
+        <li>Add observations, reliance and OSCAL's risk status values to the core.</li>
+        <li>Map the core to OSCAL for the security profile, rather than writing a second security schema.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+</body></html>
