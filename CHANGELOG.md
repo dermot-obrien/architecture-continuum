@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 From 0.4.1 on, releases are made by Release Please from the pull requests merged to `main`: a pull request's title is its line here, and the release pull request adds the next section, bumps the version and, when merged, tags `vX.Y.Z` and publishes the GitHub Release. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#releases). Do not add lines here by hand. The skills' own versions, in each `SKILL.md` and in `bundle.json`, stay separate and are bumped in the pull request that changes the skill.
 
+## [0.13.2](https://github.com/dermot-obrien/architecture-continuum/compare/v0.13.1...v0.13.2) (2026-11-15)
+
+
+### Documentation
+
+* **assessment:** add the model map, the shared core with cybersecurity, and the OSCAL map to the assessment visuals ([#98](https://github.com/dermot-obrien/architecture-continuum/issues/98)) ([9ba2e1b](https://github.com/dermot-obrien/architecture-continuum/commit/9ba2e1b8ac80adfd61ee231b63c85a936b6ea19f))
+
 ## [0.13.1](https://github.com/dermot-obrien/architecture-continuum/compare/v0.13.0...v0.13.1) (2026-10-28)
 
 

@@ -82,7 +82,7 @@ Name a skill after the command to install only that one. For a team workspace, c
 
 <!-- x-release-please-start-version -->
 ```json
-{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.13.1" } ] }
+{ "sources": [ { "bundle": "https://github.com/dermot-obrien/architecture-continuum.git", "ref": "v0.13.2" } ] }
 ```
 <!-- x-release-please-end -->
 
